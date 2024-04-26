@@ -12,7 +12,7 @@ all: build deploy
 
 build:
 	@echo "Building the Go application..."
-	GOOS=$(GOOS) GOARCH=$(GOARCH) go build -o bin/$(APP_NAME) ./cmd
+	GOOS=$(GOOS) GOARCH=$(GOARCH) go build -o bin/$(APP_NAME) .
 
 deploy:
 	@echo "Deploying the application to the server..."

@@ -3,7 +3,7 @@ package main
 import (
 	"github.com/labstack/echo/v4"
 
-	"orcamento-auto/handlers"
+	"github.com/gustavomtborges/orcamento-auto/handlers"
 )
 
 func main() {
