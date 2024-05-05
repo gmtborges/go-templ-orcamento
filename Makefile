@@ -1,24 +1,21 @@
 # Makefile for building and deploying a Go application to a Debian amd64 server.
 
-APP_NAME := myapp
-SERVER := gcloud-vm
-DEST_PATH := /home/gcloud
 GOARCH := amd64
 GOOS := linux
 
-.PHONY: all build deploy
+.PHONY: all build css-minify
 
-all: build deploy
+all: css-minify build
 
 build:
-	@echo "Building the Go application..."
-	GOOS=$(GOOS) GOARCH=$(GOARCH) go build -o bin/$(APP_NAME) .
+	GOOS=$(GOOS) GOARCH=$(GOARCH) go build -o bin/app .
 
-deploy:
-	@echo "Deploying the application to the server..."
-	scp $(APP_NAME) $(SERVER):$(DEST_PATH)
+css-minify:
+	tailwindcss -i ./assets/input.css -o ./public/output.css --minify
+
+css:
+	tailwindcss --watch -i ./assets/input.css -o ./public/output.css
 
 clean:
-	@echo "Cleaning up..."
-	rm -f $(APP_NAME)
+	rm -f bin/$(APP_NAME)
 

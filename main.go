@@ -8,6 +8,7 @@ import (
 
 func main() {
 	e := echo.New()
+	e.Any("/*", echo.WrapHandler(public()))
 	e.GET("/", handlers.HandleGetIndex)
 	e.GET("/politica-privacidade", handlers.HandleGetPolicy)
 

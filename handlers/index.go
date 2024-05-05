@@ -3,7 +3,7 @@ package handlers
 import (
 	"github.com/labstack/echo/v4"
 
-	"orcamento-auto/views"
+	"github.com/gustavomtborges/orcamento-auto/views"
 )
 
 func HandleGetIndex(c echo.Context) error {

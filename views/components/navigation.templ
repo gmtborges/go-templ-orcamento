@@ -1,0 +1,35 @@
+package components
+
+templ Navigation() {
+	<header class="w-full border-b shadow">
+		<nav class="flex py-2 px-2 justify-between items-center max-w-6xl mx-auto">
+			<div class="flex items-center space-x-2">
+				<img src="/public/logo.svg" width="48" height="48" alt="Orçamento Auto logo"/>
+				<div class="font-bold text-xl uppercase">Orçamento Auto</div>
+			</div>
+			<ul class="flex space-x-8">
+				<li class="font-medium">
+					<a href="#" class="font-medium hover:text-blue-700">Vantagens</a>
+				</li>
+				<li class="font-medium">
+					<a href="#" class="font-medium hover:text-blue-700">Como funciona</a>
+				</li>
+			</ul>
+			<div>
+				<button
+					type="button"
+					class="inline-flex items-center justify-center px-4 py-2 text-sm font-medium tracking-wide text-gray-800 transition-colors duration-100 rounded-md hover:bg-neutral-100 mr-2"
+				>
+					Seja
+					um parceiro
+				</button>
+				<button
+					type="button"
+					class="inline-flex items-center justify-center px-4 py-2 text-sm font-medium tracking-wide text-blue-600 transition-colors duration-100 bg-white border-2 border-blue-600 rounded-md hover:text-white hover:bg-blue-600"
+				>
+					Entrar
+				</button>
+			</div>
+		</nav>
+	</header>
+}
