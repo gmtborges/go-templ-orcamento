@@ -24,3 +24,5 @@ bin
 tmp
 *.db
 .DStore
+.txt
+node_modules/

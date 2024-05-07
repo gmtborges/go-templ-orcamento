@@ -9,8 +9,9 @@ import (
 func main() {
 	e := echo.New()
 	e.Any("/*", echo.WrapHandler(public()))
-	e.GET("/", handlers.HandleGetIndex)
-	e.GET("/politica-privacidade", handlers.HandleGetPolicy)
+	e.GET("/", handlers.GetIndex)
+	e.GET("/politica-privacidade", handlers.GetPolicy)
+	e.GET("/auth/login", handlers.GetLogin)
 
 	e.Logger.Fatal(e.Start(":3000"))
 }

@@ -6,6 +6,6 @@ import (
 	"github.com/gustavomtborges/orcamento-auto/views"
 )
 
-func GetPolicy(c echo.Context) error {
-	return render(c, views.Policy())
+func GetLogin(c echo.Context) error {
+	return render(c, views.Login())
 }

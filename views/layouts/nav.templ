@@ -1,0 +1,10 @@
+package layouts
+
+import "github.com/gustavomtborges/orcamento-auto/views/components"
+
+templ Nav() {
+	@Base() {
+		@components.Header()
+		{ children... }
+	}
+}
