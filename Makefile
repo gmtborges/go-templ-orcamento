@@ -5,7 +5,7 @@ GOOS := linux
 
 .PHONY: all build css-minify templ templ-proxy
 
-all: css-minify build
+all: css-minify templ build
 
 build:
 	GOOS=$(GOOS) GOARCH=$(GOARCH) go build -o bin/app .
