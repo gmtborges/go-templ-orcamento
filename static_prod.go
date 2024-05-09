@@ -7,10 +7,9 @@ import (
 	"net/http"
 )
 
-//go:embed public
+//go:embed static
 var assets embed.FS
 
-func public() http.Handler {
-	return http.FileServer(http.FS(assets))
+func static() http.Handler {
+	return http.StripPrefix("/static/", http.FileServer(http.FS(assets)))
 }
-

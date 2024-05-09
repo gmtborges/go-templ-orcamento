@@ -11,10 +11,10 @@ build:
 	GOOS=$(GOOS) GOARCH=$(GOARCH) go build -o bin/app .
 
 css-minify:
-	npx tailwindcss -i ./assets/input.css -o ./public/output.css --minify
+	npx tailwindcss -i ./assets/input.css -o ./static/output.css --minify
 
 css:
-	npx tailwindcss --watch -i ./assets/input.css -o ./public/output.css
+	npx tailwindcss --watch -i ./assets/input.css -o ./static/output.css
 
 templ:
 	templ generate

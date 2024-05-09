@@ -1,0 +1,7 @@
+wipe = true
+
+[sqlite3]
+dbname = "dev.db"
+
+blacklist = ["goose_db_version"]
+

@@ -8,7 +8,7 @@ import (
 	"os"
 )
 
-func public() http.Handler {
+func static() http.Handler {
 	fmt.Println("building static files for development...")
-	return http.StripPrefix("/public/", http.FileServerFS(os.DirFS("public")))
+	return http.StripPrefix("/static/", http.FileServerFS(os.DirFS("static")))
 }
