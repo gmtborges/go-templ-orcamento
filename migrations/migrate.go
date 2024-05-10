@@ -2,14 +2,14 @@ package main
 
 import (
 	"database/sql"
+	"embed"
+	"fmt"
 	"log"
 	"os"
 
 	"github.com/joho/godotenv"
-	"github.com/labstack/echo/v4"
 	_ "github.com/lib/pq"
-
-	"github.com/gustavomtborges/orcamento-auto/handlers"
+	"github.com/pressly/goose/v3"
 )
 
 func main() {
@@ -18,15 +18,23 @@ func main() {
 		log.Fatalf("Error loading .env file: %v", err)
 	}
 	connStr := os.Getenv("DATABASE_URL")
-	dbconn(connStr)
+	db := dbconn(connStr)
+	migrations(db)
 
-	e := echo.New()
-	e.GET("/static/*", echo.WrapHandler(static()))
-	e.GET("/", handlers.GetIndex)
-	e.GET("/politica-privacidade", handlers.GetPolicy)
-	e.GET("/login", handlers.GetLogin)
+}
 
-	e.Logger.Fatal(e.Start(":3000"))
+//go:embed *.sql
+var embedMigrations embed.FS
+
+func migrations(db *sql.DB) {
+	goose.SetBaseFS(embedMigrations)
+	if err := goose.SetDialect("postgres"); err != nil {
+		panic(err)
+	}
+	fmt.Println("running migrations...")
+	if err := goose.Up(db, "migrations"); err != nil {
+		panic(err)
+	}
 }
 
 func dbconn(connStr string) *sql.DB {

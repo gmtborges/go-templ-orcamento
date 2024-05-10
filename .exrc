@@ -1,3 +1,3 @@
 let g:dbs = [
-      \  {'name': 'dev', 'url': 'sqlite:./dev.db'}
+      \  {'name': 'dev', 'url': 'postgres://postgres:postgres@localhost:5432/orcamento_auto_dev'}
       \  ]

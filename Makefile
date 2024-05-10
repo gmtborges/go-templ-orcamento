@@ -3,7 +3,7 @@
 GOARCH := amd64
 GOOS := linux
 
-.PHONY: all build css-minify templ templ-proxy
+.PHONY: all build css-minify templ templ-proxy migrate
 
 all: css-minify templ build
 
@@ -22,6 +22,9 @@ templ:
 templ-proxy:
 	templ generate --watch --proxy=http://127.0.0.1:3000
 
+migrate:
+	go run ./migrations
+	
 clean:
 	rm -f bin/$(APP_NAME)
 

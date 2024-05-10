@@ -24,9 +24,9 @@ import (
 
 // AutoOffer is an object representing the database table.
 type AutoOffer struct {
-	OfferID      null.Int64  `boil:"offer_id" json:"offer_id,omitempty" toml:"offer_id" yaml:"offer_id,omitempty"`
-	BiddingID    int64       `boil:"bidding_id" json:"bidding_id" toml:"bidding_id" yaml:"bidding_id"`
-	StoreID      int64       `boil:"store_id" json:"store_id" toml:"store_id" yaml:"store_id"`
+	ID           int         `boil:"id" json:"id" toml:"id" yaml:"id"`
+	BiddingID    int         `boil:"bidding_id" json:"bidding_id" toml:"bidding_id" yaml:"bidding_id"`
+	StoreID      int         `boil:"store_id" json:"store_id" toml:"store_id" yaml:"store_id"`
 	OfferDetails null.String `boil:"offer_details" json:"offer_details,omitempty" toml:"offer_details" yaml:"offer_details,omitempty"`
 	OfferDate    null.Time   `boil:"offer_date" json:"offer_date,omitempty" toml:"offer_date" yaml:"offer_date,omitempty"`
 	CreatedAt    null.Time   `boil:"created_at" json:"created_at,omitempty" toml:"created_at" yaml:"created_at,omitempty"`
@@ -37,7 +37,7 @@ type AutoOffer struct {
 }
 
 var AutoOfferColumns = struct {
-	OfferID      string
+	ID           string
 	BiddingID    string
 	StoreID      string
 	OfferDetails string
@@ -45,7 +45,7 @@ var AutoOfferColumns = struct {
 	CreatedAt    string
 	UpdatedAt    string
 }{
-	OfferID:      "offer_id",
+	ID:           "id",
 	BiddingID:    "bidding_id",
 	StoreID:      "store_id",
 	OfferDetails: "offer_details",
@@ -55,7 +55,7 @@ var AutoOfferColumns = struct {
 }
 
 var AutoOfferTableColumns = struct {
-	OfferID      string
+	ID           string
 	BiddingID    string
 	StoreID      string
 	OfferDetails string
@@ -63,7 +63,7 @@ var AutoOfferTableColumns = struct {
 	CreatedAt    string
 	UpdatedAt    string
 }{
-	OfferID:      "auto_offers.offer_id",
+	ID:           "auto_offers.id",
 	BiddingID:    "auto_offers.bidding_id",
 	StoreID:      "auto_offers.store_id",
 	OfferDetails: "auto_offers.offer_details",
@@ -74,60 +74,22 @@ var AutoOfferTableColumns = struct {
 
 // Generated where
 
-type whereHelpernull_Int64 struct{ field string }
+type whereHelperint struct{ field string }
 
-func (w whereHelpernull_Int64) EQ(x null.Int64) qm.QueryMod {
-	return qmhelper.WhereNullEQ(w.field, false, x)
-}
-func (w whereHelpernull_Int64) NEQ(x null.Int64) qm.QueryMod {
-	return qmhelper.WhereNullEQ(w.field, true, x)
-}
-func (w whereHelpernull_Int64) LT(x null.Int64) qm.QueryMod {
-	return qmhelper.Where(w.field, qmhelper.LT, x)
-}
-func (w whereHelpernull_Int64) LTE(x null.Int64) qm.QueryMod {
-	return qmhelper.Where(w.field, qmhelper.LTE, x)
-}
-func (w whereHelpernull_Int64) GT(x null.Int64) qm.QueryMod {
-	return qmhelper.Where(w.field, qmhelper.GT, x)
-}
-func (w whereHelpernull_Int64) GTE(x null.Int64) qm.QueryMod {
-	return qmhelper.Where(w.field, qmhelper.GTE, x)
-}
-func (w whereHelpernull_Int64) IN(slice []int64) qm.QueryMod {
+func (w whereHelperint) EQ(x int) qm.QueryMod  { return qmhelper.Where(w.field, qmhelper.EQ, x) }
+func (w whereHelperint) NEQ(x int) qm.QueryMod { return qmhelper.Where(w.field, qmhelper.NEQ, x) }
+func (w whereHelperint) LT(x int) qm.QueryMod  { return qmhelper.Where(w.field, qmhelper.LT, x) }
+func (w whereHelperint) LTE(x int) qm.QueryMod { return qmhelper.Where(w.field, qmhelper.LTE, x) }
+func (w whereHelperint) GT(x int) qm.QueryMod  { return qmhelper.Where(w.field, qmhelper.GT, x) }
+func (w whereHelperint) GTE(x int) qm.QueryMod { return qmhelper.Where(w.field, qmhelper.GTE, x) }
+func (w whereHelperint) IN(slice []int) qm.QueryMod {
 	values := make([]interface{}, 0, len(slice))
 	for _, value := range slice {
 		values = append(values, value)
 	}
 	return qm.WhereIn(fmt.Sprintf("%s IN ?", w.field), values...)
 }
-func (w whereHelpernull_Int64) NIN(slice []int64) qm.QueryMod {
-	values := make([]interface{}, 0, len(slice))
-	for _, value := range slice {
-		values = append(values, value)
-	}
-	return qm.WhereNotIn(fmt.Sprintf("%s NOT IN ?", w.field), values...)
-}
-
-func (w whereHelpernull_Int64) IsNull() qm.QueryMod    { return qmhelper.WhereIsNull(w.field) }
-func (w whereHelpernull_Int64) IsNotNull() qm.QueryMod { return qmhelper.WhereIsNotNull(w.field) }
-
-type whereHelperint64 struct{ field string }
-
-func (w whereHelperint64) EQ(x int64) qm.QueryMod  { return qmhelper.Where(w.field, qmhelper.EQ, x) }
-func (w whereHelperint64) NEQ(x int64) qm.QueryMod { return qmhelper.Where(w.field, qmhelper.NEQ, x) }
-func (w whereHelperint64) LT(x int64) qm.QueryMod  { return qmhelper.Where(w.field, qmhelper.LT, x) }
-func (w whereHelperint64) LTE(x int64) qm.QueryMod { return qmhelper.Where(w.field, qmhelper.LTE, x) }
-func (w whereHelperint64) GT(x int64) qm.QueryMod  { return qmhelper.Where(w.field, qmhelper.GT, x) }
-func (w whereHelperint64) GTE(x int64) qm.QueryMod { return qmhelper.Where(w.field, qmhelper.GTE, x) }
-func (w whereHelperint64) IN(slice []int64) qm.QueryMod {
-	values := make([]interface{}, 0, len(slice))
-	for _, value := range slice {
-		values = append(values, value)
-	}
-	return qm.WhereIn(fmt.Sprintf("%s IN ?", w.field), values...)
-}
-func (w whereHelperint64) NIN(slice []int64) qm.QueryMod {
+func (w whereHelperint) NIN(slice []int) qm.QueryMod {
 	values := make([]interface{}, 0, len(slice))
 	for _, value := range slice {
 		values = append(values, value)
@@ -160,6 +122,12 @@ func (w whereHelpernull_String) LIKE(x null.String) qm.QueryMod {
 }
 func (w whereHelpernull_String) NLIKE(x null.String) qm.QueryMod {
 	return qm.Where(w.field+" NOT LIKE ?", x)
+}
+func (w whereHelpernull_String) ILIKE(x null.String) qm.QueryMod {
+	return qm.Where(w.field+" ILIKE ?", x)
+}
+func (w whereHelpernull_String) NILIKE(x null.String) qm.QueryMod {
+	return qm.Where(w.field+" NOT ILIKE ?", x)
 }
 func (w whereHelpernull_String) IN(slice []string) qm.QueryMod {
 	values := make([]interface{}, 0, len(slice))
@@ -204,17 +172,17 @@ func (w whereHelpernull_Time) IsNull() qm.QueryMod    { return qmhelper.WhereIsN
 func (w whereHelpernull_Time) IsNotNull() qm.QueryMod { return qmhelper.WhereIsNotNull(w.field) }
 
 var AutoOfferWhere = struct {
-	OfferID      whereHelpernull_Int64
-	BiddingID    whereHelperint64
-	StoreID      whereHelperint64
+	ID           whereHelperint
+	BiddingID    whereHelperint
+	StoreID      whereHelperint
 	OfferDetails whereHelpernull_String
 	OfferDate    whereHelpernull_Time
 	CreatedAt    whereHelpernull_Time
 	UpdatedAt    whereHelpernull_Time
 }{
-	OfferID:      whereHelpernull_Int64{field: "\"auto_offers\".\"offer_id\""},
-	BiddingID:    whereHelperint64{field: "\"auto_offers\".\"bidding_id\""},
-	StoreID:      whereHelperint64{field: "\"auto_offers\".\"store_id\""},
+	ID:           whereHelperint{field: "\"auto_offers\".\"id\""},
+	BiddingID:    whereHelperint{field: "\"auto_offers\".\"bidding_id\""},
+	StoreID:      whereHelperint{field: "\"auto_offers\".\"store_id\""},
 	OfferDetails: whereHelpernull_String{field: "\"auto_offers\".\"offer_details\""},
 	OfferDate:    whereHelpernull_Time{field: "\"auto_offers\".\"offer_date\""},
 	CreatedAt:    whereHelpernull_Time{field: "\"auto_offers\".\"created_at\""},
@@ -223,29 +191,22 @@ var AutoOfferWhere = struct {
 
 // AutoOfferRels is where relationship names are stored.
 var AutoOfferRels = struct {
-	Store   string
 	Bidding string
+	Store   string
 }{
-	Store:   "Store",
 	Bidding: "Bidding",
+	Store:   "Store",
 }
 
 // autoOfferR is where relationships are stored.
 type autoOfferR struct {
-	Store   *AutoStore `boil:"Store" json:"Store" toml:"Store" yaml:"Store"`
 	Bidding *Bidding   `boil:"Bidding" json:"Bidding" toml:"Bidding" yaml:"Bidding"`
+	Store   *AutoStore `boil:"Store" json:"Store" toml:"Store" yaml:"Store"`
 }
 
 // NewStruct creates a new relationship struct
 func (*autoOfferR) NewStruct() *autoOfferR {
 	return &autoOfferR{}
-}
-
-func (r *autoOfferR) GetStore() *AutoStore {
-	if r == nil {
-		return nil
-	}
-	return r.Store
 }
 
 func (r *autoOfferR) GetBidding() *Bidding {
@@ -255,15 +216,22 @@ func (r *autoOfferR) GetBidding() *Bidding {
 	return r.Bidding
 }
 
+func (r *autoOfferR) GetStore() *AutoStore {
+	if r == nil {
+		return nil
+	}
+	return r.Store
+}
+
 // autoOfferL is where Load methods for each relationship are stored.
 type autoOfferL struct{}
 
 var (
-	autoOfferAllColumns            = []string{"offer_id", "bidding_id", "store_id", "offer_details", "offer_date", "created_at", "updated_at"}
+	autoOfferAllColumns            = []string{"id", "bidding_id", "store_id", "offer_details", "offer_date", "created_at", "updated_at"}
 	autoOfferColumnsWithoutDefault = []string{"bidding_id", "store_id"}
-	autoOfferColumnsWithDefault    = []string{"offer_id", "offer_details", "offer_date", "created_at", "updated_at"}
-	autoOfferPrimaryKeyColumns     = []string{"offer_id"}
-	autoOfferGeneratedColumns      = []string{"offer_id"}
+	autoOfferColumnsWithDefault    = []string{"id", "offer_details", "offer_date", "created_at", "updated_at"}
+	autoOfferPrimaryKeyColumns     = []string{"id"}
+	autoOfferGeneratedColumns      = []string{}
 )
 
 type (
@@ -571,21 +539,10 @@ func (q autoOfferQuery) Exists(ctx context.Context, exec boil.ContextExecutor) (
 	return count > 0, nil
 }
 
-// Store pointed to by the foreign key.
-func (o *AutoOffer) Store(mods ...qm.QueryMod) autoStoreQuery {
-	queryMods := []qm.QueryMod{
-		qm.Where("\"store_id\" = ?", o.StoreID),
-	}
-
-	queryMods = append(queryMods, mods...)
-
-	return AutoStores(queryMods...)
-}
-
 // Bidding pointed to by the foreign key.
 func (o *AutoOffer) Bidding(mods ...qm.QueryMod) biddingQuery {
 	queryMods := []qm.QueryMod{
-		qm.Where("\"bidding_id\" = ?", o.BiddingID),
+		qm.Where("\"id\" = ?", o.BiddingID),
 	}
 
 	queryMods = append(queryMods, mods...)
@@ -593,128 +550,15 @@ func (o *AutoOffer) Bidding(mods ...qm.QueryMod) biddingQuery {
 	return Biddings(queryMods...)
 }
 
-// LoadStore allows an eager lookup of values, cached into the
-// loaded structs of the objects. This is for an N-1 relationship.
-func (autoOfferL) LoadStore(ctx context.Context, e boil.ContextExecutor, singular bool, maybeAutoOffer interface{}, mods queries.Applicator) error {
-	var slice []*AutoOffer
-	var object *AutoOffer
-
-	if singular {
-		var ok bool
-		object, ok = maybeAutoOffer.(*AutoOffer)
-		if !ok {
-			object = new(AutoOffer)
-			ok = queries.SetFromEmbeddedStruct(&object, &maybeAutoOffer)
-			if !ok {
-				return errors.New(fmt.Sprintf("failed to set %T from embedded struct %T", object, maybeAutoOffer))
-			}
-		}
-	} else {
-		s, ok := maybeAutoOffer.(*[]*AutoOffer)
-		if ok {
-			slice = *s
-		} else {
-			ok = queries.SetFromEmbeddedStruct(&slice, maybeAutoOffer)
-			if !ok {
-				return errors.New(fmt.Sprintf("failed to set %T from embedded struct %T", slice, maybeAutoOffer))
-			}
-		}
+// Store pointed to by the foreign key.
+func (o *AutoOffer) Store(mods ...qm.QueryMod) autoStoreQuery {
+	queryMods := []qm.QueryMod{
+		qm.Where("\"id\" = ?", o.StoreID),
 	}
 
-	args := make(map[interface{}]struct{})
-	if singular {
-		if object.R == nil {
-			object.R = &autoOfferR{}
-		}
-		if !queries.IsNil(object.StoreID) {
-			args[object.StoreID] = struct{}{}
-		}
+	queryMods = append(queryMods, mods...)
 
-	} else {
-		for _, obj := range slice {
-			if obj.R == nil {
-				obj.R = &autoOfferR{}
-			}
-
-			if !queries.IsNil(obj.StoreID) {
-				args[obj.StoreID] = struct{}{}
-			}
-
-		}
-	}
-
-	if len(args) == 0 {
-		return nil
-	}
-
-	argsSlice := make([]interface{}, len(args))
-	i := 0
-	for arg := range args {
-		argsSlice[i] = arg
-		i++
-	}
-
-	query := NewQuery(
-		qm.From(`auto_stores`),
-		qm.WhereIn(`auto_stores.store_id in ?`, argsSlice...),
-	)
-	if mods != nil {
-		mods.Apply(query)
-	}
-
-	results, err := query.QueryContext(ctx, e)
-	if err != nil {
-		return errors.Wrap(err, "failed to eager load AutoStore")
-	}
-
-	var resultSlice []*AutoStore
-	if err = queries.Bind(results, &resultSlice); err != nil {
-		return errors.Wrap(err, "failed to bind eager loaded slice AutoStore")
-	}
-
-	if err = results.Close(); err != nil {
-		return errors.Wrap(err, "failed to close results of eager load for auto_stores")
-	}
-	if err = results.Err(); err != nil {
-		return errors.Wrap(err, "error occurred during iteration of eager loaded relations for auto_stores")
-	}
-
-	if len(autoStoreAfterSelectHooks) != 0 {
-		for _, obj := range resultSlice {
-			if err := obj.doAfterSelectHooks(ctx, e); err != nil {
-				return err
-			}
-		}
-	}
-
-	if len(resultSlice) == 0 {
-		return nil
-	}
-
-	if singular {
-		foreign := resultSlice[0]
-		object.R.Store = foreign
-		if foreign.R == nil {
-			foreign.R = &autoStoreR{}
-		}
-		foreign.R.StoreAutoOffers = append(foreign.R.StoreAutoOffers, object)
-		return nil
-	}
-
-	for _, local := range slice {
-		for _, foreign := range resultSlice {
-			if queries.Equal(local.StoreID, foreign.StoreID) {
-				local.R.Store = foreign
-				if foreign.R == nil {
-					foreign.R = &autoStoreR{}
-				}
-				foreign.R.StoreAutoOffers = append(foreign.R.StoreAutoOffers, local)
-				break
-			}
-		}
-	}
-
-	return nil
+	return AutoStores(queryMods...)
 }
 
 // LoadBidding allows an eager lookup of values, cached into the
@@ -750,9 +594,7 @@ func (autoOfferL) LoadBidding(ctx context.Context, e boil.ContextExecutor, singu
 		if object.R == nil {
 			object.R = &autoOfferR{}
 		}
-		if !queries.IsNil(object.BiddingID) {
-			args[object.BiddingID] = struct{}{}
-		}
+		args[object.BiddingID] = struct{}{}
 
 	} else {
 		for _, obj := range slice {
@@ -760,9 +602,7 @@ func (autoOfferL) LoadBidding(ctx context.Context, e boil.ContextExecutor, singu
 				obj.R = &autoOfferR{}
 			}
 
-			if !queries.IsNil(obj.BiddingID) {
-				args[obj.BiddingID] = struct{}{}
-			}
+			args[obj.BiddingID] = struct{}{}
 
 		}
 	}
@@ -780,7 +620,7 @@ func (autoOfferL) LoadBidding(ctx context.Context, e boil.ContextExecutor, singu
 
 	query := NewQuery(
 		qm.From(`biddings`),
-		qm.WhereIn(`biddings.bidding_id in ?`, argsSlice...),
+		qm.WhereIn(`biddings.id in ?`, argsSlice...),
 	)
 	if mods != nil {
 		mods.Apply(query)
@@ -827,7 +667,7 @@ func (autoOfferL) LoadBidding(ctx context.Context, e boil.ContextExecutor, singu
 
 	for _, local := range slice {
 		for _, foreign := range resultSlice {
-			if queries.Equal(local.BiddingID, foreign.BiddingID) {
+			if local.BiddingID == foreign.ID {
 				local.R.Bidding = foreign
 				if foreign.R == nil {
 					foreign.R = &biddingR{}
@@ -841,48 +681,121 @@ func (autoOfferL) LoadBidding(ctx context.Context, e boil.ContextExecutor, singu
 	return nil
 }
 
-// SetStore of the autoOffer to the related item.
-// Sets o.R.Store to related.
-// Adds o to related.R.StoreAutoOffers.
-func (o *AutoOffer) SetStore(ctx context.Context, exec boil.ContextExecutor, insert bool, related *AutoStore) error {
-	var err error
-	if insert {
-		if err = related.Insert(ctx, exec, boil.Infer()); err != nil {
-			return errors.Wrap(err, "failed to insert into foreign table")
+// LoadStore allows an eager lookup of values, cached into the
+// loaded structs of the objects. This is for an N-1 relationship.
+func (autoOfferL) LoadStore(ctx context.Context, e boil.ContextExecutor, singular bool, maybeAutoOffer interface{}, mods queries.Applicator) error {
+	var slice []*AutoOffer
+	var object *AutoOffer
+
+	if singular {
+		var ok bool
+		object, ok = maybeAutoOffer.(*AutoOffer)
+		if !ok {
+			object = new(AutoOffer)
+			ok = queries.SetFromEmbeddedStruct(&object, &maybeAutoOffer)
+			if !ok {
+				return errors.New(fmt.Sprintf("failed to set %T from embedded struct %T", object, maybeAutoOffer))
+			}
+		}
+	} else {
+		s, ok := maybeAutoOffer.(*[]*AutoOffer)
+		if ok {
+			slice = *s
+		} else {
+			ok = queries.SetFromEmbeddedStruct(&slice, maybeAutoOffer)
+			if !ok {
+				return errors.New(fmt.Sprintf("failed to set %T from embedded struct %T", slice, maybeAutoOffer))
+			}
 		}
 	}
 
-	updateQuery := fmt.Sprintf(
-		"UPDATE \"auto_offers\" SET %s WHERE %s",
-		strmangle.SetParamNames("\"", "\"", 0, []string{"store_id"}),
-		strmangle.WhereClause("\"", "\"", 0, autoOfferPrimaryKeyColumns),
+	args := make(map[interface{}]struct{})
+	if singular {
+		if object.R == nil {
+			object.R = &autoOfferR{}
+		}
+		args[object.StoreID] = struct{}{}
+
+	} else {
+		for _, obj := range slice {
+			if obj.R == nil {
+				obj.R = &autoOfferR{}
+			}
+
+			args[obj.StoreID] = struct{}{}
+
+		}
+	}
+
+	if len(args) == 0 {
+		return nil
+	}
+
+	argsSlice := make([]interface{}, len(args))
+	i := 0
+	for arg := range args {
+		argsSlice[i] = arg
+		i++
+	}
+
+	query := NewQuery(
+		qm.From(`auto_stores`),
+		qm.WhereIn(`auto_stores.id in ?`, argsSlice...),
 	)
-	values := []interface{}{related.StoreID, o.OfferID}
-
-	if boil.IsDebug(ctx) {
-		writer := boil.DebugWriterFrom(ctx)
-		fmt.Fprintln(writer, updateQuery)
-		fmt.Fprintln(writer, values)
-	}
-	if _, err = exec.ExecContext(ctx, updateQuery, values...); err != nil {
-		return errors.Wrap(err, "failed to update local table")
+	if mods != nil {
+		mods.Apply(query)
 	}
 
-	queries.Assign(&o.StoreID, related.StoreID)
-	if o.R == nil {
-		o.R = &autoOfferR{
-			Store: related,
+	results, err := query.QueryContext(ctx, e)
+	if err != nil {
+		return errors.Wrap(err, "failed to eager load AutoStore")
+	}
+
+	var resultSlice []*AutoStore
+	if err = queries.Bind(results, &resultSlice); err != nil {
+		return errors.Wrap(err, "failed to bind eager loaded slice AutoStore")
+	}
+
+	if err = results.Close(); err != nil {
+		return errors.Wrap(err, "failed to close results of eager load for auto_stores")
+	}
+	if err = results.Err(); err != nil {
+		return errors.Wrap(err, "error occurred during iteration of eager loaded relations for auto_stores")
+	}
+
+	if len(autoStoreAfterSelectHooks) != 0 {
+		for _, obj := range resultSlice {
+			if err := obj.doAfterSelectHooks(ctx, e); err != nil {
+				return err
+			}
 		}
-	} else {
-		o.R.Store = related
 	}
 
-	if related.R == nil {
-		related.R = &autoStoreR{
-			StoreAutoOffers: AutoOfferSlice{o},
+	if len(resultSlice) == 0 {
+		return nil
+	}
+
+	if singular {
+		foreign := resultSlice[0]
+		object.R.Store = foreign
+		if foreign.R == nil {
+			foreign.R = &autoStoreR{}
 		}
-	} else {
-		related.R.StoreAutoOffers = append(related.R.StoreAutoOffers, o)
+		foreign.R.StoreAutoOffers = append(foreign.R.StoreAutoOffers, object)
+		return nil
+	}
+
+	for _, local := range slice {
+		for _, foreign := range resultSlice {
+			if local.StoreID == foreign.ID {
+				local.R.Store = foreign
+				if foreign.R == nil {
+					foreign.R = &autoStoreR{}
+				}
+				foreign.R.StoreAutoOffers = append(foreign.R.StoreAutoOffers, local)
+				break
+			}
+		}
 	}
 
 	return nil
@@ -901,10 +814,10 @@ func (o *AutoOffer) SetBidding(ctx context.Context, exec boil.ContextExecutor, i
 
 	updateQuery := fmt.Sprintf(
 		"UPDATE \"auto_offers\" SET %s WHERE %s",
-		strmangle.SetParamNames("\"", "\"", 0, []string{"bidding_id"}),
-		strmangle.WhereClause("\"", "\"", 0, autoOfferPrimaryKeyColumns),
+		strmangle.SetParamNames("\"", "\"", 1, []string{"bidding_id"}),
+		strmangle.WhereClause("\"", "\"", 2, autoOfferPrimaryKeyColumns),
 	)
-	values := []interface{}{related.BiddingID, o.OfferID}
+	values := []interface{}{related.ID, o.ID}
 
 	if boil.IsDebug(ctx) {
 		writer := boil.DebugWriterFrom(ctx)
@@ -915,7 +828,7 @@ func (o *AutoOffer) SetBidding(ctx context.Context, exec boil.ContextExecutor, i
 		return errors.Wrap(err, "failed to update local table")
 	}
 
-	queries.Assign(&o.BiddingID, related.BiddingID)
+	o.BiddingID = related.ID
 	if o.R == nil {
 		o.R = &autoOfferR{
 			Bidding: related,
@@ -935,6 +848,53 @@ func (o *AutoOffer) SetBidding(ctx context.Context, exec boil.ContextExecutor, i
 	return nil
 }
 
+// SetStore of the autoOffer to the related item.
+// Sets o.R.Store to related.
+// Adds o to related.R.StoreAutoOffers.
+func (o *AutoOffer) SetStore(ctx context.Context, exec boil.ContextExecutor, insert bool, related *AutoStore) error {
+	var err error
+	if insert {
+		if err = related.Insert(ctx, exec, boil.Infer()); err != nil {
+			return errors.Wrap(err, "failed to insert into foreign table")
+		}
+	}
+
+	updateQuery := fmt.Sprintf(
+		"UPDATE \"auto_offers\" SET %s WHERE %s",
+		strmangle.SetParamNames("\"", "\"", 1, []string{"store_id"}),
+		strmangle.WhereClause("\"", "\"", 2, autoOfferPrimaryKeyColumns),
+	)
+	values := []interface{}{related.ID, o.ID}
+
+	if boil.IsDebug(ctx) {
+		writer := boil.DebugWriterFrom(ctx)
+		fmt.Fprintln(writer, updateQuery)
+		fmt.Fprintln(writer, values)
+	}
+	if _, err = exec.ExecContext(ctx, updateQuery, values...); err != nil {
+		return errors.Wrap(err, "failed to update local table")
+	}
+
+	o.StoreID = related.ID
+	if o.R == nil {
+		o.R = &autoOfferR{
+			Store: related,
+		}
+	} else {
+		o.R.Store = related
+	}
+
+	if related.R == nil {
+		related.R = &autoStoreR{
+			StoreAutoOffers: AutoOfferSlice{o},
+		}
+	} else {
+		related.R.StoreAutoOffers = append(related.R.StoreAutoOffers, o)
+	}
+
+	return nil
+}
+
 // AutoOffers retrieves all the records using an executor.
 func AutoOffers(mods ...qm.QueryMod) autoOfferQuery {
 	mods = append(mods, qm.From("\"auto_offers\""))
@@ -948,7 +908,7 @@ func AutoOffers(mods ...qm.QueryMod) autoOfferQuery {
 
 // FindAutoOffer retrieves a single record by ID with an executor.
 // If selectCols is empty Find will return all columns.
-func FindAutoOffer(ctx context.Context, exec boil.ContextExecutor, offerID null.Int64, selectCols ...string) (*AutoOffer, error) {
+func FindAutoOffer(ctx context.Context, exec boil.ContextExecutor, iD int, selectCols ...string) (*AutoOffer, error) {
 	autoOfferObj := &AutoOffer{}
 
 	sel := "*"
@@ -956,10 +916,10 @@ func FindAutoOffer(ctx context.Context, exec boil.ContextExecutor, offerID null.
 		sel = strings.Join(strmangle.IdentQuoteSlice(dialect.LQ, dialect.RQ, selectCols), ",")
 	}
 	query := fmt.Sprintf(
-		"select %s from \"auto_offers\" where \"offer_id\"=?", sel,
+		"select %s from \"auto_offers\" where \"id\"=$1", sel,
 	)
 
-	q := queries.Raw(query, offerID)
+	q := queries.Raw(query, iD)
 
 	err := q.Bind(ctx, exec, autoOfferObj)
 	if err != nil {
@@ -1013,7 +973,6 @@ func (o *AutoOffer) Insert(ctx context.Context, exec boil.ContextExecutor, colum
 			autoOfferColumnsWithoutDefault,
 			nzDefaults,
 		)
-		wl = strmangle.SetComplement(wl, autoOfferGeneratedColumns)
 
 		cache.valueMapping, err = queries.BindMapping(autoOfferType, autoOfferMapping, wl)
 		if err != nil {
@@ -1090,7 +1049,6 @@ func (o *AutoOffer) Update(ctx context.Context, exec boil.ContextExecutor, colum
 			autoOfferAllColumns,
 			autoOfferPrimaryKeyColumns,
 		)
-		wl = strmangle.SetComplement(wl, autoOfferGeneratedColumns)
 
 		if !columns.IsWhitelist() {
 			wl = strmangle.SetComplement(wl, []string{"created_at"})
@@ -1100,8 +1058,8 @@ func (o *AutoOffer) Update(ctx context.Context, exec boil.ContextExecutor, colum
 		}
 
 		cache.query = fmt.Sprintf("UPDATE \"auto_offers\" SET %s WHERE %s",
-			strmangle.SetParamNames("\"", "\"", 0, wl),
-			strmangle.WhereClause("\"", "\"", 0, autoOfferPrimaryKeyColumns),
+			strmangle.SetParamNames("\"", "\"", 1, wl),
+			strmangle.WhereClause("\"", "\"", len(wl)+1, autoOfferPrimaryKeyColumns),
 		)
 		cache.valueMapping, err = queries.BindMapping(autoOfferType, autoOfferMapping, append(wl, autoOfferPrimaryKeyColumns...))
 		if err != nil {
@@ -1181,8 +1139,8 @@ func (o AutoOfferSlice) UpdateAll(ctx context.Context, exec boil.ContextExecutor
 	}
 
 	sql := fmt.Sprintf("UPDATE \"auto_offers\" SET %s WHERE %s",
-		strmangle.SetParamNames("\"", "\"", 0, colNames),
-		strmangle.WhereClauseRepeated(string(dialect.LQ), string(dialect.RQ), 0, autoOfferPrimaryKeyColumns, len(o)))
+		strmangle.SetParamNames("\"", "\"", 1, colNames),
+		strmangle.WhereClauseRepeated(string(dialect.LQ), string(dialect.RQ), len(colNames)+1, autoOfferPrimaryKeyColumns, len(o)))
 
 	if boil.IsDebug(ctx) {
 		writer := boil.DebugWriterFrom(ctx)
@@ -1203,7 +1161,7 @@ func (o AutoOfferSlice) UpdateAll(ctx context.Context, exec boil.ContextExecutor
 
 // Upsert attempts an insert using an executor, and does an update or ignore on conflict.
 // See boil.Columns documentation for how to properly use updateColumns and insertColumns.
-func (o *AutoOffer) Upsert(ctx context.Context, exec boil.ContextExecutor, updateOnConflict bool, conflictColumns []string, updateColumns, insertColumns boil.Columns) error {
+func (o *AutoOffer) Upsert(ctx context.Context, exec boil.ContextExecutor, updateOnConflict bool, conflictColumns []string, updateColumns, insertColumns boil.Columns, opts ...UpsertOptionFunc) error {
 	if o == nil {
 		return errors.New("models: no auto_offers provided for upsert")
 	}
@@ -1263,6 +1221,7 @@ func (o *AutoOffer) Upsert(ctx context.Context, exec boil.ContextExecutor, updat
 			autoOfferColumnsWithoutDefault,
 			nzDefaults,
 		)
+
 		update := updateColumns.UpdateColumnSet(
 			autoOfferAllColumns,
 			autoOfferPrimaryKeyColumns,
@@ -1275,11 +1234,15 @@ func (o *AutoOffer) Upsert(ctx context.Context, exec boil.ContextExecutor, updat
 		ret := strmangle.SetComplement(autoOfferAllColumns, strmangle.SetIntersect(insert, update))
 
 		conflict := conflictColumns
-		if len(conflict) == 0 {
+		if len(conflict) == 0 && updateOnConflict && len(update) != 0 {
+			if len(autoOfferPrimaryKeyColumns) == 0 {
+				return errors.New("models: unable to upsert auto_offers, could not build conflict column list")
+			}
+
 			conflict = make([]string, len(autoOfferPrimaryKeyColumns))
 			copy(conflict, autoOfferPrimaryKeyColumns)
 		}
-		cache.query = buildUpsertQuerySQLite(dialect, "\"auto_offers\"", updateOnConflict, ret, update, conflict, insert)
+		cache.query = buildUpsertQueryPostgres(dialect, "\"auto_offers\"", updateOnConflict, ret, update, conflict, insert, opts...)
 
 		cache.valueMapping, err = queries.BindMapping(autoOfferType, autoOfferMapping, insert)
 		if err != nil {
@@ -1338,7 +1301,7 @@ func (o *AutoOffer) Delete(ctx context.Context, exec boil.ContextExecutor) (int6
 	}
 
 	args := queries.ValuesFromMapping(reflect.Indirect(reflect.ValueOf(o)), autoOfferPrimaryKeyMapping)
-	sql := "DELETE FROM \"auto_offers\" WHERE \"offer_id\"=?"
+	sql := "DELETE FROM \"auto_offers\" WHERE \"id\"=$1"
 
 	if boil.IsDebug(ctx) {
 		writer := boil.DebugWriterFrom(ctx)
@@ -1404,7 +1367,7 @@ func (o AutoOfferSlice) DeleteAll(ctx context.Context, exec boil.ContextExecutor
 	}
 
 	sql := "DELETE FROM \"auto_offers\" WHERE " +
-		strmangle.WhereClauseRepeated(string(dialect.LQ), string(dialect.RQ), 0, autoOfferPrimaryKeyColumns, len(o))
+		strmangle.WhereClauseRepeated(string(dialect.LQ), string(dialect.RQ), 1, autoOfferPrimaryKeyColumns, len(o))
 
 	if boil.IsDebug(ctx) {
 		writer := boil.DebugWriterFrom(ctx)
@@ -1435,7 +1398,7 @@ func (o AutoOfferSlice) DeleteAll(ctx context.Context, exec boil.ContextExecutor
 // Reload refetches the object from the database
 // using the primary keys with an executor.
 func (o *AutoOffer) Reload(ctx context.Context, exec boil.ContextExecutor) error {
-	ret, err := FindAutoOffer(ctx, exec, o.OfferID)
+	ret, err := FindAutoOffer(ctx, exec, o.ID)
 	if err != nil {
 		return err
 	}
@@ -1459,7 +1422,7 @@ func (o *AutoOfferSlice) ReloadAll(ctx context.Context, exec boil.ContextExecuto
 	}
 
 	sql := "SELECT \"auto_offers\".* FROM \"auto_offers\" WHERE " +
-		strmangle.WhereClauseRepeated(string(dialect.LQ), string(dialect.RQ), 0, autoOfferPrimaryKeyColumns, len(*o))
+		strmangle.WhereClauseRepeated(string(dialect.LQ), string(dialect.RQ), 1, autoOfferPrimaryKeyColumns, len(*o))
 
 	q := queries.Raw(sql, args...)
 
@@ -1474,16 +1437,16 @@ func (o *AutoOfferSlice) ReloadAll(ctx context.Context, exec boil.ContextExecuto
 }
 
 // AutoOfferExists checks if the AutoOffer row exists.
-func AutoOfferExists(ctx context.Context, exec boil.ContextExecutor, offerID null.Int64) (bool, error) {
+func AutoOfferExists(ctx context.Context, exec boil.ContextExecutor, iD int) (bool, error) {
 	var exists bool
-	sql := "select exists(select 1 from \"auto_offers\" where \"offer_id\"=? limit 1)"
+	sql := "select exists(select 1 from \"auto_offers\" where \"id\"=$1 limit 1)"
 
 	if boil.IsDebug(ctx) {
 		writer := boil.DebugWriterFrom(ctx)
 		fmt.Fprintln(writer, sql)
-		fmt.Fprintln(writer, offerID)
+		fmt.Fprintln(writer, iD)
 	}
-	row := exec.QueryRowContext(ctx, sql, offerID)
+	row := exec.QueryRowContext(ctx, sql, iD)
 
 	err := row.Scan(&exists)
 	if err != nil {
@@ -1495,5 +1458,5 @@ func AutoOfferExists(ctx context.Context, exec boil.ContextExecutor, offerID nul
 
 // Exists checks if the AutoOffer row exists.
 func (o *AutoOffer) Exists(ctx context.Context, exec boil.ContextExecutor) (bool, error) {
-	return AutoOfferExists(ctx, exec, o.OfferID)
+	return AutoOfferExists(ctx, exec, o.ID)
 }

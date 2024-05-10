@@ -24,65 +24,65 @@ import (
 
 // Company is an object representing the database table.
 type Company struct {
-	CompanyID   null.Int64  `boil:"company_id" json:"company_id,omitempty" toml:"company_id" yaml:"company_id,omitempty"`
-	Name        string      `boil:"name" json:"name" toml:"name" yaml:"name"`
-	Address     null.String `boil:"address" json:"address,omitempty" toml:"address" yaml:"address,omitempty"`
-	ContactInfo null.String `boil:"contact_info" json:"contact_info,omitempty" toml:"contact_info" yaml:"contact_info,omitempty"`
-	CreatedAt   null.Time   `boil:"created_at" json:"created_at,omitempty" toml:"created_at" yaml:"created_at,omitempty"`
-	UpdatedAt   null.Time   `boil:"updated_at" json:"updated_at,omitempty" toml:"updated_at" yaml:"updated_at,omitempty"`
+	ID            int         `boil:"id" json:"id" toml:"id" yaml:"id"`
+	Name          string      `boil:"name" json:"name" toml:"name" yaml:"name"`
+	Address       null.String `boil:"address" json:"address,omitempty" toml:"address" yaml:"address,omitempty"`
+	ContactNumber null.Int    `boil:"contact_number" json:"contact_number,omitempty" toml:"contact_number" yaml:"contact_number,omitempty"`
+	CreatedAt     null.Time   `boil:"created_at" json:"created_at,omitempty" toml:"created_at" yaml:"created_at,omitempty"`
+	UpdatedAt     null.Time   `boil:"updated_at" json:"updated_at,omitempty" toml:"updated_at" yaml:"updated_at,omitempty"`
 
 	R *companyR `boil:"-" json:"-" toml:"-" yaml:"-"`
 	L companyL  `boil:"-" json:"-" toml:"-" yaml:"-"`
 }
 
 var CompanyColumns = struct {
-	CompanyID   string
-	Name        string
-	Address     string
-	ContactInfo string
-	CreatedAt   string
-	UpdatedAt   string
+	ID            string
+	Name          string
+	Address       string
+	ContactNumber string
+	CreatedAt     string
+	UpdatedAt     string
 }{
-	CompanyID:   "company_id",
-	Name:        "name",
-	Address:     "address",
-	ContactInfo: "contact_info",
-	CreatedAt:   "created_at",
-	UpdatedAt:   "updated_at",
+	ID:            "id",
+	Name:          "name",
+	Address:       "address",
+	ContactNumber: "contact_number",
+	CreatedAt:     "created_at",
+	UpdatedAt:     "updated_at",
 }
 
 var CompanyTableColumns = struct {
-	CompanyID   string
-	Name        string
-	Address     string
-	ContactInfo string
-	CreatedAt   string
-	UpdatedAt   string
+	ID            string
+	Name          string
+	Address       string
+	ContactNumber string
+	CreatedAt     string
+	UpdatedAt     string
 }{
-	CompanyID:   "companies.company_id",
-	Name:        "companies.name",
-	Address:     "companies.address",
-	ContactInfo: "companies.contact_info",
-	CreatedAt:   "companies.created_at",
-	UpdatedAt:   "companies.updated_at",
+	ID:            "companies.id",
+	Name:          "companies.name",
+	Address:       "companies.address",
+	ContactNumber: "companies.contact_number",
+	CreatedAt:     "companies.created_at",
+	UpdatedAt:     "companies.updated_at",
 }
 
 // Generated where
 
 var CompanyWhere = struct {
-	CompanyID   whereHelpernull_Int64
-	Name        whereHelperstring
-	Address     whereHelpernull_String
-	ContactInfo whereHelpernull_String
-	CreatedAt   whereHelpernull_Time
-	UpdatedAt   whereHelpernull_Time
+	ID            whereHelperint
+	Name          whereHelperstring
+	Address       whereHelpernull_String
+	ContactNumber whereHelpernull_Int
+	CreatedAt     whereHelpernull_Time
+	UpdatedAt     whereHelpernull_Time
 }{
-	CompanyID:   whereHelpernull_Int64{field: "\"companies\".\"company_id\""},
-	Name:        whereHelperstring{field: "\"companies\".\"name\""},
-	Address:     whereHelpernull_String{field: "\"companies\".\"address\""},
-	ContactInfo: whereHelpernull_String{field: "\"companies\".\"contact_info\""},
-	CreatedAt:   whereHelpernull_Time{field: "\"companies\".\"created_at\""},
-	UpdatedAt:   whereHelpernull_Time{field: "\"companies\".\"updated_at\""},
+	ID:            whereHelperint{field: "\"companies\".\"id\""},
+	Name:          whereHelperstring{field: "\"companies\".\"name\""},
+	Address:       whereHelpernull_String{field: "\"companies\".\"address\""},
+	ContactNumber: whereHelpernull_Int{field: "\"companies\".\"contact_number\""},
+	CreatedAt:     whereHelpernull_Time{field: "\"companies\".\"created_at\""},
+	UpdatedAt:     whereHelpernull_Time{field: "\"companies\".\"updated_at\""},
 }
 
 // CompanyRels is where relationship names are stored.
@@ -113,11 +113,11 @@ func (r *companyR) GetBiddings() BiddingSlice {
 type companyL struct{}
 
 var (
-	companyAllColumns            = []string{"company_id", "name", "address", "contact_info", "created_at", "updated_at"}
+	companyAllColumns            = []string{"id", "name", "address", "contact_number", "created_at", "updated_at"}
 	companyColumnsWithoutDefault = []string{"name"}
-	companyColumnsWithDefault    = []string{"company_id", "address", "contact_info", "created_at", "updated_at"}
-	companyPrimaryKeyColumns     = []string{"company_id"}
-	companyGeneratedColumns      = []string{"company_id"}
+	companyColumnsWithDefault    = []string{"id", "address", "contact_number", "created_at", "updated_at"}
+	companyPrimaryKeyColumns     = []string{"id"}
+	companyGeneratedColumns      = []string{}
 )
 
 type (
@@ -433,7 +433,7 @@ func (o *Company) Biddings(mods ...qm.QueryMod) biddingQuery {
 	}
 
 	queryMods = append(queryMods,
-		qm.Where("\"biddings\".\"company_id\"=?", o.CompanyID),
+		qm.Where("\"biddings\".\"company_id\"=?", o.ID),
 	)
 
 	return Biddings(queryMods...)
@@ -472,13 +472,13 @@ func (companyL) LoadBiddings(ctx context.Context, e boil.ContextExecutor, singul
 		if object.R == nil {
 			object.R = &companyR{}
 		}
-		args[object.CompanyID] = struct{}{}
+		args[object.ID] = struct{}{}
 	} else {
 		for _, obj := range slice {
 			if obj.R == nil {
 				obj.R = &companyR{}
 			}
-			args[obj.CompanyID] = struct{}{}
+			args[obj.ID] = struct{}{}
 		}
 	}
 
@@ -538,7 +538,7 @@ func (companyL) LoadBiddings(ctx context.Context, e boil.ContextExecutor, singul
 
 	for _, foreign := range resultSlice {
 		for _, local := range slice {
-			if queries.Equal(local.CompanyID, foreign.CompanyID) {
+			if local.ID == foreign.CompanyID {
 				local.R.Biddings = append(local.R.Biddings, foreign)
 				if foreign.R == nil {
 					foreign.R = &biddingR{}
@@ -560,17 +560,17 @@ func (o *Company) AddBiddings(ctx context.Context, exec boil.ContextExecutor, in
 	var err error
 	for _, rel := range related {
 		if insert {
-			queries.Assign(&rel.CompanyID, o.CompanyID)
+			rel.CompanyID = o.ID
 			if err = rel.Insert(ctx, exec, boil.Infer()); err != nil {
 				return errors.Wrap(err, "failed to insert into foreign table")
 			}
 		} else {
 			updateQuery := fmt.Sprintf(
 				"UPDATE \"biddings\" SET %s WHERE %s",
-				strmangle.SetParamNames("\"", "\"", 0, []string{"company_id"}),
-				strmangle.WhereClause("\"", "\"", 0, biddingPrimaryKeyColumns),
+				strmangle.SetParamNames("\"", "\"", 1, []string{"company_id"}),
+				strmangle.WhereClause("\"", "\"", 2, biddingPrimaryKeyColumns),
 			)
-			values := []interface{}{o.CompanyID, rel.BiddingID}
+			values := []interface{}{o.ID, rel.ID}
 
 			if boil.IsDebug(ctx) {
 				writer := boil.DebugWriterFrom(ctx)
@@ -581,7 +581,7 @@ func (o *Company) AddBiddings(ctx context.Context, exec boil.ContextExecutor, in
 				return errors.Wrap(err, "failed to update foreign table")
 			}
 
-			queries.Assign(&rel.CompanyID, o.CompanyID)
+			rel.CompanyID = o.ID
 		}
 	}
 
@@ -618,7 +618,7 @@ func Companies(mods ...qm.QueryMod) companyQuery {
 
 // FindCompany retrieves a single record by ID with an executor.
 // If selectCols is empty Find will return all columns.
-func FindCompany(ctx context.Context, exec boil.ContextExecutor, companyID null.Int64, selectCols ...string) (*Company, error) {
+func FindCompany(ctx context.Context, exec boil.ContextExecutor, iD int, selectCols ...string) (*Company, error) {
 	companyObj := &Company{}
 
 	sel := "*"
@@ -626,10 +626,10 @@ func FindCompany(ctx context.Context, exec boil.ContextExecutor, companyID null.
 		sel = strings.Join(strmangle.IdentQuoteSlice(dialect.LQ, dialect.RQ, selectCols), ",")
 	}
 	query := fmt.Sprintf(
-		"select %s from \"companies\" where \"company_id\"=?", sel,
+		"select %s from \"companies\" where \"id\"=$1", sel,
 	)
 
-	q := queries.Raw(query, companyID)
+	q := queries.Raw(query, iD)
 
 	err := q.Bind(ctx, exec, companyObj)
 	if err != nil {
@@ -683,7 +683,6 @@ func (o *Company) Insert(ctx context.Context, exec boil.ContextExecutor, columns
 			companyColumnsWithoutDefault,
 			nzDefaults,
 		)
-		wl = strmangle.SetComplement(wl, companyGeneratedColumns)
 
 		cache.valueMapping, err = queries.BindMapping(companyType, companyMapping, wl)
 		if err != nil {
@@ -760,7 +759,6 @@ func (o *Company) Update(ctx context.Context, exec boil.ContextExecutor, columns
 			companyAllColumns,
 			companyPrimaryKeyColumns,
 		)
-		wl = strmangle.SetComplement(wl, companyGeneratedColumns)
 
 		if !columns.IsWhitelist() {
 			wl = strmangle.SetComplement(wl, []string{"created_at"})
@@ -770,8 +768,8 @@ func (o *Company) Update(ctx context.Context, exec boil.ContextExecutor, columns
 		}
 
 		cache.query = fmt.Sprintf("UPDATE \"companies\" SET %s WHERE %s",
-			strmangle.SetParamNames("\"", "\"", 0, wl),
-			strmangle.WhereClause("\"", "\"", 0, companyPrimaryKeyColumns),
+			strmangle.SetParamNames("\"", "\"", 1, wl),
+			strmangle.WhereClause("\"", "\"", len(wl)+1, companyPrimaryKeyColumns),
 		)
 		cache.valueMapping, err = queries.BindMapping(companyType, companyMapping, append(wl, companyPrimaryKeyColumns...))
 		if err != nil {
@@ -851,8 +849,8 @@ func (o CompanySlice) UpdateAll(ctx context.Context, exec boil.ContextExecutor, 
 	}
 
 	sql := fmt.Sprintf("UPDATE \"companies\" SET %s WHERE %s",
-		strmangle.SetParamNames("\"", "\"", 0, colNames),
-		strmangle.WhereClauseRepeated(string(dialect.LQ), string(dialect.RQ), 0, companyPrimaryKeyColumns, len(o)))
+		strmangle.SetParamNames("\"", "\"", 1, colNames),
+		strmangle.WhereClauseRepeated(string(dialect.LQ), string(dialect.RQ), len(colNames)+1, companyPrimaryKeyColumns, len(o)))
 
 	if boil.IsDebug(ctx) {
 		writer := boil.DebugWriterFrom(ctx)
@@ -873,7 +871,7 @@ func (o CompanySlice) UpdateAll(ctx context.Context, exec boil.ContextExecutor, 
 
 // Upsert attempts an insert using an executor, and does an update or ignore on conflict.
 // See boil.Columns documentation for how to properly use updateColumns and insertColumns.
-func (o *Company) Upsert(ctx context.Context, exec boil.ContextExecutor, updateOnConflict bool, conflictColumns []string, updateColumns, insertColumns boil.Columns) error {
+func (o *Company) Upsert(ctx context.Context, exec boil.ContextExecutor, updateOnConflict bool, conflictColumns []string, updateColumns, insertColumns boil.Columns, opts ...UpsertOptionFunc) error {
 	if o == nil {
 		return errors.New("models: no companies provided for upsert")
 	}
@@ -933,6 +931,7 @@ func (o *Company) Upsert(ctx context.Context, exec boil.ContextExecutor, updateO
 			companyColumnsWithoutDefault,
 			nzDefaults,
 		)
+
 		update := updateColumns.UpdateColumnSet(
 			companyAllColumns,
 			companyPrimaryKeyColumns,
@@ -945,11 +944,15 @@ func (o *Company) Upsert(ctx context.Context, exec boil.ContextExecutor, updateO
 		ret := strmangle.SetComplement(companyAllColumns, strmangle.SetIntersect(insert, update))
 
 		conflict := conflictColumns
-		if len(conflict) == 0 {
+		if len(conflict) == 0 && updateOnConflict && len(update) != 0 {
+			if len(companyPrimaryKeyColumns) == 0 {
+				return errors.New("models: unable to upsert companies, could not build conflict column list")
+			}
+
 			conflict = make([]string, len(companyPrimaryKeyColumns))
 			copy(conflict, companyPrimaryKeyColumns)
 		}
-		cache.query = buildUpsertQuerySQLite(dialect, "\"companies\"", updateOnConflict, ret, update, conflict, insert)
+		cache.query = buildUpsertQueryPostgres(dialect, "\"companies\"", updateOnConflict, ret, update, conflict, insert, opts...)
 
 		cache.valueMapping, err = queries.BindMapping(companyType, companyMapping, insert)
 		if err != nil {
@@ -1008,7 +1011,7 @@ func (o *Company) Delete(ctx context.Context, exec boil.ContextExecutor) (int64,
 	}
 
 	args := queries.ValuesFromMapping(reflect.Indirect(reflect.ValueOf(o)), companyPrimaryKeyMapping)
-	sql := "DELETE FROM \"companies\" WHERE \"company_id\"=?"
+	sql := "DELETE FROM \"companies\" WHERE \"id\"=$1"
 
 	if boil.IsDebug(ctx) {
 		writer := boil.DebugWriterFrom(ctx)
@@ -1074,7 +1077,7 @@ func (o CompanySlice) DeleteAll(ctx context.Context, exec boil.ContextExecutor) 
 	}
 
 	sql := "DELETE FROM \"companies\" WHERE " +
-		strmangle.WhereClauseRepeated(string(dialect.LQ), string(dialect.RQ), 0, companyPrimaryKeyColumns, len(o))
+		strmangle.WhereClauseRepeated(string(dialect.LQ), string(dialect.RQ), 1, companyPrimaryKeyColumns, len(o))
 
 	if boil.IsDebug(ctx) {
 		writer := boil.DebugWriterFrom(ctx)
@@ -1105,7 +1108,7 @@ func (o CompanySlice) DeleteAll(ctx context.Context, exec boil.ContextExecutor) 
 // Reload refetches the object from the database
 // using the primary keys with an executor.
 func (o *Company) Reload(ctx context.Context, exec boil.ContextExecutor) error {
-	ret, err := FindCompany(ctx, exec, o.CompanyID)
+	ret, err := FindCompany(ctx, exec, o.ID)
 	if err != nil {
 		return err
 	}
@@ -1129,7 +1132,7 @@ func (o *CompanySlice) ReloadAll(ctx context.Context, exec boil.ContextExecutor)
 	}
 
 	sql := "SELECT \"companies\".* FROM \"companies\" WHERE " +
-		strmangle.WhereClauseRepeated(string(dialect.LQ), string(dialect.RQ), 0, companyPrimaryKeyColumns, len(*o))
+		strmangle.WhereClauseRepeated(string(dialect.LQ), string(dialect.RQ), 1, companyPrimaryKeyColumns, len(*o))
 
 	q := queries.Raw(sql, args...)
 
@@ -1144,16 +1147,16 @@ func (o *CompanySlice) ReloadAll(ctx context.Context, exec boil.ContextExecutor)
 }
 
 // CompanyExists checks if the Company row exists.
-func CompanyExists(ctx context.Context, exec boil.ContextExecutor, companyID null.Int64) (bool, error) {
+func CompanyExists(ctx context.Context, exec boil.ContextExecutor, iD int) (bool, error) {
 	var exists bool
-	sql := "select exists(select 1 from \"companies\" where \"company_id\"=? limit 1)"
+	sql := "select exists(select 1 from \"companies\" where \"id\"=$1 limit 1)"
 
 	if boil.IsDebug(ctx) {
 		writer := boil.DebugWriterFrom(ctx)
 		fmt.Fprintln(writer, sql)
-		fmt.Fprintln(writer, companyID)
+		fmt.Fprintln(writer, iD)
 	}
-	row := exec.QueryRowContext(ctx, sql, companyID)
+	row := exec.QueryRowContext(ctx, sql, iD)
 
 	err := row.Scan(&exists)
 	if err != nil {
@@ -1165,5 +1168,5 @@ func CompanyExists(ctx context.Context, exec boil.ContextExecutor, companyID nul
 
 // Exists checks if the Company row exists.
 func (o *Company) Exists(ctx context.Context, exec boil.ContextExecutor) (bool, error) {
-	return CompanyExists(ctx, exec, o.CompanyID)
+	return CompanyExists(ctx, exec, o.ID)
 }

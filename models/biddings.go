@@ -24,13 +24,13 @@ import (
 
 // Bidding is an object representing the database table.
 type Bidding struct {
-	BiddingID   null.Int64  `boil:"bidding_id" json:"bidding_id,omitempty" toml:"bidding_id" yaml:"bidding_id,omitempty"`
-	CompanyID   int64       `boil:"company_id" json:"company_id" toml:"company_id" yaml:"company_id"`
+	ID          int         `boil:"id" json:"id" toml:"id" yaml:"id"`
+	CompanyID   int         `boil:"company_id" json:"company_id" toml:"company_id" yaml:"company_id"`
 	Title       string      `boil:"title" json:"title" toml:"title" yaml:"title"`
 	Description null.String `boil:"description" json:"description,omitempty" toml:"description" yaml:"description,omitempty"`
 	StartDate   null.Time   `boil:"start_date" json:"start_date,omitempty" toml:"start_date" yaml:"start_date,omitempty"`
 	EndDate     null.Time   `boil:"end_date" json:"end_date,omitempty" toml:"end_date" yaml:"end_date,omitempty"`
-	CategoryID  int64       `boil:"category_id" json:"category_id" toml:"category_id" yaml:"category_id"`
+	CategoryID  int         `boil:"category_id" json:"category_id" toml:"category_id" yaml:"category_id"`
 	CreatedAt   null.Time   `boil:"created_at" json:"created_at,omitempty" toml:"created_at" yaml:"created_at,omitempty"`
 	UpdatedAt   null.Time   `boil:"updated_at" json:"updated_at,omitempty" toml:"updated_at" yaml:"updated_at,omitempty"`
 
@@ -39,7 +39,7 @@ type Bidding struct {
 }
 
 var BiddingColumns = struct {
-	BiddingID   string
+	ID          string
 	CompanyID   string
 	Title       string
 	Description string
@@ -49,7 +49,7 @@ var BiddingColumns = struct {
 	CreatedAt   string
 	UpdatedAt   string
 }{
-	BiddingID:   "bidding_id",
+	ID:          "id",
 	CompanyID:   "company_id",
 	Title:       "title",
 	Description: "description",
@@ -61,7 +61,7 @@ var BiddingColumns = struct {
 }
 
 var BiddingTableColumns = struct {
-	BiddingID   string
+	ID          string
 	CompanyID   string
 	Title       string
 	Description string
@@ -71,7 +71,7 @@ var BiddingTableColumns = struct {
 	CreatedAt   string
 	UpdatedAt   string
 }{
-	BiddingID:   "biddings.bidding_id",
+	ID:          "biddings.id",
 	CompanyID:   "biddings.company_id",
 	Title:       "biddings.title",
 	Description: "biddings.description",
@@ -85,23 +85,23 @@ var BiddingTableColumns = struct {
 // Generated where
 
 var BiddingWhere = struct {
-	BiddingID   whereHelpernull_Int64
-	CompanyID   whereHelperint64
+	ID          whereHelperint
+	CompanyID   whereHelperint
 	Title       whereHelperstring
 	Description whereHelpernull_String
 	StartDate   whereHelpernull_Time
 	EndDate     whereHelpernull_Time
-	CategoryID  whereHelperint64
+	CategoryID  whereHelperint
 	CreatedAt   whereHelpernull_Time
 	UpdatedAt   whereHelpernull_Time
 }{
-	BiddingID:   whereHelpernull_Int64{field: "\"biddings\".\"bidding_id\""},
-	CompanyID:   whereHelperint64{field: "\"biddings\".\"company_id\""},
+	ID:          whereHelperint{field: "\"biddings\".\"id\""},
+	CompanyID:   whereHelperint{field: "\"biddings\".\"company_id\""},
 	Title:       whereHelperstring{field: "\"biddings\".\"title\""},
 	Description: whereHelpernull_String{field: "\"biddings\".\"description\""},
 	StartDate:   whereHelpernull_Time{field: "\"biddings\".\"start_date\""},
 	EndDate:     whereHelpernull_Time{field: "\"biddings\".\"end_date\""},
-	CategoryID:  whereHelperint64{field: "\"biddings\".\"category_id\""},
+	CategoryID:  whereHelperint{field: "\"biddings\".\"category_id\""},
 	CreatedAt:   whereHelpernull_Time{field: "\"biddings\".\"created_at\""},
 	UpdatedAt:   whereHelpernull_Time{field: "\"biddings\".\"updated_at\""},
 }
@@ -154,11 +154,11 @@ func (r *biddingR) GetAutoOffers() AutoOfferSlice {
 type biddingL struct{}
 
 var (
-	biddingAllColumns            = []string{"bidding_id", "company_id", "title", "description", "start_date", "end_date", "category_id", "created_at", "updated_at"}
+	biddingAllColumns            = []string{"id", "company_id", "title", "description", "start_date", "end_date", "category_id", "created_at", "updated_at"}
 	biddingColumnsWithoutDefault = []string{"company_id", "title", "category_id"}
-	biddingColumnsWithDefault    = []string{"bidding_id", "description", "start_date", "end_date", "created_at", "updated_at"}
-	biddingPrimaryKeyColumns     = []string{"bidding_id"}
-	biddingGeneratedColumns      = []string{"bidding_id"}
+	biddingColumnsWithDefault    = []string{"id", "description", "start_date", "end_date", "created_at", "updated_at"}
+	biddingPrimaryKeyColumns     = []string{"id"}
+	biddingGeneratedColumns      = []string{}
 )
 
 type (
@@ -469,7 +469,7 @@ func (q biddingQuery) Exists(ctx context.Context, exec boil.ContextExecutor) (bo
 // Category pointed to by the foreign key.
 func (o *Bidding) Category(mods ...qm.QueryMod) autoPartsCategoryQuery {
 	queryMods := []qm.QueryMod{
-		qm.Where("\"category_id\" = ?", o.CategoryID),
+		qm.Where("\"id\" = ?", o.CategoryID),
 	}
 
 	queryMods = append(queryMods, mods...)
@@ -480,7 +480,7 @@ func (o *Bidding) Category(mods ...qm.QueryMod) autoPartsCategoryQuery {
 // Company pointed to by the foreign key.
 func (o *Bidding) Company(mods ...qm.QueryMod) companyQuery {
 	queryMods := []qm.QueryMod{
-		qm.Where("\"company_id\" = ?", o.CompanyID),
+		qm.Where("\"id\" = ?", o.CompanyID),
 	}
 
 	queryMods = append(queryMods, mods...)
@@ -496,7 +496,7 @@ func (o *Bidding) AutoOffers(mods ...qm.QueryMod) autoOfferQuery {
 	}
 
 	queryMods = append(queryMods,
-		qm.Where("\"auto_offers\".\"bidding_id\"=?", o.BiddingID),
+		qm.Where("\"auto_offers\".\"bidding_id\"=?", o.ID),
 	)
 
 	return AutoOffers(queryMods...)
@@ -535,9 +535,7 @@ func (biddingL) LoadCategory(ctx context.Context, e boil.ContextExecutor, singul
 		if object.R == nil {
 			object.R = &biddingR{}
 		}
-		if !queries.IsNil(object.CategoryID) {
-			args[object.CategoryID] = struct{}{}
-		}
+		args[object.CategoryID] = struct{}{}
 
 	} else {
 		for _, obj := range slice {
@@ -545,9 +543,7 @@ func (biddingL) LoadCategory(ctx context.Context, e boil.ContextExecutor, singul
 				obj.R = &biddingR{}
 			}
 
-			if !queries.IsNil(obj.CategoryID) {
-				args[obj.CategoryID] = struct{}{}
-			}
+			args[obj.CategoryID] = struct{}{}
 
 		}
 	}
@@ -565,7 +561,7 @@ func (biddingL) LoadCategory(ctx context.Context, e boil.ContextExecutor, singul
 
 	query := NewQuery(
 		qm.From(`auto_parts_categories`),
-		qm.WhereIn(`auto_parts_categories.category_id in ?`, argsSlice...),
+		qm.WhereIn(`auto_parts_categories.id in ?`, argsSlice...),
 	)
 	if mods != nil {
 		mods.Apply(query)
@@ -612,7 +608,7 @@ func (biddingL) LoadCategory(ctx context.Context, e boil.ContextExecutor, singul
 
 	for _, local := range slice {
 		for _, foreign := range resultSlice {
-			if queries.Equal(local.CategoryID, foreign.CategoryID) {
+			if local.CategoryID == foreign.ID {
 				local.R.Category = foreign
 				if foreign.R == nil {
 					foreign.R = &autoPartsCategoryR{}
@@ -659,9 +655,7 @@ func (biddingL) LoadCompany(ctx context.Context, e boil.ContextExecutor, singula
 		if object.R == nil {
 			object.R = &biddingR{}
 		}
-		if !queries.IsNil(object.CompanyID) {
-			args[object.CompanyID] = struct{}{}
-		}
+		args[object.CompanyID] = struct{}{}
 
 	} else {
 		for _, obj := range slice {
@@ -669,9 +663,7 @@ func (biddingL) LoadCompany(ctx context.Context, e boil.ContextExecutor, singula
 				obj.R = &biddingR{}
 			}
 
-			if !queries.IsNil(obj.CompanyID) {
-				args[obj.CompanyID] = struct{}{}
-			}
+			args[obj.CompanyID] = struct{}{}
 
 		}
 	}
@@ -689,7 +681,7 @@ func (biddingL) LoadCompany(ctx context.Context, e boil.ContextExecutor, singula
 
 	query := NewQuery(
 		qm.From(`companies`),
-		qm.WhereIn(`companies.company_id in ?`, argsSlice...),
+		qm.WhereIn(`companies.id in ?`, argsSlice...),
 	)
 	if mods != nil {
 		mods.Apply(query)
@@ -736,7 +728,7 @@ func (biddingL) LoadCompany(ctx context.Context, e boil.ContextExecutor, singula
 
 	for _, local := range slice {
 		for _, foreign := range resultSlice {
-			if queries.Equal(local.CompanyID, foreign.CompanyID) {
+			if local.CompanyID == foreign.ID {
 				local.R.Company = foreign
 				if foreign.R == nil {
 					foreign.R = &companyR{}
@@ -783,13 +775,13 @@ func (biddingL) LoadAutoOffers(ctx context.Context, e boil.ContextExecutor, sing
 		if object.R == nil {
 			object.R = &biddingR{}
 		}
-		args[object.BiddingID] = struct{}{}
+		args[object.ID] = struct{}{}
 	} else {
 		for _, obj := range slice {
 			if obj.R == nil {
 				obj.R = &biddingR{}
 			}
-			args[obj.BiddingID] = struct{}{}
+			args[obj.ID] = struct{}{}
 		}
 	}
 
@@ -849,7 +841,7 @@ func (biddingL) LoadAutoOffers(ctx context.Context, e boil.ContextExecutor, sing
 
 	for _, foreign := range resultSlice {
 		for _, local := range slice {
-			if queries.Equal(local.BiddingID, foreign.BiddingID) {
+			if local.ID == foreign.BiddingID {
 				local.R.AutoOffers = append(local.R.AutoOffers, foreign)
 				if foreign.R == nil {
 					foreign.R = &autoOfferR{}
@@ -876,10 +868,10 @@ func (o *Bidding) SetCategory(ctx context.Context, exec boil.ContextExecutor, in
 
 	updateQuery := fmt.Sprintf(
 		"UPDATE \"biddings\" SET %s WHERE %s",
-		strmangle.SetParamNames("\"", "\"", 0, []string{"category_id"}),
-		strmangle.WhereClause("\"", "\"", 0, biddingPrimaryKeyColumns),
+		strmangle.SetParamNames("\"", "\"", 1, []string{"category_id"}),
+		strmangle.WhereClause("\"", "\"", 2, biddingPrimaryKeyColumns),
 	)
-	values := []interface{}{related.CategoryID, o.BiddingID}
+	values := []interface{}{related.ID, o.ID}
 
 	if boil.IsDebug(ctx) {
 		writer := boil.DebugWriterFrom(ctx)
@@ -890,7 +882,7 @@ func (o *Bidding) SetCategory(ctx context.Context, exec boil.ContextExecutor, in
 		return errors.Wrap(err, "failed to update local table")
 	}
 
-	queries.Assign(&o.CategoryID, related.CategoryID)
+	o.CategoryID = related.ID
 	if o.R == nil {
 		o.R = &biddingR{
 			Category: related,
@@ -923,10 +915,10 @@ func (o *Bidding) SetCompany(ctx context.Context, exec boil.ContextExecutor, ins
 
 	updateQuery := fmt.Sprintf(
 		"UPDATE \"biddings\" SET %s WHERE %s",
-		strmangle.SetParamNames("\"", "\"", 0, []string{"company_id"}),
-		strmangle.WhereClause("\"", "\"", 0, biddingPrimaryKeyColumns),
+		strmangle.SetParamNames("\"", "\"", 1, []string{"company_id"}),
+		strmangle.WhereClause("\"", "\"", 2, biddingPrimaryKeyColumns),
 	)
-	values := []interface{}{related.CompanyID, o.BiddingID}
+	values := []interface{}{related.ID, o.ID}
 
 	if boil.IsDebug(ctx) {
 		writer := boil.DebugWriterFrom(ctx)
@@ -937,7 +929,7 @@ func (o *Bidding) SetCompany(ctx context.Context, exec boil.ContextExecutor, ins
 		return errors.Wrap(err, "failed to update local table")
 	}
 
-	queries.Assign(&o.CompanyID, related.CompanyID)
+	o.CompanyID = related.ID
 	if o.R == nil {
 		o.R = &biddingR{
 			Company: related,
@@ -965,17 +957,17 @@ func (o *Bidding) AddAutoOffers(ctx context.Context, exec boil.ContextExecutor, 
 	var err error
 	for _, rel := range related {
 		if insert {
-			queries.Assign(&rel.BiddingID, o.BiddingID)
+			rel.BiddingID = o.ID
 			if err = rel.Insert(ctx, exec, boil.Infer()); err != nil {
 				return errors.Wrap(err, "failed to insert into foreign table")
 			}
 		} else {
 			updateQuery := fmt.Sprintf(
 				"UPDATE \"auto_offers\" SET %s WHERE %s",
-				strmangle.SetParamNames("\"", "\"", 0, []string{"bidding_id"}),
-				strmangle.WhereClause("\"", "\"", 0, autoOfferPrimaryKeyColumns),
+				strmangle.SetParamNames("\"", "\"", 1, []string{"bidding_id"}),
+				strmangle.WhereClause("\"", "\"", 2, autoOfferPrimaryKeyColumns),
 			)
-			values := []interface{}{o.BiddingID, rel.OfferID}
+			values := []interface{}{o.ID, rel.ID}
 
 			if boil.IsDebug(ctx) {
 				writer := boil.DebugWriterFrom(ctx)
@@ -986,7 +978,7 @@ func (o *Bidding) AddAutoOffers(ctx context.Context, exec boil.ContextExecutor, 
 				return errors.Wrap(err, "failed to update foreign table")
 			}
 
-			queries.Assign(&rel.BiddingID, o.BiddingID)
+			rel.BiddingID = o.ID
 		}
 	}
 
@@ -1023,7 +1015,7 @@ func Biddings(mods ...qm.QueryMod) biddingQuery {
 
 // FindBidding retrieves a single record by ID with an executor.
 // If selectCols is empty Find will return all columns.
-func FindBidding(ctx context.Context, exec boil.ContextExecutor, biddingID null.Int64, selectCols ...string) (*Bidding, error) {
+func FindBidding(ctx context.Context, exec boil.ContextExecutor, iD int, selectCols ...string) (*Bidding, error) {
 	biddingObj := &Bidding{}
 
 	sel := "*"
@@ -1031,10 +1023,10 @@ func FindBidding(ctx context.Context, exec boil.ContextExecutor, biddingID null.
 		sel = strings.Join(strmangle.IdentQuoteSlice(dialect.LQ, dialect.RQ, selectCols), ",")
 	}
 	query := fmt.Sprintf(
-		"select %s from \"biddings\" where \"bidding_id\"=?", sel,
+		"select %s from \"biddings\" where \"id\"=$1", sel,
 	)
 
-	q := queries.Raw(query, biddingID)
+	q := queries.Raw(query, iD)
 
 	err := q.Bind(ctx, exec, biddingObj)
 	if err != nil {
@@ -1088,7 +1080,6 @@ func (o *Bidding) Insert(ctx context.Context, exec boil.ContextExecutor, columns
 			biddingColumnsWithoutDefault,
 			nzDefaults,
 		)
-		wl = strmangle.SetComplement(wl, biddingGeneratedColumns)
 
 		cache.valueMapping, err = queries.BindMapping(biddingType, biddingMapping, wl)
 		if err != nil {
@@ -1165,7 +1156,6 @@ func (o *Bidding) Update(ctx context.Context, exec boil.ContextExecutor, columns
 			biddingAllColumns,
 			biddingPrimaryKeyColumns,
 		)
-		wl = strmangle.SetComplement(wl, biddingGeneratedColumns)
 
 		if !columns.IsWhitelist() {
 			wl = strmangle.SetComplement(wl, []string{"created_at"})
@@ -1175,8 +1165,8 @@ func (o *Bidding) Update(ctx context.Context, exec boil.ContextExecutor, columns
 		}
 
 		cache.query = fmt.Sprintf("UPDATE \"biddings\" SET %s WHERE %s",
-			strmangle.SetParamNames("\"", "\"", 0, wl),
-			strmangle.WhereClause("\"", "\"", 0, biddingPrimaryKeyColumns),
+			strmangle.SetParamNames("\"", "\"", 1, wl),
+			strmangle.WhereClause("\"", "\"", len(wl)+1, biddingPrimaryKeyColumns),
 		)
 		cache.valueMapping, err = queries.BindMapping(biddingType, biddingMapping, append(wl, biddingPrimaryKeyColumns...))
 		if err != nil {
@@ -1256,8 +1246,8 @@ func (o BiddingSlice) UpdateAll(ctx context.Context, exec boil.ContextExecutor, 
 	}
 
 	sql := fmt.Sprintf("UPDATE \"biddings\" SET %s WHERE %s",
-		strmangle.SetParamNames("\"", "\"", 0, colNames),
-		strmangle.WhereClauseRepeated(string(dialect.LQ), string(dialect.RQ), 0, biddingPrimaryKeyColumns, len(o)))
+		strmangle.SetParamNames("\"", "\"", 1, colNames),
+		strmangle.WhereClauseRepeated(string(dialect.LQ), string(dialect.RQ), len(colNames)+1, biddingPrimaryKeyColumns, len(o)))
 
 	if boil.IsDebug(ctx) {
 		writer := boil.DebugWriterFrom(ctx)
@@ -1278,7 +1268,7 @@ func (o BiddingSlice) UpdateAll(ctx context.Context, exec boil.ContextExecutor, 
 
 // Upsert attempts an insert using an executor, and does an update or ignore on conflict.
 // See boil.Columns documentation for how to properly use updateColumns and insertColumns.
-func (o *Bidding) Upsert(ctx context.Context, exec boil.ContextExecutor, updateOnConflict bool, conflictColumns []string, updateColumns, insertColumns boil.Columns) error {
+func (o *Bidding) Upsert(ctx context.Context, exec boil.ContextExecutor, updateOnConflict bool, conflictColumns []string, updateColumns, insertColumns boil.Columns, opts ...UpsertOptionFunc) error {
 	if o == nil {
 		return errors.New("models: no biddings provided for upsert")
 	}
@@ -1338,6 +1328,7 @@ func (o *Bidding) Upsert(ctx context.Context, exec boil.ContextExecutor, updateO
 			biddingColumnsWithoutDefault,
 			nzDefaults,
 		)
+
 		update := updateColumns.UpdateColumnSet(
 			biddingAllColumns,
 			biddingPrimaryKeyColumns,
@@ -1350,11 +1341,15 @@ func (o *Bidding) Upsert(ctx context.Context, exec boil.ContextExecutor, updateO
 		ret := strmangle.SetComplement(biddingAllColumns, strmangle.SetIntersect(insert, update))
 
 		conflict := conflictColumns
-		if len(conflict) == 0 {
+		if len(conflict) == 0 && updateOnConflict && len(update) != 0 {
+			if len(biddingPrimaryKeyColumns) == 0 {
+				return errors.New("models: unable to upsert biddings, could not build conflict column list")
+			}
+
 			conflict = make([]string, len(biddingPrimaryKeyColumns))
 			copy(conflict, biddingPrimaryKeyColumns)
 		}
-		cache.query = buildUpsertQuerySQLite(dialect, "\"biddings\"", updateOnConflict, ret, update, conflict, insert)
+		cache.query = buildUpsertQueryPostgres(dialect, "\"biddings\"", updateOnConflict, ret, update, conflict, insert, opts...)
 
 		cache.valueMapping, err = queries.BindMapping(biddingType, biddingMapping, insert)
 		if err != nil {
@@ -1413,7 +1408,7 @@ func (o *Bidding) Delete(ctx context.Context, exec boil.ContextExecutor) (int64,
 	}
 
 	args := queries.ValuesFromMapping(reflect.Indirect(reflect.ValueOf(o)), biddingPrimaryKeyMapping)
-	sql := "DELETE FROM \"biddings\" WHERE \"bidding_id\"=?"
+	sql := "DELETE FROM \"biddings\" WHERE \"id\"=$1"
 
 	if boil.IsDebug(ctx) {
 		writer := boil.DebugWriterFrom(ctx)
@@ -1479,7 +1474,7 @@ func (o BiddingSlice) DeleteAll(ctx context.Context, exec boil.ContextExecutor) 
 	}
 
 	sql := "DELETE FROM \"biddings\" WHERE " +
-		strmangle.WhereClauseRepeated(string(dialect.LQ), string(dialect.RQ), 0, biddingPrimaryKeyColumns, len(o))
+		strmangle.WhereClauseRepeated(string(dialect.LQ), string(dialect.RQ), 1, biddingPrimaryKeyColumns, len(o))
 
 	if boil.IsDebug(ctx) {
 		writer := boil.DebugWriterFrom(ctx)
@@ -1510,7 +1505,7 @@ func (o BiddingSlice) DeleteAll(ctx context.Context, exec boil.ContextExecutor) 
 // Reload refetches the object from the database
 // using the primary keys with an executor.
 func (o *Bidding) Reload(ctx context.Context, exec boil.ContextExecutor) error {
-	ret, err := FindBidding(ctx, exec, o.BiddingID)
+	ret, err := FindBidding(ctx, exec, o.ID)
 	if err != nil {
 		return err
 	}
@@ -1534,7 +1529,7 @@ func (o *BiddingSlice) ReloadAll(ctx context.Context, exec boil.ContextExecutor)
 	}
 
 	sql := "SELECT \"biddings\".* FROM \"biddings\" WHERE " +
-		strmangle.WhereClauseRepeated(string(dialect.LQ), string(dialect.RQ), 0, biddingPrimaryKeyColumns, len(*o))
+		strmangle.WhereClauseRepeated(string(dialect.LQ), string(dialect.RQ), 1, biddingPrimaryKeyColumns, len(*o))
 
 	q := queries.Raw(sql, args...)
 
@@ -1549,16 +1544,16 @@ func (o *BiddingSlice) ReloadAll(ctx context.Context, exec boil.ContextExecutor)
 }
 
 // BiddingExists checks if the Bidding row exists.
-func BiddingExists(ctx context.Context, exec boil.ContextExecutor, biddingID null.Int64) (bool, error) {
+func BiddingExists(ctx context.Context, exec boil.ContextExecutor, iD int) (bool, error) {
 	var exists bool
-	sql := "select exists(select 1 from \"biddings\" where \"bidding_id\"=? limit 1)"
+	sql := "select exists(select 1 from \"biddings\" where \"id\"=$1 limit 1)"
 
 	if boil.IsDebug(ctx) {
 		writer := boil.DebugWriterFrom(ctx)
 		fmt.Fprintln(writer, sql)
-		fmt.Fprintln(writer, biddingID)
+		fmt.Fprintln(writer, iD)
 	}
-	row := exec.QueryRowContext(ctx, sql, biddingID)
+	row := exec.QueryRowContext(ctx, sql, iD)
 
 	err := row.Scan(&exists)
 	if err != nil {
@@ -1570,5 +1565,5 @@ func BiddingExists(ctx context.Context, exec boil.ContextExecutor, biddingID nul
 
 // Exists checks if the Bidding row exists.
 func (o *Bidding) Exists(ctx context.Context, exec boil.ContextExecutor) (bool, error) {
-	return BiddingExists(ctx, exec, o.BiddingID)
+	return BiddingExists(ctx, exec, o.ID)
 }

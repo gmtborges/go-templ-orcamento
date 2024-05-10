@@ -24,72 +24,110 @@ import (
 
 // AutoStore is an object representing the database table.
 type AutoStore struct {
-	StoreID     null.Int64  `boil:"store_id" json:"store_id,omitempty" toml:"store_id" yaml:"store_id,omitempty"`
-	Name        string      `boil:"name" json:"name" toml:"name" yaml:"name"`
-	Location    null.String `boil:"location" json:"location,omitempty" toml:"location" yaml:"location,omitempty"`
-	ContactInfo null.String `boil:"contact_info" json:"contact_info,omitempty" toml:"contact_info" yaml:"contact_info,omitempty"`
-	CategoryID  int64       `boil:"category_id" json:"category_id" toml:"category_id" yaml:"category_id"`
-	CreatedAt   null.Time   `boil:"created_at" json:"created_at,omitempty" toml:"created_at" yaml:"created_at,omitempty"`
-	UpdatedAt   null.Time   `boil:"updated_at" json:"updated_at,omitempty" toml:"updated_at" yaml:"updated_at,omitempty"`
+	ID            int         `boil:"id" json:"id" toml:"id" yaml:"id"`
+	Name          string      `boil:"name" json:"name" toml:"name" yaml:"name"`
+	Location      null.String `boil:"location" json:"location,omitempty" toml:"location" yaml:"location,omitempty"`
+	ContactNumber null.Int    `boil:"contact_number" json:"contact_number,omitempty" toml:"contact_number" yaml:"contact_number,omitempty"`
+	CategoryID    int         `boil:"category_id" json:"category_id" toml:"category_id" yaml:"category_id"`
+	CreatedAt     null.Time   `boil:"created_at" json:"created_at,omitempty" toml:"created_at" yaml:"created_at,omitempty"`
+	UpdatedAt     null.Time   `boil:"updated_at" json:"updated_at,omitempty" toml:"updated_at" yaml:"updated_at,omitempty"`
 
 	R *autoStoreR `boil:"-" json:"-" toml:"-" yaml:"-"`
 	L autoStoreL  `boil:"-" json:"-" toml:"-" yaml:"-"`
 }
 
 var AutoStoreColumns = struct {
-	StoreID     string
-	Name        string
-	Location    string
-	ContactInfo string
-	CategoryID  string
-	CreatedAt   string
-	UpdatedAt   string
+	ID            string
+	Name          string
+	Location      string
+	ContactNumber string
+	CategoryID    string
+	CreatedAt     string
+	UpdatedAt     string
 }{
-	StoreID:     "store_id",
-	Name:        "name",
-	Location:    "location",
-	ContactInfo: "contact_info",
-	CategoryID:  "category_id",
-	CreatedAt:   "created_at",
-	UpdatedAt:   "updated_at",
+	ID:            "id",
+	Name:          "name",
+	Location:      "location",
+	ContactNumber: "contact_number",
+	CategoryID:    "category_id",
+	CreatedAt:     "created_at",
+	UpdatedAt:     "updated_at",
 }
 
 var AutoStoreTableColumns = struct {
-	StoreID     string
-	Name        string
-	Location    string
-	ContactInfo string
-	CategoryID  string
-	CreatedAt   string
-	UpdatedAt   string
+	ID            string
+	Name          string
+	Location      string
+	ContactNumber string
+	CategoryID    string
+	CreatedAt     string
+	UpdatedAt     string
 }{
-	StoreID:     "auto_stores.store_id",
-	Name:        "auto_stores.name",
-	Location:    "auto_stores.location",
-	ContactInfo: "auto_stores.contact_info",
-	CategoryID:  "auto_stores.category_id",
-	CreatedAt:   "auto_stores.created_at",
-	UpdatedAt:   "auto_stores.updated_at",
+	ID:            "auto_stores.id",
+	Name:          "auto_stores.name",
+	Location:      "auto_stores.location",
+	ContactNumber: "auto_stores.contact_number",
+	CategoryID:    "auto_stores.category_id",
+	CreatedAt:     "auto_stores.created_at",
+	UpdatedAt:     "auto_stores.updated_at",
 }
 
 // Generated where
 
+type whereHelpernull_Int struct{ field string }
+
+func (w whereHelpernull_Int) EQ(x null.Int) qm.QueryMod {
+	return qmhelper.WhereNullEQ(w.field, false, x)
+}
+func (w whereHelpernull_Int) NEQ(x null.Int) qm.QueryMod {
+	return qmhelper.WhereNullEQ(w.field, true, x)
+}
+func (w whereHelpernull_Int) LT(x null.Int) qm.QueryMod {
+	return qmhelper.Where(w.field, qmhelper.LT, x)
+}
+func (w whereHelpernull_Int) LTE(x null.Int) qm.QueryMod {
+	return qmhelper.Where(w.field, qmhelper.LTE, x)
+}
+func (w whereHelpernull_Int) GT(x null.Int) qm.QueryMod {
+	return qmhelper.Where(w.field, qmhelper.GT, x)
+}
+func (w whereHelpernull_Int) GTE(x null.Int) qm.QueryMod {
+	return qmhelper.Where(w.field, qmhelper.GTE, x)
+}
+func (w whereHelpernull_Int) IN(slice []int) qm.QueryMod {
+	values := make([]interface{}, 0, len(slice))
+	for _, value := range slice {
+		values = append(values, value)
+	}
+	return qm.WhereIn(fmt.Sprintf("%s IN ?", w.field), values...)
+}
+func (w whereHelpernull_Int) NIN(slice []int) qm.QueryMod {
+	values := make([]interface{}, 0, len(slice))
+	for _, value := range slice {
+		values = append(values, value)
+	}
+	return qm.WhereNotIn(fmt.Sprintf("%s NOT IN ?", w.field), values...)
+}
+
+func (w whereHelpernull_Int) IsNull() qm.QueryMod    { return qmhelper.WhereIsNull(w.field) }
+func (w whereHelpernull_Int) IsNotNull() qm.QueryMod { return qmhelper.WhereIsNotNull(w.field) }
+
 var AutoStoreWhere = struct {
-	StoreID     whereHelpernull_Int64
-	Name        whereHelperstring
-	Location    whereHelpernull_String
-	ContactInfo whereHelpernull_String
-	CategoryID  whereHelperint64
-	CreatedAt   whereHelpernull_Time
-	UpdatedAt   whereHelpernull_Time
+	ID            whereHelperint
+	Name          whereHelperstring
+	Location      whereHelpernull_String
+	ContactNumber whereHelpernull_Int
+	CategoryID    whereHelperint
+	CreatedAt     whereHelpernull_Time
+	UpdatedAt     whereHelpernull_Time
 }{
-	StoreID:     whereHelpernull_Int64{field: "\"auto_stores\".\"store_id\""},
-	Name:        whereHelperstring{field: "\"auto_stores\".\"name\""},
-	Location:    whereHelpernull_String{field: "\"auto_stores\".\"location\""},
-	ContactInfo: whereHelpernull_String{field: "\"auto_stores\".\"contact_info\""},
-	CategoryID:  whereHelperint64{field: "\"auto_stores\".\"category_id\""},
-	CreatedAt:   whereHelpernull_Time{field: "\"auto_stores\".\"created_at\""},
-	UpdatedAt:   whereHelpernull_Time{field: "\"auto_stores\".\"updated_at\""},
+	ID:            whereHelperint{field: "\"auto_stores\".\"id\""},
+	Name:          whereHelperstring{field: "\"auto_stores\".\"name\""},
+	Location:      whereHelpernull_String{field: "\"auto_stores\".\"location\""},
+	ContactNumber: whereHelpernull_Int{field: "\"auto_stores\".\"contact_number\""},
+	CategoryID:    whereHelperint{field: "\"auto_stores\".\"category_id\""},
+	CreatedAt:     whereHelpernull_Time{field: "\"auto_stores\".\"created_at\""},
+	UpdatedAt:     whereHelpernull_Time{field: "\"auto_stores\".\"updated_at\""},
 }
 
 // AutoStoreRels is where relationship names are stored.
@@ -130,11 +168,11 @@ func (r *autoStoreR) GetStoreAutoOffers() AutoOfferSlice {
 type autoStoreL struct{}
 
 var (
-	autoStoreAllColumns            = []string{"store_id", "name", "location", "contact_info", "category_id", "created_at", "updated_at"}
+	autoStoreAllColumns            = []string{"id", "name", "location", "contact_number", "category_id", "created_at", "updated_at"}
 	autoStoreColumnsWithoutDefault = []string{"name", "category_id"}
-	autoStoreColumnsWithDefault    = []string{"store_id", "location", "contact_info", "created_at", "updated_at"}
-	autoStorePrimaryKeyColumns     = []string{"store_id"}
-	autoStoreGeneratedColumns      = []string{"store_id"}
+	autoStoreColumnsWithDefault    = []string{"id", "location", "contact_number", "created_at", "updated_at"}
+	autoStorePrimaryKeyColumns     = []string{"id"}
+	autoStoreGeneratedColumns      = []string{}
 )
 
 type (
@@ -445,7 +483,7 @@ func (q autoStoreQuery) Exists(ctx context.Context, exec boil.ContextExecutor) (
 // Category pointed to by the foreign key.
 func (o *AutoStore) Category(mods ...qm.QueryMod) autoPartsCategoryQuery {
 	queryMods := []qm.QueryMod{
-		qm.Where("\"category_id\" = ?", o.CategoryID),
+		qm.Where("\"id\" = ?", o.CategoryID),
 	}
 
 	queryMods = append(queryMods, mods...)
@@ -461,7 +499,7 @@ func (o *AutoStore) StoreAutoOffers(mods ...qm.QueryMod) autoOfferQuery {
 	}
 
 	queryMods = append(queryMods,
-		qm.Where("\"auto_offers\".\"store_id\"=?", o.StoreID),
+		qm.Where("\"auto_offers\".\"store_id\"=?", o.ID),
 	)
 
 	return AutoOffers(queryMods...)
@@ -500,9 +538,7 @@ func (autoStoreL) LoadCategory(ctx context.Context, e boil.ContextExecutor, sing
 		if object.R == nil {
 			object.R = &autoStoreR{}
 		}
-		if !queries.IsNil(object.CategoryID) {
-			args[object.CategoryID] = struct{}{}
-		}
+		args[object.CategoryID] = struct{}{}
 
 	} else {
 		for _, obj := range slice {
@@ -510,9 +546,7 @@ func (autoStoreL) LoadCategory(ctx context.Context, e boil.ContextExecutor, sing
 				obj.R = &autoStoreR{}
 			}
 
-			if !queries.IsNil(obj.CategoryID) {
-				args[obj.CategoryID] = struct{}{}
-			}
+			args[obj.CategoryID] = struct{}{}
 
 		}
 	}
@@ -530,7 +564,7 @@ func (autoStoreL) LoadCategory(ctx context.Context, e boil.ContextExecutor, sing
 
 	query := NewQuery(
 		qm.From(`auto_parts_categories`),
-		qm.WhereIn(`auto_parts_categories.category_id in ?`, argsSlice...),
+		qm.WhereIn(`auto_parts_categories.id in ?`, argsSlice...),
 	)
 	if mods != nil {
 		mods.Apply(query)
@@ -577,7 +611,7 @@ func (autoStoreL) LoadCategory(ctx context.Context, e boil.ContextExecutor, sing
 
 	for _, local := range slice {
 		for _, foreign := range resultSlice {
-			if queries.Equal(local.CategoryID, foreign.CategoryID) {
+			if local.CategoryID == foreign.ID {
 				local.R.Category = foreign
 				if foreign.R == nil {
 					foreign.R = &autoPartsCategoryR{}
@@ -624,13 +658,13 @@ func (autoStoreL) LoadStoreAutoOffers(ctx context.Context, e boil.ContextExecuto
 		if object.R == nil {
 			object.R = &autoStoreR{}
 		}
-		args[object.StoreID] = struct{}{}
+		args[object.ID] = struct{}{}
 	} else {
 		for _, obj := range slice {
 			if obj.R == nil {
 				obj.R = &autoStoreR{}
 			}
-			args[obj.StoreID] = struct{}{}
+			args[obj.ID] = struct{}{}
 		}
 	}
 
@@ -690,7 +724,7 @@ func (autoStoreL) LoadStoreAutoOffers(ctx context.Context, e boil.ContextExecuto
 
 	for _, foreign := range resultSlice {
 		for _, local := range slice {
-			if queries.Equal(local.StoreID, foreign.StoreID) {
+			if local.ID == foreign.StoreID {
 				local.R.StoreAutoOffers = append(local.R.StoreAutoOffers, foreign)
 				if foreign.R == nil {
 					foreign.R = &autoOfferR{}
@@ -717,10 +751,10 @@ func (o *AutoStore) SetCategory(ctx context.Context, exec boil.ContextExecutor, 
 
 	updateQuery := fmt.Sprintf(
 		"UPDATE \"auto_stores\" SET %s WHERE %s",
-		strmangle.SetParamNames("\"", "\"", 0, []string{"category_id"}),
-		strmangle.WhereClause("\"", "\"", 0, autoStorePrimaryKeyColumns),
+		strmangle.SetParamNames("\"", "\"", 1, []string{"category_id"}),
+		strmangle.WhereClause("\"", "\"", 2, autoStorePrimaryKeyColumns),
 	)
-	values := []interface{}{related.CategoryID, o.StoreID}
+	values := []interface{}{related.ID, o.ID}
 
 	if boil.IsDebug(ctx) {
 		writer := boil.DebugWriterFrom(ctx)
@@ -731,7 +765,7 @@ func (o *AutoStore) SetCategory(ctx context.Context, exec boil.ContextExecutor, 
 		return errors.Wrap(err, "failed to update local table")
 	}
 
-	queries.Assign(&o.CategoryID, related.CategoryID)
+	o.CategoryID = related.ID
 	if o.R == nil {
 		o.R = &autoStoreR{
 			Category: related,
@@ -759,17 +793,17 @@ func (o *AutoStore) AddStoreAutoOffers(ctx context.Context, exec boil.ContextExe
 	var err error
 	for _, rel := range related {
 		if insert {
-			queries.Assign(&rel.StoreID, o.StoreID)
+			rel.StoreID = o.ID
 			if err = rel.Insert(ctx, exec, boil.Infer()); err != nil {
 				return errors.Wrap(err, "failed to insert into foreign table")
 			}
 		} else {
 			updateQuery := fmt.Sprintf(
 				"UPDATE \"auto_offers\" SET %s WHERE %s",
-				strmangle.SetParamNames("\"", "\"", 0, []string{"store_id"}),
-				strmangle.WhereClause("\"", "\"", 0, autoOfferPrimaryKeyColumns),
+				strmangle.SetParamNames("\"", "\"", 1, []string{"store_id"}),
+				strmangle.WhereClause("\"", "\"", 2, autoOfferPrimaryKeyColumns),
 			)
-			values := []interface{}{o.StoreID, rel.OfferID}
+			values := []interface{}{o.ID, rel.ID}
 
 			if boil.IsDebug(ctx) {
 				writer := boil.DebugWriterFrom(ctx)
@@ -780,7 +814,7 @@ func (o *AutoStore) AddStoreAutoOffers(ctx context.Context, exec boil.ContextExe
 				return errors.Wrap(err, "failed to update foreign table")
 			}
 
-			queries.Assign(&rel.StoreID, o.StoreID)
+			rel.StoreID = o.ID
 		}
 	}
 
@@ -817,7 +851,7 @@ func AutoStores(mods ...qm.QueryMod) autoStoreQuery {
 
 // FindAutoStore retrieves a single record by ID with an executor.
 // If selectCols is empty Find will return all columns.
-func FindAutoStore(ctx context.Context, exec boil.ContextExecutor, storeID null.Int64, selectCols ...string) (*AutoStore, error) {
+func FindAutoStore(ctx context.Context, exec boil.ContextExecutor, iD int, selectCols ...string) (*AutoStore, error) {
 	autoStoreObj := &AutoStore{}
 
 	sel := "*"
@@ -825,10 +859,10 @@ func FindAutoStore(ctx context.Context, exec boil.ContextExecutor, storeID null.
 		sel = strings.Join(strmangle.IdentQuoteSlice(dialect.LQ, dialect.RQ, selectCols), ",")
 	}
 	query := fmt.Sprintf(
-		"select %s from \"auto_stores\" where \"store_id\"=?", sel,
+		"select %s from \"auto_stores\" where \"id\"=$1", sel,
 	)
 
-	q := queries.Raw(query, storeID)
+	q := queries.Raw(query, iD)
 
 	err := q.Bind(ctx, exec, autoStoreObj)
 	if err != nil {
@@ -882,7 +916,6 @@ func (o *AutoStore) Insert(ctx context.Context, exec boil.ContextExecutor, colum
 			autoStoreColumnsWithoutDefault,
 			nzDefaults,
 		)
-		wl = strmangle.SetComplement(wl, autoStoreGeneratedColumns)
 
 		cache.valueMapping, err = queries.BindMapping(autoStoreType, autoStoreMapping, wl)
 		if err != nil {
@@ -959,7 +992,6 @@ func (o *AutoStore) Update(ctx context.Context, exec boil.ContextExecutor, colum
 			autoStoreAllColumns,
 			autoStorePrimaryKeyColumns,
 		)
-		wl = strmangle.SetComplement(wl, autoStoreGeneratedColumns)
 
 		if !columns.IsWhitelist() {
 			wl = strmangle.SetComplement(wl, []string{"created_at"})
@@ -969,8 +1001,8 @@ func (o *AutoStore) Update(ctx context.Context, exec boil.ContextExecutor, colum
 		}
 
 		cache.query = fmt.Sprintf("UPDATE \"auto_stores\" SET %s WHERE %s",
-			strmangle.SetParamNames("\"", "\"", 0, wl),
-			strmangle.WhereClause("\"", "\"", 0, autoStorePrimaryKeyColumns),
+			strmangle.SetParamNames("\"", "\"", 1, wl),
+			strmangle.WhereClause("\"", "\"", len(wl)+1, autoStorePrimaryKeyColumns),
 		)
 		cache.valueMapping, err = queries.BindMapping(autoStoreType, autoStoreMapping, append(wl, autoStorePrimaryKeyColumns...))
 		if err != nil {
@@ -1050,8 +1082,8 @@ func (o AutoStoreSlice) UpdateAll(ctx context.Context, exec boil.ContextExecutor
 	}
 
 	sql := fmt.Sprintf("UPDATE \"auto_stores\" SET %s WHERE %s",
-		strmangle.SetParamNames("\"", "\"", 0, colNames),
-		strmangle.WhereClauseRepeated(string(dialect.LQ), string(dialect.RQ), 0, autoStorePrimaryKeyColumns, len(o)))
+		strmangle.SetParamNames("\"", "\"", 1, colNames),
+		strmangle.WhereClauseRepeated(string(dialect.LQ), string(dialect.RQ), len(colNames)+1, autoStorePrimaryKeyColumns, len(o)))
 
 	if boil.IsDebug(ctx) {
 		writer := boil.DebugWriterFrom(ctx)
@@ -1072,7 +1104,7 @@ func (o AutoStoreSlice) UpdateAll(ctx context.Context, exec boil.ContextExecutor
 
 // Upsert attempts an insert using an executor, and does an update or ignore on conflict.
 // See boil.Columns documentation for how to properly use updateColumns and insertColumns.
-func (o *AutoStore) Upsert(ctx context.Context, exec boil.ContextExecutor, updateOnConflict bool, conflictColumns []string, updateColumns, insertColumns boil.Columns) error {
+func (o *AutoStore) Upsert(ctx context.Context, exec boil.ContextExecutor, updateOnConflict bool, conflictColumns []string, updateColumns, insertColumns boil.Columns, opts ...UpsertOptionFunc) error {
 	if o == nil {
 		return errors.New("models: no auto_stores provided for upsert")
 	}
@@ -1132,6 +1164,7 @@ func (o *AutoStore) Upsert(ctx context.Context, exec boil.ContextExecutor, updat
 			autoStoreColumnsWithoutDefault,
 			nzDefaults,
 		)
+
 		update := updateColumns.UpdateColumnSet(
 			autoStoreAllColumns,
 			autoStorePrimaryKeyColumns,
@@ -1144,11 +1177,15 @@ func (o *AutoStore) Upsert(ctx context.Context, exec boil.ContextExecutor, updat
 		ret := strmangle.SetComplement(autoStoreAllColumns, strmangle.SetIntersect(insert, update))
 
 		conflict := conflictColumns
-		if len(conflict) == 0 {
+		if len(conflict) == 0 && updateOnConflict && len(update) != 0 {
+			if len(autoStorePrimaryKeyColumns) == 0 {
+				return errors.New("models: unable to upsert auto_stores, could not build conflict column list")
+			}
+
 			conflict = make([]string, len(autoStorePrimaryKeyColumns))
 			copy(conflict, autoStorePrimaryKeyColumns)
 		}
-		cache.query = buildUpsertQuerySQLite(dialect, "\"auto_stores\"", updateOnConflict, ret, update, conflict, insert)
+		cache.query = buildUpsertQueryPostgres(dialect, "\"auto_stores\"", updateOnConflict, ret, update, conflict, insert, opts...)
 
 		cache.valueMapping, err = queries.BindMapping(autoStoreType, autoStoreMapping, insert)
 		if err != nil {
@@ -1207,7 +1244,7 @@ func (o *AutoStore) Delete(ctx context.Context, exec boil.ContextExecutor) (int6
 	}
 
 	args := queries.ValuesFromMapping(reflect.Indirect(reflect.ValueOf(o)), autoStorePrimaryKeyMapping)
-	sql := "DELETE FROM \"auto_stores\" WHERE \"store_id\"=?"
+	sql := "DELETE FROM \"auto_stores\" WHERE \"id\"=$1"
 
 	if boil.IsDebug(ctx) {
 		writer := boil.DebugWriterFrom(ctx)
@@ -1273,7 +1310,7 @@ func (o AutoStoreSlice) DeleteAll(ctx context.Context, exec boil.ContextExecutor
 	}
 
 	sql := "DELETE FROM \"auto_stores\" WHERE " +
-		strmangle.WhereClauseRepeated(string(dialect.LQ), string(dialect.RQ), 0, autoStorePrimaryKeyColumns, len(o))
+		strmangle.WhereClauseRepeated(string(dialect.LQ), string(dialect.RQ), 1, autoStorePrimaryKeyColumns, len(o))
 
 	if boil.IsDebug(ctx) {
 		writer := boil.DebugWriterFrom(ctx)
@@ -1304,7 +1341,7 @@ func (o AutoStoreSlice) DeleteAll(ctx context.Context, exec boil.ContextExecutor
 // Reload refetches the object from the database
 // using the primary keys with an executor.
 func (o *AutoStore) Reload(ctx context.Context, exec boil.ContextExecutor) error {
-	ret, err := FindAutoStore(ctx, exec, o.StoreID)
+	ret, err := FindAutoStore(ctx, exec, o.ID)
 	if err != nil {
 		return err
 	}
@@ -1328,7 +1365,7 @@ func (o *AutoStoreSlice) ReloadAll(ctx context.Context, exec boil.ContextExecuto
 	}
 
 	sql := "SELECT \"auto_stores\".* FROM \"auto_stores\" WHERE " +
-		strmangle.WhereClauseRepeated(string(dialect.LQ), string(dialect.RQ), 0, autoStorePrimaryKeyColumns, len(*o))
+		strmangle.WhereClauseRepeated(string(dialect.LQ), string(dialect.RQ), 1, autoStorePrimaryKeyColumns, len(*o))
 
 	q := queries.Raw(sql, args...)
 
@@ -1343,16 +1380,16 @@ func (o *AutoStoreSlice) ReloadAll(ctx context.Context, exec boil.ContextExecuto
 }
 
 // AutoStoreExists checks if the AutoStore row exists.
-func AutoStoreExists(ctx context.Context, exec boil.ContextExecutor, storeID null.Int64) (bool, error) {
+func AutoStoreExists(ctx context.Context, exec boil.ContextExecutor, iD int) (bool, error) {
 	var exists bool
-	sql := "select exists(select 1 from \"auto_stores\" where \"store_id\"=? limit 1)"
+	sql := "select exists(select 1 from \"auto_stores\" where \"id\"=$1 limit 1)"
 
 	if boil.IsDebug(ctx) {
 		writer := boil.DebugWriterFrom(ctx)
 		fmt.Fprintln(writer, sql)
-		fmt.Fprintln(writer, storeID)
+		fmt.Fprintln(writer, iD)
 	}
-	row := exec.QueryRowContext(ctx, sql, storeID)
+	row := exec.QueryRowContext(ctx, sql, iD)
 
 	err := row.Scan(&exists)
 	if err != nil {
@@ -1364,5 +1401,5 @@ func AutoStoreExists(ctx context.Context, exec boil.ContextExecutor, storeID nul
 
 // Exists checks if the AutoStore row exists.
 func (o *AutoStore) Exists(ctx context.Context, exec boil.ContextExecutor) (bool, error) {
-	return AutoStoreExists(ctx, exec, o.StoreID)
+	return AutoStoreExists(ctx, exec, o.ID)
 }

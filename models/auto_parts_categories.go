@@ -24,34 +24,34 @@ import (
 
 // AutoPartsCategory is an object representing the database table.
 type AutoPartsCategory struct {
-	CategoryID   null.Int64 `boil:"category_id" json:"category_id,omitempty" toml:"category_id" yaml:"category_id,omitempty"`
-	CategoryName string     `boil:"category_name" json:"category_name" toml:"category_name" yaml:"category_name"`
-	CreatedAt    null.Time  `boil:"created_at" json:"created_at,omitempty" toml:"created_at" yaml:"created_at,omitempty"`
-	UpdatedAt    null.Time  `boil:"updated_at" json:"updated_at,omitempty" toml:"updated_at" yaml:"updated_at,omitempty"`
+	ID           int       `boil:"id" json:"id" toml:"id" yaml:"id"`
+	CategoryName string    `boil:"category_name" json:"category_name" toml:"category_name" yaml:"category_name"`
+	CreatedAt    null.Time `boil:"created_at" json:"created_at,omitempty" toml:"created_at" yaml:"created_at,omitempty"`
+	UpdatedAt    null.Time `boil:"updated_at" json:"updated_at,omitempty" toml:"updated_at" yaml:"updated_at,omitempty"`
 
 	R *autoPartsCategoryR `boil:"-" json:"-" toml:"-" yaml:"-"`
 	L autoPartsCategoryL  `boil:"-" json:"-" toml:"-" yaml:"-"`
 }
 
 var AutoPartsCategoryColumns = struct {
-	CategoryID   string
+	ID           string
 	CategoryName string
 	CreatedAt    string
 	UpdatedAt    string
 }{
-	CategoryID:   "category_id",
+	ID:           "id",
 	CategoryName: "category_name",
 	CreatedAt:    "created_at",
 	UpdatedAt:    "updated_at",
 }
 
 var AutoPartsCategoryTableColumns = struct {
-	CategoryID   string
+	ID           string
 	CategoryName string
 	CreatedAt    string
 	UpdatedAt    string
 }{
-	CategoryID:   "auto_parts_categories.category_id",
+	ID:           "auto_parts_categories.id",
 	CategoryName: "auto_parts_categories.category_name",
 	CreatedAt:    "auto_parts_categories.created_at",
 	UpdatedAt:    "auto_parts_categories.updated_at",
@@ -61,14 +61,16 @@ var AutoPartsCategoryTableColumns = struct {
 
 type whereHelperstring struct{ field string }
 
-func (w whereHelperstring) EQ(x string) qm.QueryMod    { return qmhelper.Where(w.field, qmhelper.EQ, x) }
-func (w whereHelperstring) NEQ(x string) qm.QueryMod   { return qmhelper.Where(w.field, qmhelper.NEQ, x) }
-func (w whereHelperstring) LT(x string) qm.QueryMod    { return qmhelper.Where(w.field, qmhelper.LT, x) }
-func (w whereHelperstring) LTE(x string) qm.QueryMod   { return qmhelper.Where(w.field, qmhelper.LTE, x) }
-func (w whereHelperstring) GT(x string) qm.QueryMod    { return qmhelper.Where(w.field, qmhelper.GT, x) }
-func (w whereHelperstring) GTE(x string) qm.QueryMod   { return qmhelper.Where(w.field, qmhelper.GTE, x) }
-func (w whereHelperstring) LIKE(x string) qm.QueryMod  { return qm.Where(w.field+" LIKE ?", x) }
-func (w whereHelperstring) NLIKE(x string) qm.QueryMod { return qm.Where(w.field+" NOT LIKE ?", x) }
+func (w whereHelperstring) EQ(x string) qm.QueryMod     { return qmhelper.Where(w.field, qmhelper.EQ, x) }
+func (w whereHelperstring) NEQ(x string) qm.QueryMod    { return qmhelper.Where(w.field, qmhelper.NEQ, x) }
+func (w whereHelperstring) LT(x string) qm.QueryMod     { return qmhelper.Where(w.field, qmhelper.LT, x) }
+func (w whereHelperstring) LTE(x string) qm.QueryMod    { return qmhelper.Where(w.field, qmhelper.LTE, x) }
+func (w whereHelperstring) GT(x string) qm.QueryMod     { return qmhelper.Where(w.field, qmhelper.GT, x) }
+func (w whereHelperstring) GTE(x string) qm.QueryMod    { return qmhelper.Where(w.field, qmhelper.GTE, x) }
+func (w whereHelperstring) LIKE(x string) qm.QueryMod   { return qm.Where(w.field+" LIKE ?", x) }
+func (w whereHelperstring) NLIKE(x string) qm.QueryMod  { return qm.Where(w.field+" NOT LIKE ?", x) }
+func (w whereHelperstring) ILIKE(x string) qm.QueryMod  { return qm.Where(w.field+" ILIKE ?", x) }
+func (w whereHelperstring) NILIKE(x string) qm.QueryMod { return qm.Where(w.field+" NOT ILIKE ?", x) }
 func (w whereHelperstring) IN(slice []string) qm.QueryMod {
 	values := make([]interface{}, 0, len(slice))
 	for _, value := range slice {
@@ -85,12 +87,12 @@ func (w whereHelperstring) NIN(slice []string) qm.QueryMod {
 }
 
 var AutoPartsCategoryWhere = struct {
-	CategoryID   whereHelpernull_Int64
+	ID           whereHelperint
 	CategoryName whereHelperstring
 	CreatedAt    whereHelpernull_Time
 	UpdatedAt    whereHelpernull_Time
 }{
-	CategoryID:   whereHelpernull_Int64{field: "\"auto_parts_categories\".\"category_id\""},
+	ID:           whereHelperint{field: "\"auto_parts_categories\".\"id\""},
 	CategoryName: whereHelperstring{field: "\"auto_parts_categories\".\"category_name\""},
 	CreatedAt:    whereHelpernull_Time{field: "\"auto_parts_categories\".\"created_at\""},
 	UpdatedAt:    whereHelpernull_Time{field: "\"auto_parts_categories\".\"updated_at\""},
@@ -134,11 +136,11 @@ func (r *autoPartsCategoryR) GetCategoryBiddings() BiddingSlice {
 type autoPartsCategoryL struct{}
 
 var (
-	autoPartsCategoryAllColumns            = []string{"category_id", "category_name", "created_at", "updated_at"}
+	autoPartsCategoryAllColumns            = []string{"id", "category_name", "created_at", "updated_at"}
 	autoPartsCategoryColumnsWithoutDefault = []string{"category_name"}
-	autoPartsCategoryColumnsWithDefault    = []string{"category_id", "created_at", "updated_at"}
-	autoPartsCategoryPrimaryKeyColumns     = []string{"category_id"}
-	autoPartsCategoryGeneratedColumns      = []string{"category_id"}
+	autoPartsCategoryColumnsWithDefault    = []string{"id", "created_at", "updated_at"}
+	autoPartsCategoryPrimaryKeyColumns     = []string{"id"}
+	autoPartsCategoryGeneratedColumns      = []string{}
 )
 
 type (
@@ -454,7 +456,7 @@ func (o *AutoPartsCategory) CategoryAutoStores(mods ...qm.QueryMod) autoStoreQue
 	}
 
 	queryMods = append(queryMods,
-		qm.Where("\"auto_stores\".\"category_id\"=?", o.CategoryID),
+		qm.Where("\"auto_stores\".\"category_id\"=?", o.ID),
 	)
 
 	return AutoStores(queryMods...)
@@ -468,7 +470,7 @@ func (o *AutoPartsCategory) CategoryBiddings(mods ...qm.QueryMod) biddingQuery {
 	}
 
 	queryMods = append(queryMods,
-		qm.Where("\"biddings\".\"category_id\"=?", o.CategoryID),
+		qm.Where("\"biddings\".\"category_id\"=?", o.ID),
 	)
 
 	return Biddings(queryMods...)
@@ -507,13 +509,13 @@ func (autoPartsCategoryL) LoadCategoryAutoStores(ctx context.Context, e boil.Con
 		if object.R == nil {
 			object.R = &autoPartsCategoryR{}
 		}
-		args[object.CategoryID] = struct{}{}
+		args[object.ID] = struct{}{}
 	} else {
 		for _, obj := range slice {
 			if obj.R == nil {
 				obj.R = &autoPartsCategoryR{}
 			}
-			args[obj.CategoryID] = struct{}{}
+			args[obj.ID] = struct{}{}
 		}
 	}
 
@@ -573,7 +575,7 @@ func (autoPartsCategoryL) LoadCategoryAutoStores(ctx context.Context, e boil.Con
 
 	for _, foreign := range resultSlice {
 		for _, local := range slice {
-			if queries.Equal(local.CategoryID, foreign.CategoryID) {
+			if local.ID == foreign.CategoryID {
 				local.R.CategoryAutoStores = append(local.R.CategoryAutoStores, foreign)
 				if foreign.R == nil {
 					foreign.R = &autoStoreR{}
@@ -620,13 +622,13 @@ func (autoPartsCategoryL) LoadCategoryBiddings(ctx context.Context, e boil.Conte
 		if object.R == nil {
 			object.R = &autoPartsCategoryR{}
 		}
-		args[object.CategoryID] = struct{}{}
+		args[object.ID] = struct{}{}
 	} else {
 		for _, obj := range slice {
 			if obj.R == nil {
 				obj.R = &autoPartsCategoryR{}
 			}
-			args[obj.CategoryID] = struct{}{}
+			args[obj.ID] = struct{}{}
 		}
 	}
 
@@ -686,7 +688,7 @@ func (autoPartsCategoryL) LoadCategoryBiddings(ctx context.Context, e boil.Conte
 
 	for _, foreign := range resultSlice {
 		for _, local := range slice {
-			if queries.Equal(local.CategoryID, foreign.CategoryID) {
+			if local.ID == foreign.CategoryID {
 				local.R.CategoryBiddings = append(local.R.CategoryBiddings, foreign)
 				if foreign.R == nil {
 					foreign.R = &biddingR{}
@@ -708,17 +710,17 @@ func (o *AutoPartsCategory) AddCategoryAutoStores(ctx context.Context, exec boil
 	var err error
 	for _, rel := range related {
 		if insert {
-			queries.Assign(&rel.CategoryID, o.CategoryID)
+			rel.CategoryID = o.ID
 			if err = rel.Insert(ctx, exec, boil.Infer()); err != nil {
 				return errors.Wrap(err, "failed to insert into foreign table")
 			}
 		} else {
 			updateQuery := fmt.Sprintf(
 				"UPDATE \"auto_stores\" SET %s WHERE %s",
-				strmangle.SetParamNames("\"", "\"", 0, []string{"category_id"}),
-				strmangle.WhereClause("\"", "\"", 0, autoStorePrimaryKeyColumns),
+				strmangle.SetParamNames("\"", "\"", 1, []string{"category_id"}),
+				strmangle.WhereClause("\"", "\"", 2, autoStorePrimaryKeyColumns),
 			)
-			values := []interface{}{o.CategoryID, rel.StoreID}
+			values := []interface{}{o.ID, rel.ID}
 
 			if boil.IsDebug(ctx) {
 				writer := boil.DebugWriterFrom(ctx)
@@ -729,7 +731,7 @@ func (o *AutoPartsCategory) AddCategoryAutoStores(ctx context.Context, exec boil
 				return errors.Wrap(err, "failed to update foreign table")
 			}
 
-			queries.Assign(&rel.CategoryID, o.CategoryID)
+			rel.CategoryID = o.ID
 		}
 	}
 
@@ -761,17 +763,17 @@ func (o *AutoPartsCategory) AddCategoryBiddings(ctx context.Context, exec boil.C
 	var err error
 	for _, rel := range related {
 		if insert {
-			queries.Assign(&rel.CategoryID, o.CategoryID)
+			rel.CategoryID = o.ID
 			if err = rel.Insert(ctx, exec, boil.Infer()); err != nil {
 				return errors.Wrap(err, "failed to insert into foreign table")
 			}
 		} else {
 			updateQuery := fmt.Sprintf(
 				"UPDATE \"biddings\" SET %s WHERE %s",
-				strmangle.SetParamNames("\"", "\"", 0, []string{"category_id"}),
-				strmangle.WhereClause("\"", "\"", 0, biddingPrimaryKeyColumns),
+				strmangle.SetParamNames("\"", "\"", 1, []string{"category_id"}),
+				strmangle.WhereClause("\"", "\"", 2, biddingPrimaryKeyColumns),
 			)
-			values := []interface{}{o.CategoryID, rel.BiddingID}
+			values := []interface{}{o.ID, rel.ID}
 
 			if boil.IsDebug(ctx) {
 				writer := boil.DebugWriterFrom(ctx)
@@ -782,7 +784,7 @@ func (o *AutoPartsCategory) AddCategoryBiddings(ctx context.Context, exec boil.C
 				return errors.Wrap(err, "failed to update foreign table")
 			}
 
-			queries.Assign(&rel.CategoryID, o.CategoryID)
+			rel.CategoryID = o.ID
 		}
 	}
 
@@ -819,7 +821,7 @@ func AutoPartsCategories(mods ...qm.QueryMod) autoPartsCategoryQuery {
 
 // FindAutoPartsCategory retrieves a single record by ID with an executor.
 // If selectCols is empty Find will return all columns.
-func FindAutoPartsCategory(ctx context.Context, exec boil.ContextExecutor, categoryID null.Int64, selectCols ...string) (*AutoPartsCategory, error) {
+func FindAutoPartsCategory(ctx context.Context, exec boil.ContextExecutor, iD int, selectCols ...string) (*AutoPartsCategory, error) {
 	autoPartsCategoryObj := &AutoPartsCategory{}
 
 	sel := "*"
@@ -827,10 +829,10 @@ func FindAutoPartsCategory(ctx context.Context, exec boil.ContextExecutor, categ
 		sel = strings.Join(strmangle.IdentQuoteSlice(dialect.LQ, dialect.RQ, selectCols), ",")
 	}
 	query := fmt.Sprintf(
-		"select %s from \"auto_parts_categories\" where \"category_id\"=?", sel,
+		"select %s from \"auto_parts_categories\" where \"id\"=$1", sel,
 	)
 
-	q := queries.Raw(query, categoryID)
+	q := queries.Raw(query, iD)
 
 	err := q.Bind(ctx, exec, autoPartsCategoryObj)
 	if err != nil {
@@ -884,7 +886,6 @@ func (o *AutoPartsCategory) Insert(ctx context.Context, exec boil.ContextExecuto
 			autoPartsCategoryColumnsWithoutDefault,
 			nzDefaults,
 		)
-		wl = strmangle.SetComplement(wl, autoPartsCategoryGeneratedColumns)
 
 		cache.valueMapping, err = queries.BindMapping(autoPartsCategoryType, autoPartsCategoryMapping, wl)
 		if err != nil {
@@ -961,7 +962,6 @@ func (o *AutoPartsCategory) Update(ctx context.Context, exec boil.ContextExecuto
 			autoPartsCategoryAllColumns,
 			autoPartsCategoryPrimaryKeyColumns,
 		)
-		wl = strmangle.SetComplement(wl, autoPartsCategoryGeneratedColumns)
 
 		if !columns.IsWhitelist() {
 			wl = strmangle.SetComplement(wl, []string{"created_at"})
@@ -971,8 +971,8 @@ func (o *AutoPartsCategory) Update(ctx context.Context, exec boil.ContextExecuto
 		}
 
 		cache.query = fmt.Sprintf("UPDATE \"auto_parts_categories\" SET %s WHERE %s",
-			strmangle.SetParamNames("\"", "\"", 0, wl),
-			strmangle.WhereClause("\"", "\"", 0, autoPartsCategoryPrimaryKeyColumns),
+			strmangle.SetParamNames("\"", "\"", 1, wl),
+			strmangle.WhereClause("\"", "\"", len(wl)+1, autoPartsCategoryPrimaryKeyColumns),
 		)
 		cache.valueMapping, err = queries.BindMapping(autoPartsCategoryType, autoPartsCategoryMapping, append(wl, autoPartsCategoryPrimaryKeyColumns...))
 		if err != nil {
@@ -1052,8 +1052,8 @@ func (o AutoPartsCategorySlice) UpdateAll(ctx context.Context, exec boil.Context
 	}
 
 	sql := fmt.Sprintf("UPDATE \"auto_parts_categories\" SET %s WHERE %s",
-		strmangle.SetParamNames("\"", "\"", 0, colNames),
-		strmangle.WhereClauseRepeated(string(dialect.LQ), string(dialect.RQ), 0, autoPartsCategoryPrimaryKeyColumns, len(o)))
+		strmangle.SetParamNames("\"", "\"", 1, colNames),
+		strmangle.WhereClauseRepeated(string(dialect.LQ), string(dialect.RQ), len(colNames)+1, autoPartsCategoryPrimaryKeyColumns, len(o)))
 
 	if boil.IsDebug(ctx) {
 		writer := boil.DebugWriterFrom(ctx)
@@ -1074,7 +1074,7 @@ func (o AutoPartsCategorySlice) UpdateAll(ctx context.Context, exec boil.Context
 
 // Upsert attempts an insert using an executor, and does an update or ignore on conflict.
 // See boil.Columns documentation for how to properly use updateColumns and insertColumns.
-func (o *AutoPartsCategory) Upsert(ctx context.Context, exec boil.ContextExecutor, updateOnConflict bool, conflictColumns []string, updateColumns, insertColumns boil.Columns) error {
+func (o *AutoPartsCategory) Upsert(ctx context.Context, exec boil.ContextExecutor, updateOnConflict bool, conflictColumns []string, updateColumns, insertColumns boil.Columns, opts ...UpsertOptionFunc) error {
 	if o == nil {
 		return errors.New("models: no auto_parts_categories provided for upsert")
 	}
@@ -1134,6 +1134,7 @@ func (o *AutoPartsCategory) Upsert(ctx context.Context, exec boil.ContextExecuto
 			autoPartsCategoryColumnsWithoutDefault,
 			nzDefaults,
 		)
+
 		update := updateColumns.UpdateColumnSet(
 			autoPartsCategoryAllColumns,
 			autoPartsCategoryPrimaryKeyColumns,
@@ -1146,11 +1147,15 @@ func (o *AutoPartsCategory) Upsert(ctx context.Context, exec boil.ContextExecuto
 		ret := strmangle.SetComplement(autoPartsCategoryAllColumns, strmangle.SetIntersect(insert, update))
 
 		conflict := conflictColumns
-		if len(conflict) == 0 {
+		if len(conflict) == 0 && updateOnConflict && len(update) != 0 {
+			if len(autoPartsCategoryPrimaryKeyColumns) == 0 {
+				return errors.New("models: unable to upsert auto_parts_categories, could not build conflict column list")
+			}
+
 			conflict = make([]string, len(autoPartsCategoryPrimaryKeyColumns))
 			copy(conflict, autoPartsCategoryPrimaryKeyColumns)
 		}
-		cache.query = buildUpsertQuerySQLite(dialect, "\"auto_parts_categories\"", updateOnConflict, ret, update, conflict, insert)
+		cache.query = buildUpsertQueryPostgres(dialect, "\"auto_parts_categories\"", updateOnConflict, ret, update, conflict, insert, opts...)
 
 		cache.valueMapping, err = queries.BindMapping(autoPartsCategoryType, autoPartsCategoryMapping, insert)
 		if err != nil {
@@ -1209,7 +1214,7 @@ func (o *AutoPartsCategory) Delete(ctx context.Context, exec boil.ContextExecuto
 	}
 
 	args := queries.ValuesFromMapping(reflect.Indirect(reflect.ValueOf(o)), autoPartsCategoryPrimaryKeyMapping)
-	sql := "DELETE FROM \"auto_parts_categories\" WHERE \"category_id\"=?"
+	sql := "DELETE FROM \"auto_parts_categories\" WHERE \"id\"=$1"
 
 	if boil.IsDebug(ctx) {
 		writer := boil.DebugWriterFrom(ctx)
@@ -1275,7 +1280,7 @@ func (o AutoPartsCategorySlice) DeleteAll(ctx context.Context, exec boil.Context
 	}
 
 	sql := "DELETE FROM \"auto_parts_categories\" WHERE " +
-		strmangle.WhereClauseRepeated(string(dialect.LQ), string(dialect.RQ), 0, autoPartsCategoryPrimaryKeyColumns, len(o))
+		strmangle.WhereClauseRepeated(string(dialect.LQ), string(dialect.RQ), 1, autoPartsCategoryPrimaryKeyColumns, len(o))
 
 	if boil.IsDebug(ctx) {
 		writer := boil.DebugWriterFrom(ctx)
@@ -1306,7 +1311,7 @@ func (o AutoPartsCategorySlice) DeleteAll(ctx context.Context, exec boil.Context
 // Reload refetches the object from the database
 // using the primary keys with an executor.
 func (o *AutoPartsCategory) Reload(ctx context.Context, exec boil.ContextExecutor) error {
-	ret, err := FindAutoPartsCategory(ctx, exec, o.CategoryID)
+	ret, err := FindAutoPartsCategory(ctx, exec, o.ID)
 	if err != nil {
 		return err
 	}
@@ -1330,7 +1335,7 @@ func (o *AutoPartsCategorySlice) ReloadAll(ctx context.Context, exec boil.Contex
 	}
 
 	sql := "SELECT \"auto_parts_categories\".* FROM \"auto_parts_categories\" WHERE " +
-		strmangle.WhereClauseRepeated(string(dialect.LQ), string(dialect.RQ), 0, autoPartsCategoryPrimaryKeyColumns, len(*o))
+		strmangle.WhereClauseRepeated(string(dialect.LQ), string(dialect.RQ), 1, autoPartsCategoryPrimaryKeyColumns, len(*o))
 
 	q := queries.Raw(sql, args...)
 
@@ -1345,16 +1350,16 @@ func (o *AutoPartsCategorySlice) ReloadAll(ctx context.Context, exec boil.Contex
 }
 
 // AutoPartsCategoryExists checks if the AutoPartsCategory row exists.
-func AutoPartsCategoryExists(ctx context.Context, exec boil.ContextExecutor, categoryID null.Int64) (bool, error) {
+func AutoPartsCategoryExists(ctx context.Context, exec boil.ContextExecutor, iD int) (bool, error) {
 	var exists bool
-	sql := "select exists(select 1 from \"auto_parts_categories\" where \"category_id\"=? limit 1)"
+	sql := "select exists(select 1 from \"auto_parts_categories\" where \"id\"=$1 limit 1)"
 
 	if boil.IsDebug(ctx) {
 		writer := boil.DebugWriterFrom(ctx)
 		fmt.Fprintln(writer, sql)
-		fmt.Fprintln(writer, categoryID)
+		fmt.Fprintln(writer, iD)
 	}
-	row := exec.QueryRowContext(ctx, sql, categoryID)
+	row := exec.QueryRowContext(ctx, sql, iD)
 
 	err := row.Scan(&exists)
 	if err != nil {
@@ -1366,5 +1371,5 @@ func AutoPartsCategoryExists(ctx context.Context, exec boil.ContextExecutor, cat
 
 // Exists checks if the AutoPartsCategory row exists.
 func (o *AutoPartsCategory) Exists(ctx context.Context, exec boil.ContextExecutor) (bool, error) {
-	return AutoPartsCategoryExists(ctx, exec, o.CategoryID)
+	return AutoPartsCategoryExists(ctx, exec, o.ID)
 }
