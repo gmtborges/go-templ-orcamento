@@ -17,13 +17,13 @@ func main() {
 	if err != nil {
 		log.Fatalf("Error loading .env file: %v", err)
 	}
-	connStr := os.Getenv("DATABASE_URL")
+	connStr := os.Getenv("DB_URL")
 	db := dbconn(connStr)
 	migrations(db)
 
 }
 
-//go:embed *.sql
+//go:embed migrations/*.sql
 var embedMigrations embed.FS
 
 func migrations(db *sql.DB) {
@@ -39,7 +39,7 @@ func migrations(db *sql.DB) {
 
 func dbconn(connStr string) *sql.DB {
 	if connStr == "" {
-		log.Fatalf("DATABASE_URL environment variable not set")
+		log.Fatalf("DB_URL environment variable not set")
 	}
 	db, err := sql.Open("postgres", connStr)
 	if err != nil {

@@ -6,6 +6,6 @@ import (
 	"github.com/gustavomtborges/orcamento-auto/views"
 )
 
-func GetIndex(c echo.Context) error {
+func ShowIndex(c echo.Context) error {
 	return render(c, views.Index())
 }
