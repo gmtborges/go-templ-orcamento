@@ -3,7 +3,7 @@ module github.com/gustavomtborges/orcamento-auto
 go 1.22.2
 
 require (
-	github.com/a-h/templ v0.2.663
+	github.com/a-h/templ v0.2.680
 	github.com/friendsofgo/errors v0.9.2
 	github.com/labstack/echo/v4 v4.12.0
 	github.com/volatiletech/null/v8 v8.1.2
