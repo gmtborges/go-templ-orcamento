@@ -26,3 +26,4 @@ tmp
 .DStore
 *.txt
 node_modules/
+.exrc

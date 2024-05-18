@@ -4,17 +4,21 @@
 package models
 
 var TableNames = struct {
-	AutoOffers          string
-	AutoPartsCategories string
-	AutoStores          string
-	Biddings            string
-	Companies           string
-	Users               string
+	AutoCategories       string
+	AutoOffers           string
+	AutoStores           string
+	AutoStoresCategories string
+	Biddings             string
+	Companies            string
+	Employers            string
+	Users                string
 }{
-	AutoOffers:          "auto_offers",
-	AutoPartsCategories: "auto_parts_categories",
-	AutoStores:          "auto_stores",
-	Biddings:            "biddings",
-	Companies:           "companies",
-	Users:               "users",
+	AutoCategories:       "auto_categories",
+	AutoOffers:           "auto_offers",
+	AutoStores:           "auto_stores",
+	AutoStoresCategories: "auto_stores_categories",
+	Biddings:             "biddings",
+	Companies:            "companies",
+	Employers:            "employers",
+	Users:                "users",
 }

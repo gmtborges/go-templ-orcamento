@@ -1,12 +1,16 @@
 package main
 
 import (
-	"database/sql"
+	"context"
 	"log"
 	"os"
 
 	"github.com/joho/godotenv"
 	_ "github.com/lib/pq"
+	"github.com/volatiletech/sqlboiler/v4/boil"
+
+	"github.com/gustavomtborges/orcamento-auto/db"
+	"github.com/gustavomtborges/orcamento-auto/models"
 )
 
 func main() {
@@ -15,29 +19,24 @@ func main() {
 		log.Fatalf("Error on loading .env: %v", err)
 	}
 	connStr := os.Getenv("DB_URL")
-	db := dbConn(connStr)
-	sql, err := os.ReadFile("seed.sql")
-	if err != nil {
-		log.Fatalf("Error on reading seed: %v", err)
-	}
-	seed(db, string(sql))
-}
+	db := db.Conn(connStr)
+	ctx := context.Background()
 
-func seed(db *sql.DB, sql string) {
-	_, err := db.Exec(sql)
+	ep := models.Employer{
+		Type: "company",
+	}
+	models.Employers().DeleteAll(ctx, db)
+	err = ep.Insert(ctx, db, boil.Infer())
 	if err != nil {
 		panic(err)
 	}
-}
-
-func dbConn(connStr string) *sql.DB {
-	db, err := sql.Open("postgres", connStr)
-	if err != nil {
-		log.Fatalf("Error opening db: %v", err)
+	cp := models.Company{
+		Name:       "My assoc",
+		EmployerID: ep.ID,
 	}
-	err = db.Ping()
+	models.Companies().DeleteAll(ctx, db)
+	err = cp.Insert(ctx, db, boil.Infer())
 	if err != nil {
-		log.Fatalf("Error pinging db: %v", err)
+		panic(err)
 	}
-	return db
 }

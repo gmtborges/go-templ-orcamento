@@ -25,10 +25,10 @@ import (
 // AutoStore is an object representing the database table.
 type AutoStore struct {
 	ID            int         `boil:"id" json:"id" toml:"id" yaml:"id"`
+	EmployerID    int         `boil:"employer_id" json:"employer_id" toml:"employer_id" yaml:"employer_id"`
 	Name          string      `boil:"name" json:"name" toml:"name" yaml:"name"`
 	Location      null.String `boil:"location" json:"location,omitempty" toml:"location" yaml:"location,omitempty"`
 	ContactNumber null.Int    `boil:"contact_number" json:"contact_number,omitempty" toml:"contact_number" yaml:"contact_number,omitempty"`
-	CategoryID    int         `boil:"category_id" json:"category_id" toml:"category_id" yaml:"category_id"`
 	CreatedAt     null.Time   `boil:"created_at" json:"created_at,omitempty" toml:"created_at" yaml:"created_at,omitempty"`
 	UpdatedAt     null.Time   `boil:"updated_at" json:"updated_at,omitempty" toml:"updated_at" yaml:"updated_at,omitempty"`
 
@@ -38,36 +38,36 @@ type AutoStore struct {
 
 var AutoStoreColumns = struct {
 	ID            string
+	EmployerID    string
 	Name          string
 	Location      string
 	ContactNumber string
-	CategoryID    string
 	CreatedAt     string
 	UpdatedAt     string
 }{
 	ID:            "id",
+	EmployerID:    "employer_id",
 	Name:          "name",
 	Location:      "location",
 	ContactNumber: "contact_number",
-	CategoryID:    "category_id",
 	CreatedAt:     "created_at",
 	UpdatedAt:     "updated_at",
 }
 
 var AutoStoreTableColumns = struct {
 	ID            string
+	EmployerID    string
 	Name          string
 	Location      string
 	ContactNumber string
-	CategoryID    string
 	CreatedAt     string
 	UpdatedAt     string
 }{
 	ID:            "auto_stores.id",
+	EmployerID:    "auto_stores.employer_id",
 	Name:          "auto_stores.name",
 	Location:      "auto_stores.location",
 	ContactNumber: "auto_stores.contact_number",
-	CategoryID:    "auto_stores.category_id",
 	CreatedAt:     "auto_stores.created_at",
 	UpdatedAt:     "auto_stores.updated_at",
 }
@@ -114,35 +114,38 @@ func (w whereHelpernull_Int) IsNotNull() qm.QueryMod { return qmhelper.WhereIsNo
 
 var AutoStoreWhere = struct {
 	ID            whereHelperint
+	EmployerID    whereHelperint
 	Name          whereHelperstring
 	Location      whereHelpernull_String
 	ContactNumber whereHelpernull_Int
-	CategoryID    whereHelperint
 	CreatedAt     whereHelpernull_Time
 	UpdatedAt     whereHelpernull_Time
 }{
 	ID:            whereHelperint{field: "\"auto_stores\".\"id\""},
+	EmployerID:    whereHelperint{field: "\"auto_stores\".\"employer_id\""},
 	Name:          whereHelperstring{field: "\"auto_stores\".\"name\""},
 	Location:      whereHelpernull_String{field: "\"auto_stores\".\"location\""},
 	ContactNumber: whereHelpernull_Int{field: "\"auto_stores\".\"contact_number\""},
-	CategoryID:    whereHelperint{field: "\"auto_stores\".\"category_id\""},
 	CreatedAt:     whereHelpernull_Time{field: "\"auto_stores\".\"created_at\""},
 	UpdatedAt:     whereHelpernull_Time{field: "\"auto_stores\".\"updated_at\""},
 }
 
 // AutoStoreRels is where relationship names are stored.
 var AutoStoreRels = struct {
-	Category        string
-	StoreAutoOffers string
+	Employer       string
+	AutoOffers     string
+	AutoCategories string
 }{
-	Category:        "Category",
-	StoreAutoOffers: "StoreAutoOffers",
+	Employer:       "Employer",
+	AutoOffers:     "AutoOffers",
+	AutoCategories: "AutoCategories",
 }
 
 // autoStoreR is where relationships are stored.
 type autoStoreR struct {
-	Category        *AutoPartsCategory `boil:"Category" json:"Category" toml:"Category" yaml:"Category"`
-	StoreAutoOffers AutoOfferSlice     `boil:"StoreAutoOffers" json:"StoreAutoOffers" toml:"StoreAutoOffers" yaml:"StoreAutoOffers"`
+	Employer       *Employer         `boil:"Employer" json:"Employer" toml:"Employer" yaml:"Employer"`
+	AutoOffers     AutoOfferSlice    `boil:"AutoOffers" json:"AutoOffers" toml:"AutoOffers" yaml:"AutoOffers"`
+	AutoCategories AutoCategorySlice `boil:"AutoCategories" json:"AutoCategories" toml:"AutoCategories" yaml:"AutoCategories"`
 }
 
 // NewStruct creates a new relationship struct
@@ -150,26 +153,33 @@ func (*autoStoreR) NewStruct() *autoStoreR {
 	return &autoStoreR{}
 }
 
-func (r *autoStoreR) GetCategory() *AutoPartsCategory {
+func (r *autoStoreR) GetEmployer() *Employer {
 	if r == nil {
 		return nil
 	}
-	return r.Category
+	return r.Employer
 }
 
-func (r *autoStoreR) GetStoreAutoOffers() AutoOfferSlice {
+func (r *autoStoreR) GetAutoOffers() AutoOfferSlice {
 	if r == nil {
 		return nil
 	}
-	return r.StoreAutoOffers
+	return r.AutoOffers
+}
+
+func (r *autoStoreR) GetAutoCategories() AutoCategorySlice {
+	if r == nil {
+		return nil
+	}
+	return r.AutoCategories
 }
 
 // autoStoreL is where Load methods for each relationship are stored.
 type autoStoreL struct{}
 
 var (
-	autoStoreAllColumns            = []string{"id", "name", "location", "contact_number", "category_id", "created_at", "updated_at"}
-	autoStoreColumnsWithoutDefault = []string{"name", "category_id"}
+	autoStoreAllColumns            = []string{"id", "employer_id", "name", "location", "contact_number", "created_at", "updated_at"}
+	autoStoreColumnsWithoutDefault = []string{"employer_id", "name"}
 	autoStoreColumnsWithDefault    = []string{"id", "location", "contact_number", "created_at", "updated_at"}
 	autoStorePrimaryKeyColumns     = []string{"id"}
 	autoStoreGeneratedColumns      = []string{}
@@ -480,34 +490,49 @@ func (q autoStoreQuery) Exists(ctx context.Context, exec boil.ContextExecutor) (
 	return count > 0, nil
 }
 
-// Category pointed to by the foreign key.
-func (o *AutoStore) Category(mods ...qm.QueryMod) autoPartsCategoryQuery {
+// Employer pointed to by the foreign key.
+func (o *AutoStore) Employer(mods ...qm.QueryMod) employerQuery {
 	queryMods := []qm.QueryMod{
-		qm.Where("\"id\" = ?", o.CategoryID),
+		qm.Where("\"id\" = ?", o.EmployerID),
 	}
 
 	queryMods = append(queryMods, mods...)
 
-	return AutoPartsCategories(queryMods...)
+	return Employers(queryMods...)
 }
 
-// StoreAutoOffers retrieves all the auto_offer's AutoOffers with an executor via store_id column.
-func (o *AutoStore) StoreAutoOffers(mods ...qm.QueryMod) autoOfferQuery {
+// AutoOffers retrieves all the auto_offer's AutoOffers with an executor.
+func (o *AutoStore) AutoOffers(mods ...qm.QueryMod) autoOfferQuery {
 	var queryMods []qm.QueryMod
 	if len(mods) != 0 {
 		queryMods = append(queryMods, mods...)
 	}
 
 	queryMods = append(queryMods,
-		qm.Where("\"auto_offers\".\"store_id\"=?", o.ID),
+		qm.Where("\"auto_offers\".\"auto_store_id\"=?", o.ID),
 	)
 
 	return AutoOffers(queryMods...)
 }
 
-// LoadCategory allows an eager lookup of values, cached into the
+// AutoCategories retrieves all the auto_category's AutoCategories with an executor.
+func (o *AutoStore) AutoCategories(mods ...qm.QueryMod) autoCategoryQuery {
+	var queryMods []qm.QueryMod
+	if len(mods) != 0 {
+		queryMods = append(queryMods, mods...)
+	}
+
+	queryMods = append(queryMods,
+		qm.InnerJoin("\"auto_stores_categories\" on \"auto_categories\".\"id\" = \"auto_stores_categories\".\"auto_category_id\""),
+		qm.Where("\"auto_stores_categories\".\"auto_store_id\"=?", o.ID),
+	)
+
+	return AutoCategories(queryMods...)
+}
+
+// LoadEmployer allows an eager lookup of values, cached into the
 // loaded structs of the objects. This is for an N-1 relationship.
-func (autoStoreL) LoadCategory(ctx context.Context, e boil.ContextExecutor, singular bool, maybeAutoStore interface{}, mods queries.Applicator) error {
+func (autoStoreL) LoadEmployer(ctx context.Context, e boil.ContextExecutor, singular bool, maybeAutoStore interface{}, mods queries.Applicator) error {
 	var slice []*AutoStore
 	var object *AutoStore
 
@@ -538,7 +563,7 @@ func (autoStoreL) LoadCategory(ctx context.Context, e boil.ContextExecutor, sing
 		if object.R == nil {
 			object.R = &autoStoreR{}
 		}
-		args[object.CategoryID] = struct{}{}
+		args[object.EmployerID] = struct{}{}
 
 	} else {
 		for _, obj := range slice {
@@ -546,7 +571,7 @@ func (autoStoreL) LoadCategory(ctx context.Context, e boil.ContextExecutor, sing
 				obj.R = &autoStoreR{}
 			}
 
-			args[obj.CategoryID] = struct{}{}
+			args[obj.EmployerID] = struct{}{}
 
 		}
 	}
@@ -563,8 +588,8 @@ func (autoStoreL) LoadCategory(ctx context.Context, e boil.ContextExecutor, sing
 	}
 
 	query := NewQuery(
-		qm.From(`auto_parts_categories`),
-		qm.WhereIn(`auto_parts_categories.id in ?`, argsSlice...),
+		qm.From(`employers`),
+		qm.WhereIn(`employers.id in ?`, argsSlice...),
 	)
 	if mods != nil {
 		mods.Apply(query)
@@ -572,22 +597,22 @@ func (autoStoreL) LoadCategory(ctx context.Context, e boil.ContextExecutor, sing
 
 	results, err := query.QueryContext(ctx, e)
 	if err != nil {
-		return errors.Wrap(err, "failed to eager load AutoPartsCategory")
+		return errors.Wrap(err, "failed to eager load Employer")
 	}
 
-	var resultSlice []*AutoPartsCategory
+	var resultSlice []*Employer
 	if err = queries.Bind(results, &resultSlice); err != nil {
-		return errors.Wrap(err, "failed to bind eager loaded slice AutoPartsCategory")
+		return errors.Wrap(err, "failed to bind eager loaded slice Employer")
 	}
 
 	if err = results.Close(); err != nil {
-		return errors.Wrap(err, "failed to close results of eager load for auto_parts_categories")
+		return errors.Wrap(err, "failed to close results of eager load for employers")
 	}
 	if err = results.Err(); err != nil {
-		return errors.Wrap(err, "error occurred during iteration of eager loaded relations for auto_parts_categories")
+		return errors.Wrap(err, "error occurred during iteration of eager loaded relations for employers")
 	}
 
-	if len(autoPartsCategoryAfterSelectHooks) != 0 {
+	if len(employerAfterSelectHooks) != 0 {
 		for _, obj := range resultSlice {
 			if err := obj.doAfterSelectHooks(ctx, e); err != nil {
 				return err
@@ -601,22 +626,22 @@ func (autoStoreL) LoadCategory(ctx context.Context, e boil.ContextExecutor, sing
 
 	if singular {
 		foreign := resultSlice[0]
-		object.R.Category = foreign
+		object.R.Employer = foreign
 		if foreign.R == nil {
-			foreign.R = &autoPartsCategoryR{}
+			foreign.R = &employerR{}
 		}
-		foreign.R.CategoryAutoStores = append(foreign.R.CategoryAutoStores, object)
+		foreign.R.AutoStores = append(foreign.R.AutoStores, object)
 		return nil
 	}
 
 	for _, local := range slice {
 		for _, foreign := range resultSlice {
-			if local.CategoryID == foreign.ID {
-				local.R.Category = foreign
+			if local.EmployerID == foreign.ID {
+				local.R.Employer = foreign
 				if foreign.R == nil {
-					foreign.R = &autoPartsCategoryR{}
+					foreign.R = &employerR{}
 				}
-				foreign.R.CategoryAutoStores = append(foreign.R.CategoryAutoStores, local)
+				foreign.R.AutoStores = append(foreign.R.AutoStores, local)
 				break
 			}
 		}
@@ -625,9 +650,9 @@ func (autoStoreL) LoadCategory(ctx context.Context, e boil.ContextExecutor, sing
 	return nil
 }
 
-// LoadStoreAutoOffers allows an eager lookup of values, cached into the
+// LoadAutoOffers allows an eager lookup of values, cached into the
 // loaded structs of the objects. This is for a 1-M or N-M relationship.
-func (autoStoreL) LoadStoreAutoOffers(ctx context.Context, e boil.ContextExecutor, singular bool, maybeAutoStore interface{}, mods queries.Applicator) error {
+func (autoStoreL) LoadAutoOffers(ctx context.Context, e boil.ContextExecutor, singular bool, maybeAutoStore interface{}, mods queries.Applicator) error {
 	var slice []*AutoStore
 	var object *AutoStore
 
@@ -681,7 +706,7 @@ func (autoStoreL) LoadStoreAutoOffers(ctx context.Context, e boil.ContextExecuto
 
 	query := NewQuery(
 		qm.From(`auto_offers`),
-		qm.WhereIn(`auto_offers.store_id in ?`, argsSlice...),
+		qm.WhereIn(`auto_offers.auto_store_id in ?`, argsSlice...),
 	)
 	if mods != nil {
 		mods.Apply(query)
@@ -712,24 +737,24 @@ func (autoStoreL) LoadStoreAutoOffers(ctx context.Context, e boil.ContextExecuto
 		}
 	}
 	if singular {
-		object.R.StoreAutoOffers = resultSlice
+		object.R.AutoOffers = resultSlice
 		for _, foreign := range resultSlice {
 			if foreign.R == nil {
 				foreign.R = &autoOfferR{}
 			}
-			foreign.R.Store = object
+			foreign.R.AutoStore = object
 		}
 		return nil
 	}
 
 	for _, foreign := range resultSlice {
 		for _, local := range slice {
-			if local.ID == foreign.StoreID {
-				local.R.StoreAutoOffers = append(local.R.StoreAutoOffers, foreign)
+			if local.ID == foreign.AutoStoreID {
+				local.R.AutoOffers = append(local.R.AutoOffers, foreign)
 				if foreign.R == nil {
 					foreign.R = &autoOfferR{}
 				}
-				foreign.R.Store = local
+				foreign.R.AutoStore = local
 				break
 			}
 		}
@@ -738,10 +763,140 @@ func (autoStoreL) LoadStoreAutoOffers(ctx context.Context, e boil.ContextExecuto
 	return nil
 }
 
-// SetCategory of the autoStore to the related item.
-// Sets o.R.Category to related.
-// Adds o to related.R.CategoryAutoStores.
-func (o *AutoStore) SetCategory(ctx context.Context, exec boil.ContextExecutor, insert bool, related *AutoPartsCategory) error {
+// LoadAutoCategories allows an eager lookup of values, cached into the
+// loaded structs of the objects. This is for a 1-M or N-M relationship.
+func (autoStoreL) LoadAutoCategories(ctx context.Context, e boil.ContextExecutor, singular bool, maybeAutoStore interface{}, mods queries.Applicator) error {
+	var slice []*AutoStore
+	var object *AutoStore
+
+	if singular {
+		var ok bool
+		object, ok = maybeAutoStore.(*AutoStore)
+		if !ok {
+			object = new(AutoStore)
+			ok = queries.SetFromEmbeddedStruct(&object, &maybeAutoStore)
+			if !ok {
+				return errors.New(fmt.Sprintf("failed to set %T from embedded struct %T", object, maybeAutoStore))
+			}
+		}
+	} else {
+		s, ok := maybeAutoStore.(*[]*AutoStore)
+		if ok {
+			slice = *s
+		} else {
+			ok = queries.SetFromEmbeddedStruct(&slice, maybeAutoStore)
+			if !ok {
+				return errors.New(fmt.Sprintf("failed to set %T from embedded struct %T", slice, maybeAutoStore))
+			}
+		}
+	}
+
+	args := make(map[interface{}]struct{})
+	if singular {
+		if object.R == nil {
+			object.R = &autoStoreR{}
+		}
+		args[object.ID] = struct{}{}
+	} else {
+		for _, obj := range slice {
+			if obj.R == nil {
+				obj.R = &autoStoreR{}
+			}
+			args[obj.ID] = struct{}{}
+		}
+	}
+
+	if len(args) == 0 {
+		return nil
+	}
+
+	argsSlice := make([]interface{}, len(args))
+	i := 0
+	for arg := range args {
+		argsSlice[i] = arg
+		i++
+	}
+
+	query := NewQuery(
+		qm.Select("\"auto_categories\".\"id\", \"auto_categories\".\"name\", \"auto_categories\".\"created_at\", \"auto_categories\".\"updated_at\", \"a\".\"auto_store_id\""),
+		qm.From("\"auto_categories\""),
+		qm.InnerJoin("\"auto_stores_categories\" as \"a\" on \"auto_categories\".\"id\" = \"a\".\"auto_category_id\""),
+		qm.WhereIn("\"a\".\"auto_store_id\" in ?", argsSlice...),
+	)
+	if mods != nil {
+		mods.Apply(query)
+	}
+
+	results, err := query.QueryContext(ctx, e)
+	if err != nil {
+		return errors.Wrap(err, "failed to eager load auto_categories")
+	}
+
+	var resultSlice []*AutoCategory
+
+	var localJoinCols []int
+	for results.Next() {
+		one := new(AutoCategory)
+		var localJoinCol int
+
+		err = results.Scan(&one.ID, &one.Name, &one.CreatedAt, &one.UpdatedAt, &localJoinCol)
+		if err != nil {
+			return errors.Wrap(err, "failed to scan eager loaded results for auto_categories")
+		}
+		if err = results.Err(); err != nil {
+			return errors.Wrap(err, "failed to plebian-bind eager loaded slice auto_categories")
+		}
+
+		resultSlice = append(resultSlice, one)
+		localJoinCols = append(localJoinCols, localJoinCol)
+	}
+
+	if err = results.Close(); err != nil {
+		return errors.Wrap(err, "failed to close results in eager load on auto_categories")
+	}
+	if err = results.Err(); err != nil {
+		return errors.Wrap(err, "error occurred during iteration of eager loaded relations for auto_categories")
+	}
+
+	if len(autoCategoryAfterSelectHooks) != 0 {
+		for _, obj := range resultSlice {
+			if err := obj.doAfterSelectHooks(ctx, e); err != nil {
+				return err
+			}
+		}
+	}
+	if singular {
+		object.R.AutoCategories = resultSlice
+		for _, foreign := range resultSlice {
+			if foreign.R == nil {
+				foreign.R = &autoCategoryR{}
+			}
+			foreign.R.AutoStores = append(foreign.R.AutoStores, object)
+		}
+		return nil
+	}
+
+	for i, foreign := range resultSlice {
+		localJoinCol := localJoinCols[i]
+		for _, local := range slice {
+			if local.ID == localJoinCol {
+				local.R.AutoCategories = append(local.R.AutoCategories, foreign)
+				if foreign.R == nil {
+					foreign.R = &autoCategoryR{}
+				}
+				foreign.R.AutoStores = append(foreign.R.AutoStores, local)
+				break
+			}
+		}
+	}
+
+	return nil
+}
+
+// SetEmployer of the autoStore to the related item.
+// Sets o.R.Employer to related.
+// Adds o to related.R.AutoStores.
+func (o *AutoStore) SetEmployer(ctx context.Context, exec boil.ContextExecutor, insert bool, related *Employer) error {
 	var err error
 	if insert {
 		if err = related.Insert(ctx, exec, boil.Infer()); err != nil {
@@ -751,7 +906,7 @@ func (o *AutoStore) SetCategory(ctx context.Context, exec boil.ContextExecutor, 
 
 	updateQuery := fmt.Sprintf(
 		"UPDATE \"auto_stores\" SET %s WHERE %s",
-		strmangle.SetParamNames("\"", "\"", 1, []string{"category_id"}),
+		strmangle.SetParamNames("\"", "\"", 1, []string{"employer_id"}),
 		strmangle.WhereClause("\"", "\"", 2, autoStorePrimaryKeyColumns),
 	)
 	values := []interface{}{related.ID, o.ID}
@@ -765,42 +920,42 @@ func (o *AutoStore) SetCategory(ctx context.Context, exec boil.ContextExecutor, 
 		return errors.Wrap(err, "failed to update local table")
 	}
 
-	o.CategoryID = related.ID
+	o.EmployerID = related.ID
 	if o.R == nil {
 		o.R = &autoStoreR{
-			Category: related,
+			Employer: related,
 		}
 	} else {
-		o.R.Category = related
+		o.R.Employer = related
 	}
 
 	if related.R == nil {
-		related.R = &autoPartsCategoryR{
-			CategoryAutoStores: AutoStoreSlice{o},
+		related.R = &employerR{
+			AutoStores: AutoStoreSlice{o},
 		}
 	} else {
-		related.R.CategoryAutoStores = append(related.R.CategoryAutoStores, o)
+		related.R.AutoStores = append(related.R.AutoStores, o)
 	}
 
 	return nil
 }
 
-// AddStoreAutoOffers adds the given related objects to the existing relationships
+// AddAutoOffers adds the given related objects to the existing relationships
 // of the auto_store, optionally inserting them as new records.
-// Appends related to o.R.StoreAutoOffers.
-// Sets related.R.Store appropriately.
-func (o *AutoStore) AddStoreAutoOffers(ctx context.Context, exec boil.ContextExecutor, insert bool, related ...*AutoOffer) error {
+// Appends related to o.R.AutoOffers.
+// Sets related.R.AutoStore appropriately.
+func (o *AutoStore) AddAutoOffers(ctx context.Context, exec boil.ContextExecutor, insert bool, related ...*AutoOffer) error {
 	var err error
 	for _, rel := range related {
 		if insert {
-			rel.StoreID = o.ID
+			rel.AutoStoreID = o.ID
 			if err = rel.Insert(ctx, exec, boil.Infer()); err != nil {
 				return errors.Wrap(err, "failed to insert into foreign table")
 			}
 		} else {
 			updateQuery := fmt.Sprintf(
 				"UPDATE \"auto_offers\" SET %s WHERE %s",
-				strmangle.SetParamNames("\"", "\"", 1, []string{"store_id"}),
+				strmangle.SetParamNames("\"", "\"", 1, []string{"auto_store_id"}),
 				strmangle.WhereClause("\"", "\"", 2, autoOfferPrimaryKeyColumns),
 			)
 			values := []interface{}{o.ID, rel.ID}
@@ -814,28 +969,173 @@ func (o *AutoStore) AddStoreAutoOffers(ctx context.Context, exec boil.ContextExe
 				return errors.Wrap(err, "failed to update foreign table")
 			}
 
-			rel.StoreID = o.ID
+			rel.AutoStoreID = o.ID
 		}
 	}
 
 	if o.R == nil {
 		o.R = &autoStoreR{
-			StoreAutoOffers: related,
+			AutoOffers: related,
 		}
 	} else {
-		o.R.StoreAutoOffers = append(o.R.StoreAutoOffers, related...)
+		o.R.AutoOffers = append(o.R.AutoOffers, related...)
 	}
 
 	for _, rel := range related {
 		if rel.R == nil {
 			rel.R = &autoOfferR{
-				Store: o,
+				AutoStore: o,
 			}
 		} else {
-			rel.R.Store = o
+			rel.R.AutoStore = o
 		}
 	}
 	return nil
+}
+
+// AddAutoCategories adds the given related objects to the existing relationships
+// of the auto_store, optionally inserting them as new records.
+// Appends related to o.R.AutoCategories.
+// Sets related.R.AutoStores appropriately.
+func (o *AutoStore) AddAutoCategories(ctx context.Context, exec boil.ContextExecutor, insert bool, related ...*AutoCategory) error {
+	var err error
+	for _, rel := range related {
+		if insert {
+			if err = rel.Insert(ctx, exec, boil.Infer()); err != nil {
+				return errors.Wrap(err, "failed to insert into foreign table")
+			}
+		}
+	}
+
+	for _, rel := range related {
+		query := "insert into \"auto_stores_categories\" (\"auto_store_id\", \"auto_category_id\") values ($1, $2)"
+		values := []interface{}{o.ID, rel.ID}
+
+		if boil.IsDebug(ctx) {
+			writer := boil.DebugWriterFrom(ctx)
+			fmt.Fprintln(writer, query)
+			fmt.Fprintln(writer, values)
+		}
+		_, err = exec.ExecContext(ctx, query, values...)
+		if err != nil {
+			return errors.Wrap(err, "failed to insert into join table")
+		}
+	}
+	if o.R == nil {
+		o.R = &autoStoreR{
+			AutoCategories: related,
+		}
+	} else {
+		o.R.AutoCategories = append(o.R.AutoCategories, related...)
+	}
+
+	for _, rel := range related {
+		if rel.R == nil {
+			rel.R = &autoCategoryR{
+				AutoStores: AutoStoreSlice{o},
+			}
+		} else {
+			rel.R.AutoStores = append(rel.R.AutoStores, o)
+		}
+	}
+	return nil
+}
+
+// SetAutoCategories removes all previously related items of the
+// auto_store replacing them completely with the passed
+// in related items, optionally inserting them as new records.
+// Sets o.R.AutoStores's AutoCategories accordingly.
+// Replaces o.R.AutoCategories with related.
+// Sets related.R.AutoStores's AutoCategories accordingly.
+func (o *AutoStore) SetAutoCategories(ctx context.Context, exec boil.ContextExecutor, insert bool, related ...*AutoCategory) error {
+	query := "delete from \"auto_stores_categories\" where \"auto_store_id\" = $1"
+	values := []interface{}{o.ID}
+	if boil.IsDebug(ctx) {
+		writer := boil.DebugWriterFrom(ctx)
+		fmt.Fprintln(writer, query)
+		fmt.Fprintln(writer, values)
+	}
+	_, err := exec.ExecContext(ctx, query, values...)
+	if err != nil {
+		return errors.Wrap(err, "failed to remove relationships before set")
+	}
+
+	removeAutoCategoriesFromAutoStoresSlice(o, related)
+	if o.R != nil {
+		o.R.AutoCategories = nil
+	}
+
+	return o.AddAutoCategories(ctx, exec, insert, related...)
+}
+
+// RemoveAutoCategories relationships from objects passed in.
+// Removes related items from R.AutoCategories (uses pointer comparison, removal does not keep order)
+// Sets related.R.AutoStores.
+func (o *AutoStore) RemoveAutoCategories(ctx context.Context, exec boil.ContextExecutor, related ...*AutoCategory) error {
+	if len(related) == 0 {
+		return nil
+	}
+
+	var err error
+	query := fmt.Sprintf(
+		"delete from \"auto_stores_categories\" where \"auto_store_id\" = $1 and \"auto_category_id\" in (%s)",
+		strmangle.Placeholders(dialect.UseIndexPlaceholders, len(related), 2, 1),
+	)
+	values := []interface{}{o.ID}
+	for _, rel := range related {
+		values = append(values, rel.ID)
+	}
+
+	if boil.IsDebug(ctx) {
+		writer := boil.DebugWriterFrom(ctx)
+		fmt.Fprintln(writer, query)
+		fmt.Fprintln(writer, values)
+	}
+	_, err = exec.ExecContext(ctx, query, values...)
+	if err != nil {
+		return errors.Wrap(err, "failed to remove relationships before set")
+	}
+	removeAutoCategoriesFromAutoStoresSlice(o, related)
+	if o.R == nil {
+		return nil
+	}
+
+	for _, rel := range related {
+		for i, ri := range o.R.AutoCategories {
+			if rel != ri {
+				continue
+			}
+
+			ln := len(o.R.AutoCategories)
+			if ln > 1 && i < ln-1 {
+				o.R.AutoCategories[i] = o.R.AutoCategories[ln-1]
+			}
+			o.R.AutoCategories = o.R.AutoCategories[:ln-1]
+			break
+		}
+	}
+
+	return nil
+}
+
+func removeAutoCategoriesFromAutoStoresSlice(o *AutoStore, related []*AutoCategory) {
+	for _, rel := range related {
+		if rel.R == nil {
+			continue
+		}
+		for i, ri := range rel.R.AutoStores {
+			if o.ID != ri.ID {
+				continue
+			}
+
+			ln := len(rel.R.AutoStores)
+			if ln > 1 && i < ln-1 {
+				rel.R.AutoStores[i] = rel.R.AutoStores[ln-1]
+			}
+			rel.R.AutoStores = rel.R.AutoStores[:ln-1]
+			break
+		}
+	}
 }
 
 // AutoStores retrieves all the records using an executor.

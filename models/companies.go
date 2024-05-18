@@ -25,6 +25,7 @@ import (
 // Company is an object representing the database table.
 type Company struct {
 	ID            int         `boil:"id" json:"id" toml:"id" yaml:"id"`
+	EmployerID    int         `boil:"employer_id" json:"employer_id" toml:"employer_id" yaml:"employer_id"`
 	Name          string      `boil:"name" json:"name" toml:"name" yaml:"name"`
 	Address       null.String `boil:"address" json:"address,omitempty" toml:"address" yaml:"address,omitempty"`
 	ContactNumber null.Int    `boil:"contact_number" json:"contact_number,omitempty" toml:"contact_number" yaml:"contact_number,omitempty"`
@@ -37,6 +38,7 @@ type Company struct {
 
 var CompanyColumns = struct {
 	ID            string
+	EmployerID    string
 	Name          string
 	Address       string
 	ContactNumber string
@@ -44,6 +46,7 @@ var CompanyColumns = struct {
 	UpdatedAt     string
 }{
 	ID:            "id",
+	EmployerID:    "employer_id",
 	Name:          "name",
 	Address:       "address",
 	ContactNumber: "contact_number",
@@ -53,6 +56,7 @@ var CompanyColumns = struct {
 
 var CompanyTableColumns = struct {
 	ID            string
+	EmployerID    string
 	Name          string
 	Address       string
 	ContactNumber string
@@ -60,6 +64,7 @@ var CompanyTableColumns = struct {
 	UpdatedAt     string
 }{
 	ID:            "companies.id",
+	EmployerID:    "companies.employer_id",
 	Name:          "companies.name",
 	Address:       "companies.address",
 	ContactNumber: "companies.contact_number",
@@ -71,6 +76,7 @@ var CompanyTableColumns = struct {
 
 var CompanyWhere = struct {
 	ID            whereHelperint
+	EmployerID    whereHelperint
 	Name          whereHelperstring
 	Address       whereHelpernull_String
 	ContactNumber whereHelpernull_Int
@@ -78,6 +84,7 @@ var CompanyWhere = struct {
 	UpdatedAt     whereHelpernull_Time
 }{
 	ID:            whereHelperint{field: "\"companies\".\"id\""},
+	EmployerID:    whereHelperint{field: "\"companies\".\"employer_id\""},
 	Name:          whereHelperstring{field: "\"companies\".\"name\""},
 	Address:       whereHelpernull_String{field: "\"companies\".\"address\""},
 	ContactNumber: whereHelpernull_Int{field: "\"companies\".\"contact_number\""},
@@ -87,19 +94,29 @@ var CompanyWhere = struct {
 
 // CompanyRels is where relationship names are stored.
 var CompanyRels = struct {
+	Employer string
 	Biddings string
 }{
+	Employer: "Employer",
 	Biddings: "Biddings",
 }
 
 // companyR is where relationships are stored.
 type companyR struct {
+	Employer *Employer    `boil:"Employer" json:"Employer" toml:"Employer" yaml:"Employer"`
 	Biddings BiddingSlice `boil:"Biddings" json:"Biddings" toml:"Biddings" yaml:"Biddings"`
 }
 
 // NewStruct creates a new relationship struct
 func (*companyR) NewStruct() *companyR {
 	return &companyR{}
+}
+
+func (r *companyR) GetEmployer() *Employer {
+	if r == nil {
+		return nil
+	}
+	return r.Employer
 }
 
 func (r *companyR) GetBiddings() BiddingSlice {
@@ -113,8 +130,8 @@ func (r *companyR) GetBiddings() BiddingSlice {
 type companyL struct{}
 
 var (
-	companyAllColumns            = []string{"id", "name", "address", "contact_number", "created_at", "updated_at"}
-	companyColumnsWithoutDefault = []string{"name"}
+	companyAllColumns            = []string{"id", "employer_id", "name", "address", "contact_number", "created_at", "updated_at"}
+	companyColumnsWithoutDefault = []string{"employer_id", "name"}
 	companyColumnsWithDefault    = []string{"id", "address", "contact_number", "created_at", "updated_at"}
 	companyPrimaryKeyColumns     = []string{"id"}
 	companyGeneratedColumns      = []string{}
@@ -425,6 +442,17 @@ func (q companyQuery) Exists(ctx context.Context, exec boil.ContextExecutor) (bo
 	return count > 0, nil
 }
 
+// Employer pointed to by the foreign key.
+func (o *Company) Employer(mods ...qm.QueryMod) employerQuery {
+	queryMods := []qm.QueryMod{
+		qm.Where("\"id\" = ?", o.EmployerID),
+	}
+
+	queryMods = append(queryMods, mods...)
+
+	return Employers(queryMods...)
+}
+
 // Biddings retrieves all the bidding's Biddings with an executor.
 func (o *Company) Biddings(mods ...qm.QueryMod) biddingQuery {
 	var queryMods []qm.QueryMod
@@ -437,6 +465,126 @@ func (o *Company) Biddings(mods ...qm.QueryMod) biddingQuery {
 	)
 
 	return Biddings(queryMods...)
+}
+
+// LoadEmployer allows an eager lookup of values, cached into the
+// loaded structs of the objects. This is for an N-1 relationship.
+func (companyL) LoadEmployer(ctx context.Context, e boil.ContextExecutor, singular bool, maybeCompany interface{}, mods queries.Applicator) error {
+	var slice []*Company
+	var object *Company
+
+	if singular {
+		var ok bool
+		object, ok = maybeCompany.(*Company)
+		if !ok {
+			object = new(Company)
+			ok = queries.SetFromEmbeddedStruct(&object, &maybeCompany)
+			if !ok {
+				return errors.New(fmt.Sprintf("failed to set %T from embedded struct %T", object, maybeCompany))
+			}
+		}
+	} else {
+		s, ok := maybeCompany.(*[]*Company)
+		if ok {
+			slice = *s
+		} else {
+			ok = queries.SetFromEmbeddedStruct(&slice, maybeCompany)
+			if !ok {
+				return errors.New(fmt.Sprintf("failed to set %T from embedded struct %T", slice, maybeCompany))
+			}
+		}
+	}
+
+	args := make(map[interface{}]struct{})
+	if singular {
+		if object.R == nil {
+			object.R = &companyR{}
+		}
+		args[object.EmployerID] = struct{}{}
+
+	} else {
+		for _, obj := range slice {
+			if obj.R == nil {
+				obj.R = &companyR{}
+			}
+
+			args[obj.EmployerID] = struct{}{}
+
+		}
+	}
+
+	if len(args) == 0 {
+		return nil
+	}
+
+	argsSlice := make([]interface{}, len(args))
+	i := 0
+	for arg := range args {
+		argsSlice[i] = arg
+		i++
+	}
+
+	query := NewQuery(
+		qm.From(`employers`),
+		qm.WhereIn(`employers.id in ?`, argsSlice...),
+	)
+	if mods != nil {
+		mods.Apply(query)
+	}
+
+	results, err := query.QueryContext(ctx, e)
+	if err != nil {
+		return errors.Wrap(err, "failed to eager load Employer")
+	}
+
+	var resultSlice []*Employer
+	if err = queries.Bind(results, &resultSlice); err != nil {
+		return errors.Wrap(err, "failed to bind eager loaded slice Employer")
+	}
+
+	if err = results.Close(); err != nil {
+		return errors.Wrap(err, "failed to close results of eager load for employers")
+	}
+	if err = results.Err(); err != nil {
+		return errors.Wrap(err, "error occurred during iteration of eager loaded relations for employers")
+	}
+
+	if len(employerAfterSelectHooks) != 0 {
+		for _, obj := range resultSlice {
+			if err := obj.doAfterSelectHooks(ctx, e); err != nil {
+				return err
+			}
+		}
+	}
+
+	if len(resultSlice) == 0 {
+		return nil
+	}
+
+	if singular {
+		foreign := resultSlice[0]
+		object.R.Employer = foreign
+		if foreign.R == nil {
+			foreign.R = &employerR{}
+		}
+		foreign.R.Companies = append(foreign.R.Companies, object)
+		return nil
+	}
+
+	for _, local := range slice {
+		for _, foreign := range resultSlice {
+			if local.EmployerID == foreign.ID {
+				local.R.Employer = foreign
+				if foreign.R == nil {
+					foreign.R = &employerR{}
+				}
+				foreign.R.Companies = append(foreign.R.Companies, local)
+				break
+			}
+		}
+	}
+
+	return nil
 }
 
 // LoadBiddings allows an eager lookup of values, cached into the
@@ -547,6 +695,53 @@ func (companyL) LoadBiddings(ctx context.Context, e boil.ContextExecutor, singul
 				break
 			}
 		}
+	}
+
+	return nil
+}
+
+// SetEmployer of the company to the related item.
+// Sets o.R.Employer to related.
+// Adds o to related.R.Companies.
+func (o *Company) SetEmployer(ctx context.Context, exec boil.ContextExecutor, insert bool, related *Employer) error {
+	var err error
+	if insert {
+		if err = related.Insert(ctx, exec, boil.Infer()); err != nil {
+			return errors.Wrap(err, "failed to insert into foreign table")
+		}
+	}
+
+	updateQuery := fmt.Sprintf(
+		"UPDATE \"companies\" SET %s WHERE %s",
+		strmangle.SetParamNames("\"", "\"", 1, []string{"employer_id"}),
+		strmangle.WhereClause("\"", "\"", 2, companyPrimaryKeyColumns),
+	)
+	values := []interface{}{related.ID, o.ID}
+
+	if boil.IsDebug(ctx) {
+		writer := boil.DebugWriterFrom(ctx)
+		fmt.Fprintln(writer, updateQuery)
+		fmt.Fprintln(writer, values)
+	}
+	if _, err = exec.ExecContext(ctx, updateQuery, values...); err != nil {
+		return errors.Wrap(err, "failed to update local table")
+	}
+
+	o.EmployerID = related.ID
+	if o.R == nil {
+		o.R = &companyR{
+			Employer: related,
+		}
+	} else {
+		o.R.Employer = related
+	}
+
+	if related.R == nil {
+		related.R = &employerR{
+			Companies: CompanySlice{o},
+		}
+	} else {
+		related.R.Companies = append(related.R.Companies, o)
 	}
 
 	return nil

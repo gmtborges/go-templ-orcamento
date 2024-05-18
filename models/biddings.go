@@ -119,9 +119,9 @@ var BiddingRels = struct {
 
 // biddingR is where relationships are stored.
 type biddingR struct {
-	Category   *AutoPartsCategory `boil:"Category" json:"Category" toml:"Category" yaml:"Category"`
-	Company    *Company           `boil:"Company" json:"Company" toml:"Company" yaml:"Company"`
-	AutoOffers AutoOfferSlice     `boil:"AutoOffers" json:"AutoOffers" toml:"AutoOffers" yaml:"AutoOffers"`
+	Category   *AutoCategory  `boil:"Category" json:"Category" toml:"Category" yaml:"Category"`
+	Company    *Company       `boil:"Company" json:"Company" toml:"Company" yaml:"Company"`
+	AutoOffers AutoOfferSlice `boil:"AutoOffers" json:"AutoOffers" toml:"AutoOffers" yaml:"AutoOffers"`
 }
 
 // NewStruct creates a new relationship struct
@@ -129,7 +129,7 @@ func (*biddingR) NewStruct() *biddingR {
 	return &biddingR{}
 }
 
-func (r *biddingR) GetCategory() *AutoPartsCategory {
+func (r *biddingR) GetCategory() *AutoCategory {
 	if r == nil {
 		return nil
 	}
@@ -467,14 +467,14 @@ func (q biddingQuery) Exists(ctx context.Context, exec boil.ContextExecutor) (bo
 }
 
 // Category pointed to by the foreign key.
-func (o *Bidding) Category(mods ...qm.QueryMod) autoPartsCategoryQuery {
+func (o *Bidding) Category(mods ...qm.QueryMod) autoCategoryQuery {
 	queryMods := []qm.QueryMod{
 		qm.Where("\"id\" = ?", o.CategoryID),
 	}
 
 	queryMods = append(queryMods, mods...)
 
-	return AutoPartsCategories(queryMods...)
+	return AutoCategories(queryMods...)
 }
 
 // Company pointed to by the foreign key.
@@ -560,8 +560,8 @@ func (biddingL) LoadCategory(ctx context.Context, e boil.ContextExecutor, singul
 	}
 
 	query := NewQuery(
-		qm.From(`auto_parts_categories`),
-		qm.WhereIn(`auto_parts_categories.id in ?`, argsSlice...),
+		qm.From(`auto_categories`),
+		qm.WhereIn(`auto_categories.id in ?`, argsSlice...),
 	)
 	if mods != nil {
 		mods.Apply(query)
@@ -569,22 +569,22 @@ func (biddingL) LoadCategory(ctx context.Context, e boil.ContextExecutor, singul
 
 	results, err := query.QueryContext(ctx, e)
 	if err != nil {
-		return errors.Wrap(err, "failed to eager load AutoPartsCategory")
+		return errors.Wrap(err, "failed to eager load AutoCategory")
 	}
 
-	var resultSlice []*AutoPartsCategory
+	var resultSlice []*AutoCategory
 	if err = queries.Bind(results, &resultSlice); err != nil {
-		return errors.Wrap(err, "failed to bind eager loaded slice AutoPartsCategory")
+		return errors.Wrap(err, "failed to bind eager loaded slice AutoCategory")
 	}
 
 	if err = results.Close(); err != nil {
-		return errors.Wrap(err, "failed to close results of eager load for auto_parts_categories")
+		return errors.Wrap(err, "failed to close results of eager load for auto_categories")
 	}
 	if err = results.Err(); err != nil {
-		return errors.Wrap(err, "error occurred during iteration of eager loaded relations for auto_parts_categories")
+		return errors.Wrap(err, "error occurred during iteration of eager loaded relations for auto_categories")
 	}
 
-	if len(autoPartsCategoryAfterSelectHooks) != 0 {
+	if len(autoCategoryAfterSelectHooks) != 0 {
 		for _, obj := range resultSlice {
 			if err := obj.doAfterSelectHooks(ctx, e); err != nil {
 				return err
@@ -600,7 +600,7 @@ func (biddingL) LoadCategory(ctx context.Context, e boil.ContextExecutor, singul
 		foreign := resultSlice[0]
 		object.R.Category = foreign
 		if foreign.R == nil {
-			foreign.R = &autoPartsCategoryR{}
+			foreign.R = &autoCategoryR{}
 		}
 		foreign.R.CategoryBiddings = append(foreign.R.CategoryBiddings, object)
 		return nil
@@ -611,7 +611,7 @@ func (biddingL) LoadCategory(ctx context.Context, e boil.ContextExecutor, singul
 			if local.CategoryID == foreign.ID {
 				local.R.Category = foreign
 				if foreign.R == nil {
-					foreign.R = &autoPartsCategoryR{}
+					foreign.R = &autoCategoryR{}
 				}
 				foreign.R.CategoryBiddings = append(foreign.R.CategoryBiddings, local)
 				break
@@ -858,7 +858,7 @@ func (biddingL) LoadAutoOffers(ctx context.Context, e boil.ContextExecutor, sing
 // SetCategory of the bidding to the related item.
 // Sets o.R.Category to related.
 // Adds o to related.R.CategoryBiddings.
-func (o *Bidding) SetCategory(ctx context.Context, exec boil.ContextExecutor, insert bool, related *AutoPartsCategory) error {
+func (o *Bidding) SetCategory(ctx context.Context, exec boil.ContextExecutor, insert bool, related *AutoCategory) error {
 	var err error
 	if insert {
 		if err = related.Insert(ctx, exec, boil.Infer()); err != nil {
@@ -892,7 +892,7 @@ func (o *Bidding) SetCategory(ctx context.Context, exec boil.ContextExecutor, in
 	}
 
 	if related.R == nil {
-		related.R = &autoPartsCategoryR{
+		related.R = &autoCategoryR{
 			CategoryBiddings: BiddingSlice{o},
 		}
 	} else {

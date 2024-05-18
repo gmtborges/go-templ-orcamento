@@ -24,73 +24,84 @@ import (
 
 // User is an object representing the database table.
 type User struct {
-	ID        int         `boil:"id" json:"id" toml:"id" yaml:"id"`
-	Email     null.String `boil:"email" json:"email,omitempty" toml:"email" yaml:"email,omitempty"`
-	Password  string      `boil:"password" json:"password" toml:"password" yaml:"password"`
-	Role      string      `boil:"role" json:"role" toml:"role" yaml:"role"`
-	CreatedAt null.Time   `boil:"created_at" json:"created_at,omitempty" toml:"created_at" yaml:"created_at,omitempty"`
-	UpdatedAt null.Time   `boil:"updated_at" json:"updated_at,omitempty" toml:"updated_at" yaml:"updated_at,omitempty"`
+	ID         int         `boil:"id" json:"id" toml:"id" yaml:"id"`
+	Email      null.String `boil:"email" json:"email,omitempty" toml:"email" yaml:"email,omitempty"`
+	Password   string      `boil:"password" json:"password" toml:"password" yaml:"password"`
+	Role       string      `boil:"role" json:"role" toml:"role" yaml:"role"`
+	EmployerID int         `boil:"employer_id" json:"employer_id" toml:"employer_id" yaml:"employer_id"`
+	CreatedAt  null.Time   `boil:"created_at" json:"created_at,omitempty" toml:"created_at" yaml:"created_at,omitempty"`
+	UpdatedAt  null.Time   `boil:"updated_at" json:"updated_at,omitempty" toml:"updated_at" yaml:"updated_at,omitempty"`
 
 	R *userR `boil:"-" json:"-" toml:"-" yaml:"-"`
 	L userL  `boil:"-" json:"-" toml:"-" yaml:"-"`
 }
 
 var UserColumns = struct {
-	ID        string
-	Email     string
-	Password  string
-	Role      string
-	CreatedAt string
-	UpdatedAt string
+	ID         string
+	Email      string
+	Password   string
+	Role       string
+	EmployerID string
+	CreatedAt  string
+	UpdatedAt  string
 }{
-	ID:        "id",
-	Email:     "email",
-	Password:  "password",
-	Role:      "role",
-	CreatedAt: "created_at",
-	UpdatedAt: "updated_at",
+	ID:         "id",
+	Email:      "email",
+	Password:   "password",
+	Role:       "role",
+	EmployerID: "employer_id",
+	CreatedAt:  "created_at",
+	UpdatedAt:  "updated_at",
 }
 
 var UserTableColumns = struct {
-	ID        string
-	Email     string
-	Password  string
-	Role      string
-	CreatedAt string
-	UpdatedAt string
+	ID         string
+	Email      string
+	Password   string
+	Role       string
+	EmployerID string
+	CreatedAt  string
+	UpdatedAt  string
 }{
-	ID:        "users.id",
-	Email:     "users.email",
-	Password:  "users.password",
-	Role:      "users.role",
-	CreatedAt: "users.created_at",
-	UpdatedAt: "users.updated_at",
+	ID:         "users.id",
+	Email:      "users.email",
+	Password:   "users.password",
+	Role:       "users.role",
+	EmployerID: "users.employer_id",
+	CreatedAt:  "users.created_at",
+	UpdatedAt:  "users.updated_at",
 }
 
 // Generated where
 
 var UserWhere = struct {
-	ID        whereHelperint
-	Email     whereHelpernull_String
-	Password  whereHelperstring
-	Role      whereHelperstring
-	CreatedAt whereHelpernull_Time
-	UpdatedAt whereHelpernull_Time
+	ID         whereHelperint
+	Email      whereHelpernull_String
+	Password   whereHelperstring
+	Role       whereHelperstring
+	EmployerID whereHelperint
+	CreatedAt  whereHelpernull_Time
+	UpdatedAt  whereHelpernull_Time
 }{
-	ID:        whereHelperint{field: "\"users\".\"id\""},
-	Email:     whereHelpernull_String{field: "\"users\".\"email\""},
-	Password:  whereHelperstring{field: "\"users\".\"password\""},
-	Role:      whereHelperstring{field: "\"users\".\"role\""},
-	CreatedAt: whereHelpernull_Time{field: "\"users\".\"created_at\""},
-	UpdatedAt: whereHelpernull_Time{field: "\"users\".\"updated_at\""},
+	ID:         whereHelperint{field: "\"users\".\"id\""},
+	Email:      whereHelpernull_String{field: "\"users\".\"email\""},
+	Password:   whereHelperstring{field: "\"users\".\"password\""},
+	Role:       whereHelperstring{field: "\"users\".\"role\""},
+	EmployerID: whereHelperint{field: "\"users\".\"employer_id\""},
+	CreatedAt:  whereHelpernull_Time{field: "\"users\".\"created_at\""},
+	UpdatedAt:  whereHelpernull_Time{field: "\"users\".\"updated_at\""},
 }
 
 // UserRels is where relationship names are stored.
 var UserRels = struct {
-}{}
+	Employer string
+}{
+	Employer: "Employer",
+}
 
 // userR is where relationships are stored.
 type userR struct {
+	Employer *Employer `boil:"Employer" json:"Employer" toml:"Employer" yaml:"Employer"`
 }
 
 // NewStruct creates a new relationship struct
@@ -98,12 +109,19 @@ func (*userR) NewStruct() *userR {
 	return &userR{}
 }
 
+func (r *userR) GetEmployer() *Employer {
+	if r == nil {
+		return nil
+	}
+	return r.Employer
+}
+
 // userL is where Load methods for each relationship are stored.
 type userL struct{}
 
 var (
-	userAllColumns            = []string{"id", "email", "password", "role", "created_at", "updated_at"}
-	userColumnsWithoutDefault = []string{"password", "role"}
+	userAllColumns            = []string{"id", "email", "password", "role", "employer_id", "created_at", "updated_at"}
+	userColumnsWithoutDefault = []string{"password", "role", "employer_id"}
 	userColumnsWithDefault    = []string{"id", "email", "created_at", "updated_at"}
 	userPrimaryKeyColumns     = []string{"id"}
 	userGeneratedColumns      = []string{}
@@ -412,6 +430,184 @@ func (q userQuery) Exists(ctx context.Context, exec boil.ContextExecutor) (bool,
 	}
 
 	return count > 0, nil
+}
+
+// Employer pointed to by the foreign key.
+func (o *User) Employer(mods ...qm.QueryMod) employerQuery {
+	queryMods := []qm.QueryMod{
+		qm.Where("\"id\" = ?", o.EmployerID),
+	}
+
+	queryMods = append(queryMods, mods...)
+
+	return Employers(queryMods...)
+}
+
+// LoadEmployer allows an eager lookup of values, cached into the
+// loaded structs of the objects. This is for an N-1 relationship.
+func (userL) LoadEmployer(ctx context.Context, e boil.ContextExecutor, singular bool, maybeUser interface{}, mods queries.Applicator) error {
+	var slice []*User
+	var object *User
+
+	if singular {
+		var ok bool
+		object, ok = maybeUser.(*User)
+		if !ok {
+			object = new(User)
+			ok = queries.SetFromEmbeddedStruct(&object, &maybeUser)
+			if !ok {
+				return errors.New(fmt.Sprintf("failed to set %T from embedded struct %T", object, maybeUser))
+			}
+		}
+	} else {
+		s, ok := maybeUser.(*[]*User)
+		if ok {
+			slice = *s
+		} else {
+			ok = queries.SetFromEmbeddedStruct(&slice, maybeUser)
+			if !ok {
+				return errors.New(fmt.Sprintf("failed to set %T from embedded struct %T", slice, maybeUser))
+			}
+		}
+	}
+
+	args := make(map[interface{}]struct{})
+	if singular {
+		if object.R == nil {
+			object.R = &userR{}
+		}
+		args[object.EmployerID] = struct{}{}
+
+	} else {
+		for _, obj := range slice {
+			if obj.R == nil {
+				obj.R = &userR{}
+			}
+
+			args[obj.EmployerID] = struct{}{}
+
+		}
+	}
+
+	if len(args) == 0 {
+		return nil
+	}
+
+	argsSlice := make([]interface{}, len(args))
+	i := 0
+	for arg := range args {
+		argsSlice[i] = arg
+		i++
+	}
+
+	query := NewQuery(
+		qm.From(`employers`),
+		qm.WhereIn(`employers.id in ?`, argsSlice...),
+	)
+	if mods != nil {
+		mods.Apply(query)
+	}
+
+	results, err := query.QueryContext(ctx, e)
+	if err != nil {
+		return errors.Wrap(err, "failed to eager load Employer")
+	}
+
+	var resultSlice []*Employer
+	if err = queries.Bind(results, &resultSlice); err != nil {
+		return errors.Wrap(err, "failed to bind eager loaded slice Employer")
+	}
+
+	if err = results.Close(); err != nil {
+		return errors.Wrap(err, "failed to close results of eager load for employers")
+	}
+	if err = results.Err(); err != nil {
+		return errors.Wrap(err, "error occurred during iteration of eager loaded relations for employers")
+	}
+
+	if len(employerAfterSelectHooks) != 0 {
+		for _, obj := range resultSlice {
+			if err := obj.doAfterSelectHooks(ctx, e); err != nil {
+				return err
+			}
+		}
+	}
+
+	if len(resultSlice) == 0 {
+		return nil
+	}
+
+	if singular {
+		foreign := resultSlice[0]
+		object.R.Employer = foreign
+		if foreign.R == nil {
+			foreign.R = &employerR{}
+		}
+		foreign.R.Users = append(foreign.R.Users, object)
+		return nil
+	}
+
+	for _, local := range slice {
+		for _, foreign := range resultSlice {
+			if local.EmployerID == foreign.ID {
+				local.R.Employer = foreign
+				if foreign.R == nil {
+					foreign.R = &employerR{}
+				}
+				foreign.R.Users = append(foreign.R.Users, local)
+				break
+			}
+		}
+	}
+
+	return nil
+}
+
+// SetEmployer of the user to the related item.
+// Sets o.R.Employer to related.
+// Adds o to related.R.Users.
+func (o *User) SetEmployer(ctx context.Context, exec boil.ContextExecutor, insert bool, related *Employer) error {
+	var err error
+	if insert {
+		if err = related.Insert(ctx, exec, boil.Infer()); err != nil {
+			return errors.Wrap(err, "failed to insert into foreign table")
+		}
+	}
+
+	updateQuery := fmt.Sprintf(
+		"UPDATE \"users\" SET %s WHERE %s",
+		strmangle.SetParamNames("\"", "\"", 1, []string{"employer_id"}),
+		strmangle.WhereClause("\"", "\"", 2, userPrimaryKeyColumns),
+	)
+	values := []interface{}{related.ID, o.ID}
+
+	if boil.IsDebug(ctx) {
+		writer := boil.DebugWriterFrom(ctx)
+		fmt.Fprintln(writer, updateQuery)
+		fmt.Fprintln(writer, values)
+	}
+	if _, err = exec.ExecContext(ctx, updateQuery, values...); err != nil {
+		return errors.Wrap(err, "failed to update local table")
+	}
+
+	o.EmployerID = related.ID
+	if o.R == nil {
+		o.R = &userR{
+			Employer: related,
+		}
+	} else {
+		o.R.Employer = related
+	}
+
+	if related.R == nil {
+		related.R = &employerR{
+			Users: UserSlice{o},
+		}
+	} else {
+		related.R.Users = append(related.R.Users, o)
+	}
+
+	return nil
 }
 
 // Users retrieves all the records using an executor.
