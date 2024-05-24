@@ -19,21 +19,34 @@ func main() {
 	}
 	connStr := os.Getenv("DB_URL")
 	db := dbconn(connStr)
-	migrations(db)
+	if len(os.Args) < 2 {
+		fmt.Print("Usage: go run ./cmd/migrate <up|down|status>")
+		os.Exit(0)
+	}
+	cmd := os.Args[1]
+	migrations(db, cmd)
 
 }
 
 //go:embed migrations/*.sql
 var embedMigrations embed.FS
 
-func migrations(db *sql.DB) {
+func migrations(db *sql.DB, cmd string) {
 	goose.SetBaseFS(embedMigrations)
 	if err := goose.SetDialect("postgres"); err != nil {
 		panic(err)
 	}
-	fmt.Println("running migrations...")
-	if err := goose.Up(db, "migrations"); err != nil {
-		panic(err)
+	switch cmd {
+	case "up":
+		fmt.Println("running migrations...")
+		if err := goose.Up(db, "migrations"); err != nil {
+			panic(err)
+		}
+	case "down":
+		fmt.Println("rollback migrations...")
+		if err := goose.Down(db, "migrations"); err != nil {
+			panic(err)
+		}
 	}
 }
 
