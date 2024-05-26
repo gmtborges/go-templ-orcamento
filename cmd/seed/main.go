@@ -2,15 +2,18 @@ package main
 
 import (
 	"context"
+	"database/sql"
 	"log"
 	"os"
 
 	"github.com/joho/godotenv"
 	_ "github.com/lib/pq"
+	"github.com/volatiletech/null/v8"
 	"github.com/volatiletech/sqlboiler/v4/boil"
 
 	"github.com/gustavomtborges/orcamento-auto/db"
 	"github.com/gustavomtborges/orcamento-auto/models"
+	"github.com/gustavomtborges/orcamento-auto/services"
 )
 
 func main() {
@@ -22,21 +25,36 @@ func main() {
 	db := db.Conn(connStr)
 	ctx := context.Background()
 
-	ep := models.Employer{
-		Type: "company",
-	}
-	models.Employers().DeleteAll(ctx, db)
-	err = ep.Insert(ctx, db, boil.Infer())
-	if err != nil {
-		panic(err)
-	}
+	cleanUp(ctx, db)
+
 	cp := models.Company{
-		Name:       "My assoc",
-		EmployerID: ep.ID,
+		Name: "Admin",
+		Type: "admin",
 	}
-	models.Companies().DeleteAll(ctx, db)
-	err = cp.Insert(ctx, db, boil.Infer())
-	if err != nil {
+	if err := cp.Insert(ctx, db, boil.Infer()); err != nil {
 		panic(err)
+	}
+
+	authSvc := services.NewAuthService()
+	hash, err := authSvc.GeneratePasswordHash("admin123")
+	if err != nil {
+		log.Fatal(err)
+	}
+	u := models.User{
+		Name:      "Gustavo",
+		Email:     null.StringFrom("admin@test.com"),
+		Password:  hash,
+		Role:      "admin",
+		CompanyID: cp.ID,
+	}
+	if err := u.Insert(ctx, db, boil.Infer()); err != nil {
+		panic(err)
+	}
+}
+
+func cleanUp(ctx context.Context, db *sql.DB) {
+	_, err := models.Companies().DeleteAll(ctx, db)
+	if err != nil {
+		log.Fatal(err)
 	}
 }

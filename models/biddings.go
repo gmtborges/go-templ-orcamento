@@ -25,7 +25,7 @@ import (
 // Bidding is an object representing the database table.
 type Bidding struct {
 	ID          int         `boil:"id" json:"id" toml:"id" yaml:"id"`
-	CompanyID   int         `boil:"company_id" json:"company_id" toml:"company_id" yaml:"company_id"`
+	UserID      int         `boil:"user_id" json:"user_id" toml:"user_id" yaml:"user_id"`
 	Title       string      `boil:"title" json:"title" toml:"title" yaml:"title"`
 	Description null.String `boil:"description" json:"description,omitempty" toml:"description" yaml:"description,omitempty"`
 	StartDate   null.Time   `boil:"start_date" json:"start_date,omitempty" toml:"start_date" yaml:"start_date,omitempty"`
@@ -40,7 +40,7 @@ type Bidding struct {
 
 var BiddingColumns = struct {
 	ID          string
-	CompanyID   string
+	UserID      string
 	Title       string
 	Description string
 	StartDate   string
@@ -50,7 +50,7 @@ var BiddingColumns = struct {
 	UpdatedAt   string
 }{
 	ID:          "id",
-	CompanyID:   "company_id",
+	UserID:      "user_id",
 	Title:       "title",
 	Description: "description",
 	StartDate:   "start_date",
@@ -62,7 +62,7 @@ var BiddingColumns = struct {
 
 var BiddingTableColumns = struct {
 	ID          string
-	CompanyID   string
+	UserID      string
 	Title       string
 	Description string
 	StartDate   string
@@ -72,7 +72,7 @@ var BiddingTableColumns = struct {
 	UpdatedAt   string
 }{
 	ID:          "biddings.id",
-	CompanyID:   "biddings.company_id",
+	UserID:      "biddings.user_id",
 	Title:       "biddings.title",
 	Description: "biddings.description",
 	StartDate:   "biddings.start_date",
@@ -86,7 +86,7 @@ var BiddingTableColumns = struct {
 
 var BiddingWhere = struct {
 	ID          whereHelperint
-	CompanyID   whereHelperint
+	UserID      whereHelperint
 	Title       whereHelperstring
 	Description whereHelpernull_String
 	StartDate   whereHelpernull_Time
@@ -96,7 +96,7 @@ var BiddingWhere = struct {
 	UpdatedAt   whereHelpernull_Time
 }{
 	ID:          whereHelperint{field: "\"biddings\".\"id\""},
-	CompanyID:   whereHelperint{field: "\"biddings\".\"company_id\""},
+	UserID:      whereHelperint{field: "\"biddings\".\"user_id\""},
 	Title:       whereHelperstring{field: "\"biddings\".\"title\""},
 	Description: whereHelpernull_String{field: "\"biddings\".\"description\""},
 	StartDate:   whereHelpernull_Time{field: "\"biddings\".\"start_date\""},
@@ -109,18 +109,18 @@ var BiddingWhere = struct {
 // BiddingRels is where relationship names are stored.
 var BiddingRels = struct {
 	Category   string
-	Company    string
+	User       string
 	AutoOffers string
 }{
 	Category:   "Category",
-	Company:    "Company",
+	User:       "User",
 	AutoOffers: "AutoOffers",
 }
 
 // biddingR is where relationships are stored.
 type biddingR struct {
 	Category   *AutoCategory  `boil:"Category" json:"Category" toml:"Category" yaml:"Category"`
-	Company    *Company       `boil:"Company" json:"Company" toml:"Company" yaml:"Company"`
+	User       *User          `boil:"User" json:"User" toml:"User" yaml:"User"`
 	AutoOffers AutoOfferSlice `boil:"AutoOffers" json:"AutoOffers" toml:"AutoOffers" yaml:"AutoOffers"`
 }
 
@@ -136,11 +136,11 @@ func (r *biddingR) GetCategory() *AutoCategory {
 	return r.Category
 }
 
-func (r *biddingR) GetCompany() *Company {
+func (r *biddingR) GetUser() *User {
 	if r == nil {
 		return nil
 	}
-	return r.Company
+	return r.User
 }
 
 func (r *biddingR) GetAutoOffers() AutoOfferSlice {
@@ -154,8 +154,8 @@ func (r *biddingR) GetAutoOffers() AutoOfferSlice {
 type biddingL struct{}
 
 var (
-	biddingAllColumns            = []string{"id", "company_id", "title", "description", "start_date", "end_date", "category_id", "created_at", "updated_at"}
-	biddingColumnsWithoutDefault = []string{"company_id", "title", "category_id"}
+	biddingAllColumns            = []string{"id", "user_id", "title", "description", "start_date", "end_date", "category_id", "created_at", "updated_at"}
+	biddingColumnsWithoutDefault = []string{"user_id", "title", "category_id"}
 	biddingColumnsWithDefault    = []string{"id", "description", "start_date", "end_date", "created_at", "updated_at"}
 	biddingPrimaryKeyColumns     = []string{"id"}
 	biddingGeneratedColumns      = []string{}
@@ -477,15 +477,15 @@ func (o *Bidding) Category(mods ...qm.QueryMod) autoCategoryQuery {
 	return AutoCategories(queryMods...)
 }
 
-// Company pointed to by the foreign key.
-func (o *Bidding) Company(mods ...qm.QueryMod) companyQuery {
+// User pointed to by the foreign key.
+func (o *Bidding) User(mods ...qm.QueryMod) userQuery {
 	queryMods := []qm.QueryMod{
-		qm.Where("\"id\" = ?", o.CompanyID),
+		qm.Where("\"id\" = ?", o.UserID),
 	}
 
 	queryMods = append(queryMods, mods...)
 
-	return Companies(queryMods...)
+	return Users(queryMods...)
 }
 
 // AutoOffers retrieves all the auto_offer's AutoOffers with an executor.
@@ -622,9 +622,9 @@ func (biddingL) LoadCategory(ctx context.Context, e boil.ContextExecutor, singul
 	return nil
 }
 
-// LoadCompany allows an eager lookup of values, cached into the
+// LoadUser allows an eager lookup of values, cached into the
 // loaded structs of the objects. This is for an N-1 relationship.
-func (biddingL) LoadCompany(ctx context.Context, e boil.ContextExecutor, singular bool, maybeBidding interface{}, mods queries.Applicator) error {
+func (biddingL) LoadUser(ctx context.Context, e boil.ContextExecutor, singular bool, maybeBidding interface{}, mods queries.Applicator) error {
 	var slice []*Bidding
 	var object *Bidding
 
@@ -655,7 +655,7 @@ func (biddingL) LoadCompany(ctx context.Context, e boil.ContextExecutor, singula
 		if object.R == nil {
 			object.R = &biddingR{}
 		}
-		args[object.CompanyID] = struct{}{}
+		args[object.UserID] = struct{}{}
 
 	} else {
 		for _, obj := range slice {
@@ -663,7 +663,7 @@ func (biddingL) LoadCompany(ctx context.Context, e boil.ContextExecutor, singula
 				obj.R = &biddingR{}
 			}
 
-			args[obj.CompanyID] = struct{}{}
+			args[obj.UserID] = struct{}{}
 
 		}
 	}
@@ -680,8 +680,8 @@ func (biddingL) LoadCompany(ctx context.Context, e boil.ContextExecutor, singula
 	}
 
 	query := NewQuery(
-		qm.From(`companies`),
-		qm.WhereIn(`companies.id in ?`, argsSlice...),
+		qm.From(`users`),
+		qm.WhereIn(`users.id in ?`, argsSlice...),
 	)
 	if mods != nil {
 		mods.Apply(query)
@@ -689,22 +689,22 @@ func (biddingL) LoadCompany(ctx context.Context, e boil.ContextExecutor, singula
 
 	results, err := query.QueryContext(ctx, e)
 	if err != nil {
-		return errors.Wrap(err, "failed to eager load Company")
+		return errors.Wrap(err, "failed to eager load User")
 	}
 
-	var resultSlice []*Company
+	var resultSlice []*User
 	if err = queries.Bind(results, &resultSlice); err != nil {
-		return errors.Wrap(err, "failed to bind eager loaded slice Company")
+		return errors.Wrap(err, "failed to bind eager loaded slice User")
 	}
 
 	if err = results.Close(); err != nil {
-		return errors.Wrap(err, "failed to close results of eager load for companies")
+		return errors.Wrap(err, "failed to close results of eager load for users")
 	}
 	if err = results.Err(); err != nil {
-		return errors.Wrap(err, "error occurred during iteration of eager loaded relations for companies")
+		return errors.Wrap(err, "error occurred during iteration of eager loaded relations for users")
 	}
 
-	if len(companyAfterSelectHooks) != 0 {
+	if len(userAfterSelectHooks) != 0 {
 		for _, obj := range resultSlice {
 			if err := obj.doAfterSelectHooks(ctx, e); err != nil {
 				return err
@@ -718,9 +718,9 @@ func (biddingL) LoadCompany(ctx context.Context, e boil.ContextExecutor, singula
 
 	if singular {
 		foreign := resultSlice[0]
-		object.R.Company = foreign
+		object.R.User = foreign
 		if foreign.R == nil {
-			foreign.R = &companyR{}
+			foreign.R = &userR{}
 		}
 		foreign.R.Biddings = append(foreign.R.Biddings, object)
 		return nil
@@ -728,10 +728,10 @@ func (biddingL) LoadCompany(ctx context.Context, e boil.ContextExecutor, singula
 
 	for _, local := range slice {
 		for _, foreign := range resultSlice {
-			if local.CompanyID == foreign.ID {
-				local.R.Company = foreign
+			if local.UserID == foreign.ID {
+				local.R.User = foreign
 				if foreign.R == nil {
-					foreign.R = &companyR{}
+					foreign.R = &userR{}
 				}
 				foreign.R.Biddings = append(foreign.R.Biddings, local)
 				break
@@ -902,10 +902,10 @@ func (o *Bidding) SetCategory(ctx context.Context, exec boil.ContextExecutor, in
 	return nil
 }
 
-// SetCompany of the bidding to the related item.
-// Sets o.R.Company to related.
+// SetUser of the bidding to the related item.
+// Sets o.R.User to related.
 // Adds o to related.R.Biddings.
-func (o *Bidding) SetCompany(ctx context.Context, exec boil.ContextExecutor, insert bool, related *Company) error {
+func (o *Bidding) SetUser(ctx context.Context, exec boil.ContextExecutor, insert bool, related *User) error {
 	var err error
 	if insert {
 		if err = related.Insert(ctx, exec, boil.Infer()); err != nil {
@@ -915,7 +915,7 @@ func (o *Bidding) SetCompany(ctx context.Context, exec boil.ContextExecutor, ins
 
 	updateQuery := fmt.Sprintf(
 		"UPDATE \"biddings\" SET %s WHERE %s",
-		strmangle.SetParamNames("\"", "\"", 1, []string{"company_id"}),
+		strmangle.SetParamNames("\"", "\"", 1, []string{"user_id"}),
 		strmangle.WhereClause("\"", "\"", 2, biddingPrimaryKeyColumns),
 	)
 	values := []interface{}{related.ID, o.ID}
@@ -929,17 +929,17 @@ func (o *Bidding) SetCompany(ctx context.Context, exec boil.ContextExecutor, ins
 		return errors.Wrap(err, "failed to update local table")
 	}
 
-	o.CompanyID = related.ID
+	o.UserID = related.ID
 	if o.R == nil {
 		o.R = &biddingR{
-			Company: related,
+			User: related,
 		}
 	} else {
-		o.R.Company = related
+		o.R.User = related
 	}
 
 	if related.R == nil {
-		related.R = &companyR{
+		related.R = &userR{
 			Biddings: BiddingSlice{o},
 		}
 	} else {

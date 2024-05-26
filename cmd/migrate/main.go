@@ -47,6 +47,11 @@ func migrations(db *sql.DB, cmd string) {
 		if err := goose.Down(db, "migrations"); err != nil {
 			panic(err)
 		}
+	case "status":
+		fmt.Println("migration status")
+		if err := goose.Status(db, "migrations"); err != nil {
+			panic(err)
+		}
 	}
 }
 

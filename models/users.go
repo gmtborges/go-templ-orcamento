@@ -24,84 +24,97 @@ import (
 
 // User is an object representing the database table.
 type User struct {
-	ID         int         `boil:"id" json:"id" toml:"id" yaml:"id"`
-	Email      null.String `boil:"email" json:"email,omitempty" toml:"email" yaml:"email,omitempty"`
-	Password   string      `boil:"password" json:"password" toml:"password" yaml:"password"`
-	Role       string      `boil:"role" json:"role" toml:"role" yaml:"role"`
-	EmployerID int         `boil:"employer_id" json:"employer_id" toml:"employer_id" yaml:"employer_id"`
-	CreatedAt  null.Time   `boil:"created_at" json:"created_at,omitempty" toml:"created_at" yaml:"created_at,omitempty"`
-	UpdatedAt  null.Time   `boil:"updated_at" json:"updated_at,omitempty" toml:"updated_at" yaml:"updated_at,omitempty"`
+	ID        int         `boil:"id" json:"id" toml:"id" yaml:"id"`
+	Email     null.String `boil:"email" json:"email,omitempty" toml:"email" yaml:"email,omitempty"`
+	Password  string      `boil:"password" json:"password" toml:"password" yaml:"password"`
+	Name      string      `boil:"name" json:"name" toml:"name" yaml:"name"`
+	Role      string      `boil:"role" json:"role" toml:"role" yaml:"role"`
+	CompanyID int         `boil:"company_id" json:"company_id" toml:"company_id" yaml:"company_id"`
+	CreatedAt null.Time   `boil:"created_at" json:"created_at,omitempty" toml:"created_at" yaml:"created_at,omitempty"`
+	UpdatedAt null.Time   `boil:"updated_at" json:"updated_at,omitempty" toml:"updated_at" yaml:"updated_at,omitempty"`
 
 	R *userR `boil:"-" json:"-" toml:"-" yaml:"-"`
 	L userL  `boil:"-" json:"-" toml:"-" yaml:"-"`
 }
 
 var UserColumns = struct {
-	ID         string
-	Email      string
-	Password   string
-	Role       string
-	EmployerID string
-	CreatedAt  string
-	UpdatedAt  string
+	ID        string
+	Email     string
+	Password  string
+	Name      string
+	Role      string
+	CompanyID string
+	CreatedAt string
+	UpdatedAt string
 }{
-	ID:         "id",
-	Email:      "email",
-	Password:   "password",
-	Role:       "role",
-	EmployerID: "employer_id",
-	CreatedAt:  "created_at",
-	UpdatedAt:  "updated_at",
+	ID:        "id",
+	Email:     "email",
+	Password:  "password",
+	Name:      "name",
+	Role:      "role",
+	CompanyID: "company_id",
+	CreatedAt: "created_at",
+	UpdatedAt: "updated_at",
 }
 
 var UserTableColumns = struct {
-	ID         string
-	Email      string
-	Password   string
-	Role       string
-	EmployerID string
-	CreatedAt  string
-	UpdatedAt  string
+	ID        string
+	Email     string
+	Password  string
+	Name      string
+	Role      string
+	CompanyID string
+	CreatedAt string
+	UpdatedAt string
 }{
-	ID:         "users.id",
-	Email:      "users.email",
-	Password:   "users.password",
-	Role:       "users.role",
-	EmployerID: "users.employer_id",
-	CreatedAt:  "users.created_at",
-	UpdatedAt:  "users.updated_at",
+	ID:        "users.id",
+	Email:     "users.email",
+	Password:  "users.password",
+	Name:      "users.name",
+	Role:      "users.role",
+	CompanyID: "users.company_id",
+	CreatedAt: "users.created_at",
+	UpdatedAt: "users.updated_at",
 }
 
 // Generated where
 
 var UserWhere = struct {
-	ID         whereHelperint
-	Email      whereHelpernull_String
-	Password   whereHelperstring
-	Role       whereHelperstring
-	EmployerID whereHelperint
-	CreatedAt  whereHelpernull_Time
-	UpdatedAt  whereHelpernull_Time
+	ID        whereHelperint
+	Email     whereHelpernull_String
+	Password  whereHelperstring
+	Name      whereHelperstring
+	Role      whereHelperstring
+	CompanyID whereHelperint
+	CreatedAt whereHelpernull_Time
+	UpdatedAt whereHelpernull_Time
 }{
-	ID:         whereHelperint{field: "\"users\".\"id\""},
-	Email:      whereHelpernull_String{field: "\"users\".\"email\""},
-	Password:   whereHelperstring{field: "\"users\".\"password\""},
-	Role:       whereHelperstring{field: "\"users\".\"role\""},
-	EmployerID: whereHelperint{field: "\"users\".\"employer_id\""},
-	CreatedAt:  whereHelpernull_Time{field: "\"users\".\"created_at\""},
-	UpdatedAt:  whereHelpernull_Time{field: "\"users\".\"updated_at\""},
+	ID:        whereHelperint{field: "\"users\".\"id\""},
+	Email:     whereHelpernull_String{field: "\"users\".\"email\""},
+	Password:  whereHelperstring{field: "\"users\".\"password\""},
+	Name:      whereHelperstring{field: "\"users\".\"name\""},
+	Role:      whereHelperstring{field: "\"users\".\"role\""},
+	CompanyID: whereHelperint{field: "\"users\".\"company_id\""},
+	CreatedAt: whereHelpernull_Time{field: "\"users\".\"created_at\""},
+	UpdatedAt: whereHelpernull_Time{field: "\"users\".\"updated_at\""},
 }
 
 // UserRels is where relationship names are stored.
 var UserRels = struct {
-	Employer string
+	Company    string
+	AutoOffers string
+	Biddings   string
 }{
-	Employer: "Employer",
+	Company:    "Company",
+	AutoOffers: "AutoOffers",
+	Biddings:   "Biddings",
 }
 
 // userR is where relationships are stored.
 type userR struct {
-	Employer *Employer `boil:"Employer" json:"Employer" toml:"Employer" yaml:"Employer"`
+	Company    *Company       `boil:"Company" json:"Company" toml:"Company" yaml:"Company"`
+	AutoOffers AutoOfferSlice `boil:"AutoOffers" json:"AutoOffers" toml:"AutoOffers" yaml:"AutoOffers"`
+	Biddings   BiddingSlice   `boil:"Biddings" json:"Biddings" toml:"Biddings" yaml:"Biddings"`
 }
 
 // NewStruct creates a new relationship struct
@@ -109,19 +122,33 @@ func (*userR) NewStruct() *userR {
 	return &userR{}
 }
 
-func (r *userR) GetEmployer() *Employer {
+func (r *userR) GetCompany() *Company {
 	if r == nil {
 		return nil
 	}
-	return r.Employer
+	return r.Company
+}
+
+func (r *userR) GetAutoOffers() AutoOfferSlice {
+	if r == nil {
+		return nil
+	}
+	return r.AutoOffers
+}
+
+func (r *userR) GetBiddings() BiddingSlice {
+	if r == nil {
+		return nil
+	}
+	return r.Biddings
 }
 
 // userL is where Load methods for each relationship are stored.
 type userL struct{}
 
 var (
-	userAllColumns            = []string{"id", "email", "password", "role", "employer_id", "created_at", "updated_at"}
-	userColumnsWithoutDefault = []string{"password", "role", "employer_id"}
+	userAllColumns            = []string{"id", "email", "password", "name", "role", "company_id", "created_at", "updated_at"}
+	userColumnsWithoutDefault = []string{"password", "name", "role", "company_id"}
 	userColumnsWithDefault    = []string{"id", "email", "created_at", "updated_at"}
 	userPrimaryKeyColumns     = []string{"id"}
 	userGeneratedColumns      = []string{}
@@ -432,20 +459,48 @@ func (q userQuery) Exists(ctx context.Context, exec boil.ContextExecutor) (bool,
 	return count > 0, nil
 }
 
-// Employer pointed to by the foreign key.
-func (o *User) Employer(mods ...qm.QueryMod) employerQuery {
+// Company pointed to by the foreign key.
+func (o *User) Company(mods ...qm.QueryMod) companyQuery {
 	queryMods := []qm.QueryMod{
-		qm.Where("\"id\" = ?", o.EmployerID),
+		qm.Where("\"id\" = ?", o.CompanyID),
 	}
 
 	queryMods = append(queryMods, mods...)
 
-	return Employers(queryMods...)
+	return Companies(queryMods...)
 }
 
-// LoadEmployer allows an eager lookup of values, cached into the
+// AutoOffers retrieves all the auto_offer's AutoOffers with an executor.
+func (o *User) AutoOffers(mods ...qm.QueryMod) autoOfferQuery {
+	var queryMods []qm.QueryMod
+	if len(mods) != 0 {
+		queryMods = append(queryMods, mods...)
+	}
+
+	queryMods = append(queryMods,
+		qm.Where("\"auto_offers\".\"user_id\"=?", o.ID),
+	)
+
+	return AutoOffers(queryMods...)
+}
+
+// Biddings retrieves all the bidding's Biddings with an executor.
+func (o *User) Biddings(mods ...qm.QueryMod) biddingQuery {
+	var queryMods []qm.QueryMod
+	if len(mods) != 0 {
+		queryMods = append(queryMods, mods...)
+	}
+
+	queryMods = append(queryMods,
+		qm.Where("\"biddings\".\"user_id\"=?", o.ID),
+	)
+
+	return Biddings(queryMods...)
+}
+
+// LoadCompany allows an eager lookup of values, cached into the
 // loaded structs of the objects. This is for an N-1 relationship.
-func (userL) LoadEmployer(ctx context.Context, e boil.ContextExecutor, singular bool, maybeUser interface{}, mods queries.Applicator) error {
+func (userL) LoadCompany(ctx context.Context, e boil.ContextExecutor, singular bool, maybeUser interface{}, mods queries.Applicator) error {
 	var slice []*User
 	var object *User
 
@@ -476,7 +531,7 @@ func (userL) LoadEmployer(ctx context.Context, e boil.ContextExecutor, singular 
 		if object.R == nil {
 			object.R = &userR{}
 		}
-		args[object.EmployerID] = struct{}{}
+		args[object.CompanyID] = struct{}{}
 
 	} else {
 		for _, obj := range slice {
@@ -484,7 +539,7 @@ func (userL) LoadEmployer(ctx context.Context, e boil.ContextExecutor, singular 
 				obj.R = &userR{}
 			}
 
-			args[obj.EmployerID] = struct{}{}
+			args[obj.CompanyID] = struct{}{}
 
 		}
 	}
@@ -501,8 +556,8 @@ func (userL) LoadEmployer(ctx context.Context, e boil.ContextExecutor, singular 
 	}
 
 	query := NewQuery(
-		qm.From(`employers`),
-		qm.WhereIn(`employers.id in ?`, argsSlice...),
+		qm.From(`companies`),
+		qm.WhereIn(`companies.id in ?`, argsSlice...),
 	)
 	if mods != nil {
 		mods.Apply(query)
@@ -510,22 +565,22 @@ func (userL) LoadEmployer(ctx context.Context, e boil.ContextExecutor, singular 
 
 	results, err := query.QueryContext(ctx, e)
 	if err != nil {
-		return errors.Wrap(err, "failed to eager load Employer")
+		return errors.Wrap(err, "failed to eager load Company")
 	}
 
-	var resultSlice []*Employer
+	var resultSlice []*Company
 	if err = queries.Bind(results, &resultSlice); err != nil {
-		return errors.Wrap(err, "failed to bind eager loaded slice Employer")
+		return errors.Wrap(err, "failed to bind eager loaded slice Company")
 	}
 
 	if err = results.Close(); err != nil {
-		return errors.Wrap(err, "failed to close results of eager load for employers")
+		return errors.Wrap(err, "failed to close results of eager load for companies")
 	}
 	if err = results.Err(); err != nil {
-		return errors.Wrap(err, "error occurred during iteration of eager loaded relations for employers")
+		return errors.Wrap(err, "error occurred during iteration of eager loaded relations for companies")
 	}
 
-	if len(employerAfterSelectHooks) != 0 {
+	if len(companyAfterSelectHooks) != 0 {
 		for _, obj := range resultSlice {
 			if err := obj.doAfterSelectHooks(ctx, e); err != nil {
 				return err
@@ -539,9 +594,9 @@ func (userL) LoadEmployer(ctx context.Context, e boil.ContextExecutor, singular 
 
 	if singular {
 		foreign := resultSlice[0]
-		object.R.Employer = foreign
+		object.R.Company = foreign
 		if foreign.R == nil {
-			foreign.R = &employerR{}
+			foreign.R = &companyR{}
 		}
 		foreign.R.Users = append(foreign.R.Users, object)
 		return nil
@@ -549,10 +604,10 @@ func (userL) LoadEmployer(ctx context.Context, e boil.ContextExecutor, singular 
 
 	for _, local := range slice {
 		for _, foreign := range resultSlice {
-			if local.EmployerID == foreign.ID {
-				local.R.Employer = foreign
+			if local.CompanyID == foreign.ID {
+				local.R.Company = foreign
 				if foreign.R == nil {
-					foreign.R = &employerR{}
+					foreign.R = &companyR{}
 				}
 				foreign.R.Users = append(foreign.R.Users, local)
 				break
@@ -563,10 +618,236 @@ func (userL) LoadEmployer(ctx context.Context, e boil.ContextExecutor, singular 
 	return nil
 }
 
-// SetEmployer of the user to the related item.
-// Sets o.R.Employer to related.
+// LoadAutoOffers allows an eager lookup of values, cached into the
+// loaded structs of the objects. This is for a 1-M or N-M relationship.
+func (userL) LoadAutoOffers(ctx context.Context, e boil.ContextExecutor, singular bool, maybeUser interface{}, mods queries.Applicator) error {
+	var slice []*User
+	var object *User
+
+	if singular {
+		var ok bool
+		object, ok = maybeUser.(*User)
+		if !ok {
+			object = new(User)
+			ok = queries.SetFromEmbeddedStruct(&object, &maybeUser)
+			if !ok {
+				return errors.New(fmt.Sprintf("failed to set %T from embedded struct %T", object, maybeUser))
+			}
+		}
+	} else {
+		s, ok := maybeUser.(*[]*User)
+		if ok {
+			slice = *s
+		} else {
+			ok = queries.SetFromEmbeddedStruct(&slice, maybeUser)
+			if !ok {
+				return errors.New(fmt.Sprintf("failed to set %T from embedded struct %T", slice, maybeUser))
+			}
+		}
+	}
+
+	args := make(map[interface{}]struct{})
+	if singular {
+		if object.R == nil {
+			object.R = &userR{}
+		}
+		args[object.ID] = struct{}{}
+	} else {
+		for _, obj := range slice {
+			if obj.R == nil {
+				obj.R = &userR{}
+			}
+			args[obj.ID] = struct{}{}
+		}
+	}
+
+	if len(args) == 0 {
+		return nil
+	}
+
+	argsSlice := make([]interface{}, len(args))
+	i := 0
+	for arg := range args {
+		argsSlice[i] = arg
+		i++
+	}
+
+	query := NewQuery(
+		qm.From(`auto_offers`),
+		qm.WhereIn(`auto_offers.user_id in ?`, argsSlice...),
+	)
+	if mods != nil {
+		mods.Apply(query)
+	}
+
+	results, err := query.QueryContext(ctx, e)
+	if err != nil {
+		return errors.Wrap(err, "failed to eager load auto_offers")
+	}
+
+	var resultSlice []*AutoOffer
+	if err = queries.Bind(results, &resultSlice); err != nil {
+		return errors.Wrap(err, "failed to bind eager loaded slice auto_offers")
+	}
+
+	if err = results.Close(); err != nil {
+		return errors.Wrap(err, "failed to close results in eager load on auto_offers")
+	}
+	if err = results.Err(); err != nil {
+		return errors.Wrap(err, "error occurred during iteration of eager loaded relations for auto_offers")
+	}
+
+	if len(autoOfferAfterSelectHooks) != 0 {
+		for _, obj := range resultSlice {
+			if err := obj.doAfterSelectHooks(ctx, e); err != nil {
+				return err
+			}
+		}
+	}
+	if singular {
+		object.R.AutoOffers = resultSlice
+		for _, foreign := range resultSlice {
+			if foreign.R == nil {
+				foreign.R = &autoOfferR{}
+			}
+			foreign.R.User = object
+		}
+		return nil
+	}
+
+	for _, foreign := range resultSlice {
+		for _, local := range slice {
+			if local.ID == foreign.UserID {
+				local.R.AutoOffers = append(local.R.AutoOffers, foreign)
+				if foreign.R == nil {
+					foreign.R = &autoOfferR{}
+				}
+				foreign.R.User = local
+				break
+			}
+		}
+	}
+
+	return nil
+}
+
+// LoadBiddings allows an eager lookup of values, cached into the
+// loaded structs of the objects. This is for a 1-M or N-M relationship.
+func (userL) LoadBiddings(ctx context.Context, e boil.ContextExecutor, singular bool, maybeUser interface{}, mods queries.Applicator) error {
+	var slice []*User
+	var object *User
+
+	if singular {
+		var ok bool
+		object, ok = maybeUser.(*User)
+		if !ok {
+			object = new(User)
+			ok = queries.SetFromEmbeddedStruct(&object, &maybeUser)
+			if !ok {
+				return errors.New(fmt.Sprintf("failed to set %T from embedded struct %T", object, maybeUser))
+			}
+		}
+	} else {
+		s, ok := maybeUser.(*[]*User)
+		if ok {
+			slice = *s
+		} else {
+			ok = queries.SetFromEmbeddedStruct(&slice, maybeUser)
+			if !ok {
+				return errors.New(fmt.Sprintf("failed to set %T from embedded struct %T", slice, maybeUser))
+			}
+		}
+	}
+
+	args := make(map[interface{}]struct{})
+	if singular {
+		if object.R == nil {
+			object.R = &userR{}
+		}
+		args[object.ID] = struct{}{}
+	} else {
+		for _, obj := range slice {
+			if obj.R == nil {
+				obj.R = &userR{}
+			}
+			args[obj.ID] = struct{}{}
+		}
+	}
+
+	if len(args) == 0 {
+		return nil
+	}
+
+	argsSlice := make([]interface{}, len(args))
+	i := 0
+	for arg := range args {
+		argsSlice[i] = arg
+		i++
+	}
+
+	query := NewQuery(
+		qm.From(`biddings`),
+		qm.WhereIn(`biddings.user_id in ?`, argsSlice...),
+	)
+	if mods != nil {
+		mods.Apply(query)
+	}
+
+	results, err := query.QueryContext(ctx, e)
+	if err != nil {
+		return errors.Wrap(err, "failed to eager load biddings")
+	}
+
+	var resultSlice []*Bidding
+	if err = queries.Bind(results, &resultSlice); err != nil {
+		return errors.Wrap(err, "failed to bind eager loaded slice biddings")
+	}
+
+	if err = results.Close(); err != nil {
+		return errors.Wrap(err, "failed to close results in eager load on biddings")
+	}
+	if err = results.Err(); err != nil {
+		return errors.Wrap(err, "error occurred during iteration of eager loaded relations for biddings")
+	}
+
+	if len(biddingAfterSelectHooks) != 0 {
+		for _, obj := range resultSlice {
+			if err := obj.doAfterSelectHooks(ctx, e); err != nil {
+				return err
+			}
+		}
+	}
+	if singular {
+		object.R.Biddings = resultSlice
+		for _, foreign := range resultSlice {
+			if foreign.R == nil {
+				foreign.R = &biddingR{}
+			}
+			foreign.R.User = object
+		}
+		return nil
+	}
+
+	for _, foreign := range resultSlice {
+		for _, local := range slice {
+			if local.ID == foreign.UserID {
+				local.R.Biddings = append(local.R.Biddings, foreign)
+				if foreign.R == nil {
+					foreign.R = &biddingR{}
+				}
+				foreign.R.User = local
+				break
+			}
+		}
+	}
+
+	return nil
+}
+
+// SetCompany of the user to the related item.
+// Sets o.R.Company to related.
 // Adds o to related.R.Users.
-func (o *User) SetEmployer(ctx context.Context, exec boil.ContextExecutor, insert bool, related *Employer) error {
+func (o *User) SetCompany(ctx context.Context, exec boil.ContextExecutor, insert bool, related *Company) error {
 	var err error
 	if insert {
 		if err = related.Insert(ctx, exec, boil.Infer()); err != nil {
@@ -576,7 +857,7 @@ func (o *User) SetEmployer(ctx context.Context, exec boil.ContextExecutor, inser
 
 	updateQuery := fmt.Sprintf(
 		"UPDATE \"users\" SET %s WHERE %s",
-		strmangle.SetParamNames("\"", "\"", 1, []string{"employer_id"}),
+		strmangle.SetParamNames("\"", "\"", 1, []string{"company_id"}),
 		strmangle.WhereClause("\"", "\"", 2, userPrimaryKeyColumns),
 	)
 	values := []interface{}{related.ID, o.ID}
@@ -590,23 +871,129 @@ func (o *User) SetEmployer(ctx context.Context, exec boil.ContextExecutor, inser
 		return errors.Wrap(err, "failed to update local table")
 	}
 
-	o.EmployerID = related.ID
+	o.CompanyID = related.ID
 	if o.R == nil {
 		o.R = &userR{
-			Employer: related,
+			Company: related,
 		}
 	} else {
-		o.R.Employer = related
+		o.R.Company = related
 	}
 
 	if related.R == nil {
-		related.R = &employerR{
+		related.R = &companyR{
 			Users: UserSlice{o},
 		}
 	} else {
 		related.R.Users = append(related.R.Users, o)
 	}
 
+	return nil
+}
+
+// AddAutoOffers adds the given related objects to the existing relationships
+// of the user, optionally inserting them as new records.
+// Appends related to o.R.AutoOffers.
+// Sets related.R.User appropriately.
+func (o *User) AddAutoOffers(ctx context.Context, exec boil.ContextExecutor, insert bool, related ...*AutoOffer) error {
+	var err error
+	for _, rel := range related {
+		if insert {
+			rel.UserID = o.ID
+			if err = rel.Insert(ctx, exec, boil.Infer()); err != nil {
+				return errors.Wrap(err, "failed to insert into foreign table")
+			}
+		} else {
+			updateQuery := fmt.Sprintf(
+				"UPDATE \"auto_offers\" SET %s WHERE %s",
+				strmangle.SetParamNames("\"", "\"", 1, []string{"user_id"}),
+				strmangle.WhereClause("\"", "\"", 2, autoOfferPrimaryKeyColumns),
+			)
+			values := []interface{}{o.ID, rel.ID}
+
+			if boil.IsDebug(ctx) {
+				writer := boil.DebugWriterFrom(ctx)
+				fmt.Fprintln(writer, updateQuery)
+				fmt.Fprintln(writer, values)
+			}
+			if _, err = exec.ExecContext(ctx, updateQuery, values...); err != nil {
+				return errors.Wrap(err, "failed to update foreign table")
+			}
+
+			rel.UserID = o.ID
+		}
+	}
+
+	if o.R == nil {
+		o.R = &userR{
+			AutoOffers: related,
+		}
+	} else {
+		o.R.AutoOffers = append(o.R.AutoOffers, related...)
+	}
+
+	for _, rel := range related {
+		if rel.R == nil {
+			rel.R = &autoOfferR{
+				User: o,
+			}
+		} else {
+			rel.R.User = o
+		}
+	}
+	return nil
+}
+
+// AddBiddings adds the given related objects to the existing relationships
+// of the user, optionally inserting them as new records.
+// Appends related to o.R.Biddings.
+// Sets related.R.User appropriately.
+func (o *User) AddBiddings(ctx context.Context, exec boil.ContextExecutor, insert bool, related ...*Bidding) error {
+	var err error
+	for _, rel := range related {
+		if insert {
+			rel.UserID = o.ID
+			if err = rel.Insert(ctx, exec, boil.Infer()); err != nil {
+				return errors.Wrap(err, "failed to insert into foreign table")
+			}
+		} else {
+			updateQuery := fmt.Sprintf(
+				"UPDATE \"biddings\" SET %s WHERE %s",
+				strmangle.SetParamNames("\"", "\"", 1, []string{"user_id"}),
+				strmangle.WhereClause("\"", "\"", 2, biddingPrimaryKeyColumns),
+			)
+			values := []interface{}{o.ID, rel.ID}
+
+			if boil.IsDebug(ctx) {
+				writer := boil.DebugWriterFrom(ctx)
+				fmt.Fprintln(writer, updateQuery)
+				fmt.Fprintln(writer, values)
+			}
+			if _, err = exec.ExecContext(ctx, updateQuery, values...); err != nil {
+				return errors.Wrap(err, "failed to update foreign table")
+			}
+
+			rel.UserID = o.ID
+		}
+	}
+
+	if o.R == nil {
+		o.R = &userR{
+			Biddings: related,
+		}
+	} else {
+		o.R.Biddings = append(o.R.Biddings, related...)
+	}
+
+	for _, rel := range related {
+		if rel.R == nil {
+			rel.R = &biddingR{
+				User: o,
+			}
+		} else {
+			rel.R.User = o
+		}
+	}
 	return nil
 }
 

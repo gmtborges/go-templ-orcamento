@@ -6,6 +6,12 @@ import (
 	"github.com/gustavomtborges/orcamento-auto/views"
 )
 
-func ShowIndex(c echo.Context) error {
-	return render(c, views.Index())
+type IndexHandler struct{}
+
+func NewIndexHandler() *IndexHandler {
+	return &IndexHandler{}
+}
+
+func (h *IndexHandler) Show(c echo.Context) error {
+	return views.Index().Render(c.Request().Context(), c.Response())
 }

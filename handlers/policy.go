@@ -6,6 +6,12 @@ import (
 	"github.com/gustavomtborges/orcamento-auto/views"
 )
 
-func ShowPolicy(c echo.Context) error {
-	return render(c, views.Policy())
+type PolicyHandler struct{}
+
+func NewPolicyHandler() *PolicyHandler {
+	return &PolicyHandler{}
+}
+
+func (h *PolicyHandler) Show(c echo.Context) error {
+	return views.Policy().Render(c.Request().Context(), c.Response())
 }

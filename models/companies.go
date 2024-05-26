@@ -25,8 +25,8 @@ import (
 // Company is an object representing the database table.
 type Company struct {
 	ID            int         `boil:"id" json:"id" toml:"id" yaml:"id"`
-	EmployerID    int         `boil:"employer_id" json:"employer_id" toml:"employer_id" yaml:"employer_id"`
 	Name          string      `boil:"name" json:"name" toml:"name" yaml:"name"`
+	Type          string      `boil:"type" json:"type" toml:"type" yaml:"type"`
 	Address       null.String `boil:"address" json:"address,omitempty" toml:"address" yaml:"address,omitempty"`
 	ContactNumber null.Int    `boil:"contact_number" json:"contact_number,omitempty" toml:"contact_number" yaml:"contact_number,omitempty"`
 	CreatedAt     null.Time   `boil:"created_at" json:"created_at,omitempty" toml:"created_at" yaml:"created_at,omitempty"`
@@ -38,16 +38,16 @@ type Company struct {
 
 var CompanyColumns = struct {
 	ID            string
-	EmployerID    string
 	Name          string
+	Type          string
 	Address       string
 	ContactNumber string
 	CreatedAt     string
 	UpdatedAt     string
 }{
 	ID:            "id",
-	EmployerID:    "employer_id",
 	Name:          "name",
+	Type:          "type",
 	Address:       "address",
 	ContactNumber: "contact_number",
 	CreatedAt:     "created_at",
@@ -56,16 +56,16 @@ var CompanyColumns = struct {
 
 var CompanyTableColumns = struct {
 	ID            string
-	EmployerID    string
 	Name          string
+	Type          string
 	Address       string
 	ContactNumber string
 	CreatedAt     string
 	UpdatedAt     string
 }{
 	ID:            "companies.id",
-	EmployerID:    "companies.employer_id",
 	Name:          "companies.name",
+	Type:          "companies.type",
 	Address:       "companies.address",
 	ContactNumber: "companies.contact_number",
 	CreatedAt:     "companies.created_at",
@@ -74,18 +74,56 @@ var CompanyTableColumns = struct {
 
 // Generated where
 
+type whereHelpernull_Int struct{ field string }
+
+func (w whereHelpernull_Int) EQ(x null.Int) qm.QueryMod {
+	return qmhelper.WhereNullEQ(w.field, false, x)
+}
+func (w whereHelpernull_Int) NEQ(x null.Int) qm.QueryMod {
+	return qmhelper.WhereNullEQ(w.field, true, x)
+}
+func (w whereHelpernull_Int) LT(x null.Int) qm.QueryMod {
+	return qmhelper.Where(w.field, qmhelper.LT, x)
+}
+func (w whereHelpernull_Int) LTE(x null.Int) qm.QueryMod {
+	return qmhelper.Where(w.field, qmhelper.LTE, x)
+}
+func (w whereHelpernull_Int) GT(x null.Int) qm.QueryMod {
+	return qmhelper.Where(w.field, qmhelper.GT, x)
+}
+func (w whereHelpernull_Int) GTE(x null.Int) qm.QueryMod {
+	return qmhelper.Where(w.field, qmhelper.GTE, x)
+}
+func (w whereHelpernull_Int) IN(slice []int) qm.QueryMod {
+	values := make([]interface{}, 0, len(slice))
+	for _, value := range slice {
+		values = append(values, value)
+	}
+	return qm.WhereIn(fmt.Sprintf("%s IN ?", w.field), values...)
+}
+func (w whereHelpernull_Int) NIN(slice []int) qm.QueryMod {
+	values := make([]interface{}, 0, len(slice))
+	for _, value := range slice {
+		values = append(values, value)
+	}
+	return qm.WhereNotIn(fmt.Sprintf("%s NOT IN ?", w.field), values...)
+}
+
+func (w whereHelpernull_Int) IsNull() qm.QueryMod    { return qmhelper.WhereIsNull(w.field) }
+func (w whereHelpernull_Int) IsNotNull() qm.QueryMod { return qmhelper.WhereIsNotNull(w.field) }
+
 var CompanyWhere = struct {
 	ID            whereHelperint
-	EmployerID    whereHelperint
 	Name          whereHelperstring
+	Type          whereHelperstring
 	Address       whereHelpernull_String
 	ContactNumber whereHelpernull_Int
 	CreatedAt     whereHelpernull_Time
 	UpdatedAt     whereHelpernull_Time
 }{
 	ID:            whereHelperint{field: "\"companies\".\"id\""},
-	EmployerID:    whereHelperint{field: "\"companies\".\"employer_id\""},
 	Name:          whereHelperstring{field: "\"companies\".\"name\""},
+	Type:          whereHelperstring{field: "\"companies\".\"type\""},
 	Address:       whereHelpernull_String{field: "\"companies\".\"address\""},
 	ContactNumber: whereHelpernull_Int{field: "\"companies\".\"contact_number\""},
 	CreatedAt:     whereHelpernull_Time{field: "\"companies\".\"created_at\""},
@@ -94,17 +132,17 @@ var CompanyWhere = struct {
 
 // CompanyRels is where relationship names are stored.
 var CompanyRels = struct {
-	Employer string
-	Biddings string
+	AutoCategories string
+	Users          string
 }{
-	Employer: "Employer",
-	Biddings: "Biddings",
+	AutoCategories: "AutoCategories",
+	Users:          "Users",
 }
 
 // companyR is where relationships are stored.
 type companyR struct {
-	Employer *Employer    `boil:"Employer" json:"Employer" toml:"Employer" yaml:"Employer"`
-	Biddings BiddingSlice `boil:"Biddings" json:"Biddings" toml:"Biddings" yaml:"Biddings"`
+	AutoCategories AutoCategorySlice `boil:"AutoCategories" json:"AutoCategories" toml:"AutoCategories" yaml:"AutoCategories"`
+	Users          UserSlice         `boil:"Users" json:"Users" toml:"Users" yaml:"Users"`
 }
 
 // NewStruct creates a new relationship struct
@@ -112,26 +150,26 @@ func (*companyR) NewStruct() *companyR {
 	return &companyR{}
 }
 
-func (r *companyR) GetEmployer() *Employer {
+func (r *companyR) GetAutoCategories() AutoCategorySlice {
 	if r == nil {
 		return nil
 	}
-	return r.Employer
+	return r.AutoCategories
 }
 
-func (r *companyR) GetBiddings() BiddingSlice {
+func (r *companyR) GetUsers() UserSlice {
 	if r == nil {
 		return nil
 	}
-	return r.Biddings
+	return r.Users
 }
 
 // companyL is where Load methods for each relationship are stored.
 type companyL struct{}
 
 var (
-	companyAllColumns            = []string{"id", "employer_id", "name", "address", "contact_number", "created_at", "updated_at"}
-	companyColumnsWithoutDefault = []string{"employer_id", "name"}
+	companyAllColumns            = []string{"id", "name", "type", "address", "contact_number", "created_at", "updated_at"}
+	companyColumnsWithoutDefault = []string{"name", "type"}
 	companyColumnsWithDefault    = []string{"id", "address", "contact_number", "created_at", "updated_at"}
 	companyPrimaryKeyColumns     = []string{"id"}
 	companyGeneratedColumns      = []string{}
@@ -442,154 +480,38 @@ func (q companyQuery) Exists(ctx context.Context, exec boil.ContextExecutor) (bo
 	return count > 0, nil
 }
 
-// Employer pointed to by the foreign key.
-func (o *Company) Employer(mods ...qm.QueryMod) employerQuery {
-	queryMods := []qm.QueryMod{
-		qm.Where("\"id\" = ?", o.EmployerID),
-	}
-
-	queryMods = append(queryMods, mods...)
-
-	return Employers(queryMods...)
-}
-
-// Biddings retrieves all the bidding's Biddings with an executor.
-func (o *Company) Biddings(mods ...qm.QueryMod) biddingQuery {
+// AutoCategories retrieves all the auto_category's AutoCategories with an executor.
+func (o *Company) AutoCategories(mods ...qm.QueryMod) autoCategoryQuery {
 	var queryMods []qm.QueryMod
 	if len(mods) != 0 {
 		queryMods = append(queryMods, mods...)
 	}
 
 	queryMods = append(queryMods,
-		qm.Where("\"biddings\".\"company_id\"=?", o.ID),
+		qm.InnerJoin("\"auto_stores_categories\" on \"auto_categories\".\"id\" = \"auto_stores_categories\".\"auto_category_id\""),
+		qm.Where("\"auto_stores_categories\".\"company_id\"=?", o.ID),
 	)
 
-	return Biddings(queryMods...)
+	return AutoCategories(queryMods...)
 }
 
-// LoadEmployer allows an eager lookup of values, cached into the
-// loaded structs of the objects. This is for an N-1 relationship.
-func (companyL) LoadEmployer(ctx context.Context, e boil.ContextExecutor, singular bool, maybeCompany interface{}, mods queries.Applicator) error {
-	var slice []*Company
-	var object *Company
-
-	if singular {
-		var ok bool
-		object, ok = maybeCompany.(*Company)
-		if !ok {
-			object = new(Company)
-			ok = queries.SetFromEmbeddedStruct(&object, &maybeCompany)
-			if !ok {
-				return errors.New(fmt.Sprintf("failed to set %T from embedded struct %T", object, maybeCompany))
-			}
-		}
-	} else {
-		s, ok := maybeCompany.(*[]*Company)
-		if ok {
-			slice = *s
-		} else {
-			ok = queries.SetFromEmbeddedStruct(&slice, maybeCompany)
-			if !ok {
-				return errors.New(fmt.Sprintf("failed to set %T from embedded struct %T", slice, maybeCompany))
-			}
-		}
+// Users retrieves all the user's Users with an executor.
+func (o *Company) Users(mods ...qm.QueryMod) userQuery {
+	var queryMods []qm.QueryMod
+	if len(mods) != 0 {
+		queryMods = append(queryMods, mods...)
 	}
 
-	args := make(map[interface{}]struct{})
-	if singular {
-		if object.R == nil {
-			object.R = &companyR{}
-		}
-		args[object.EmployerID] = struct{}{}
-
-	} else {
-		for _, obj := range slice {
-			if obj.R == nil {
-				obj.R = &companyR{}
-			}
-
-			args[obj.EmployerID] = struct{}{}
-
-		}
-	}
-
-	if len(args) == 0 {
-		return nil
-	}
-
-	argsSlice := make([]interface{}, len(args))
-	i := 0
-	for arg := range args {
-		argsSlice[i] = arg
-		i++
-	}
-
-	query := NewQuery(
-		qm.From(`employers`),
-		qm.WhereIn(`employers.id in ?`, argsSlice...),
+	queryMods = append(queryMods,
+		qm.Where("\"users\".\"company_id\"=?", o.ID),
 	)
-	if mods != nil {
-		mods.Apply(query)
-	}
 
-	results, err := query.QueryContext(ctx, e)
-	if err != nil {
-		return errors.Wrap(err, "failed to eager load Employer")
-	}
-
-	var resultSlice []*Employer
-	if err = queries.Bind(results, &resultSlice); err != nil {
-		return errors.Wrap(err, "failed to bind eager loaded slice Employer")
-	}
-
-	if err = results.Close(); err != nil {
-		return errors.Wrap(err, "failed to close results of eager load for employers")
-	}
-	if err = results.Err(); err != nil {
-		return errors.Wrap(err, "error occurred during iteration of eager loaded relations for employers")
-	}
-
-	if len(employerAfterSelectHooks) != 0 {
-		for _, obj := range resultSlice {
-			if err := obj.doAfterSelectHooks(ctx, e); err != nil {
-				return err
-			}
-		}
-	}
-
-	if len(resultSlice) == 0 {
-		return nil
-	}
-
-	if singular {
-		foreign := resultSlice[0]
-		object.R.Employer = foreign
-		if foreign.R == nil {
-			foreign.R = &employerR{}
-		}
-		foreign.R.Companies = append(foreign.R.Companies, object)
-		return nil
-	}
-
-	for _, local := range slice {
-		for _, foreign := range resultSlice {
-			if local.EmployerID == foreign.ID {
-				local.R.Employer = foreign
-				if foreign.R == nil {
-					foreign.R = &employerR{}
-				}
-				foreign.R.Companies = append(foreign.R.Companies, local)
-				break
-			}
-		}
-	}
-
-	return nil
+	return Users(queryMods...)
 }
 
-// LoadBiddings allows an eager lookup of values, cached into the
+// LoadAutoCategories allows an eager lookup of values, cached into the
 // loaded structs of the objects. This is for a 1-M or N-M relationship.
-func (companyL) LoadBiddings(ctx context.Context, e boil.ContextExecutor, singular bool, maybeCompany interface{}, mods queries.Applicator) error {
+func (companyL) LoadAutoCategories(ctx context.Context, e boil.ContextExecutor, singular bool, maybeCompany interface{}, mods queries.Applicator) error {
 	var slice []*Company
 	var object *Company
 
@@ -642,8 +564,10 @@ func (companyL) LoadBiddings(ctx context.Context, e boil.ContextExecutor, singul
 	}
 
 	query := NewQuery(
-		qm.From(`biddings`),
-		qm.WhereIn(`biddings.company_id in ?`, argsSlice...),
+		qm.Select("\"auto_categories\".\"id\", \"auto_categories\".\"name\", \"auto_categories\".\"created_at\", \"auto_categories\".\"updated_at\", \"a\".\"company_id\""),
+		qm.From("\"auto_categories\""),
+		qm.InnerJoin("\"auto_stores_categories\" as \"a\" on \"auto_categories\".\"id\" = \"a\".\"auto_category_id\""),
+		qm.WhereIn("\"a\".\"company_id\" in ?", argsSlice...),
 	)
 	if mods != nil {
 		mods.Apply(query)
@@ -651,22 +575,36 @@ func (companyL) LoadBiddings(ctx context.Context, e boil.ContextExecutor, singul
 
 	results, err := query.QueryContext(ctx, e)
 	if err != nil {
-		return errors.Wrap(err, "failed to eager load biddings")
+		return errors.Wrap(err, "failed to eager load auto_categories")
 	}
 
-	var resultSlice []*Bidding
-	if err = queries.Bind(results, &resultSlice); err != nil {
-		return errors.Wrap(err, "failed to bind eager loaded slice biddings")
+	var resultSlice []*AutoCategory
+
+	var localJoinCols []int
+	for results.Next() {
+		one := new(AutoCategory)
+		var localJoinCol int
+
+		err = results.Scan(&one.ID, &one.Name, &one.CreatedAt, &one.UpdatedAt, &localJoinCol)
+		if err != nil {
+			return errors.Wrap(err, "failed to scan eager loaded results for auto_categories")
+		}
+		if err = results.Err(); err != nil {
+			return errors.Wrap(err, "failed to plebian-bind eager loaded slice auto_categories")
+		}
+
+		resultSlice = append(resultSlice, one)
+		localJoinCols = append(localJoinCols, localJoinCol)
 	}
 
 	if err = results.Close(); err != nil {
-		return errors.Wrap(err, "failed to close results in eager load on biddings")
+		return errors.Wrap(err, "failed to close results in eager load on auto_categories")
 	}
 	if err = results.Err(); err != nil {
-		return errors.Wrap(err, "error occurred during iteration of eager loaded relations for biddings")
+		return errors.Wrap(err, "error occurred during iteration of eager loaded relations for auto_categories")
 	}
 
-	if len(biddingAfterSelectHooks) != 0 {
+	if len(autoCategoryAfterSelectHooks) != 0 {
 		for _, obj := range resultSlice {
 			if err := obj.doAfterSelectHooks(ctx, e); err != nil {
 				return err
@@ -674,10 +612,124 @@ func (companyL) LoadBiddings(ctx context.Context, e boil.ContextExecutor, singul
 		}
 	}
 	if singular {
-		object.R.Biddings = resultSlice
+		object.R.AutoCategories = resultSlice
 		for _, foreign := range resultSlice {
 			if foreign.R == nil {
-				foreign.R = &biddingR{}
+				foreign.R = &autoCategoryR{}
+			}
+			foreign.R.Companies = append(foreign.R.Companies, object)
+		}
+		return nil
+	}
+
+	for i, foreign := range resultSlice {
+		localJoinCol := localJoinCols[i]
+		for _, local := range slice {
+			if local.ID == localJoinCol {
+				local.R.AutoCategories = append(local.R.AutoCategories, foreign)
+				if foreign.R == nil {
+					foreign.R = &autoCategoryR{}
+				}
+				foreign.R.Companies = append(foreign.R.Companies, local)
+				break
+			}
+		}
+	}
+
+	return nil
+}
+
+// LoadUsers allows an eager lookup of values, cached into the
+// loaded structs of the objects. This is for a 1-M or N-M relationship.
+func (companyL) LoadUsers(ctx context.Context, e boil.ContextExecutor, singular bool, maybeCompany interface{}, mods queries.Applicator) error {
+	var slice []*Company
+	var object *Company
+
+	if singular {
+		var ok bool
+		object, ok = maybeCompany.(*Company)
+		if !ok {
+			object = new(Company)
+			ok = queries.SetFromEmbeddedStruct(&object, &maybeCompany)
+			if !ok {
+				return errors.New(fmt.Sprintf("failed to set %T from embedded struct %T", object, maybeCompany))
+			}
+		}
+	} else {
+		s, ok := maybeCompany.(*[]*Company)
+		if ok {
+			slice = *s
+		} else {
+			ok = queries.SetFromEmbeddedStruct(&slice, maybeCompany)
+			if !ok {
+				return errors.New(fmt.Sprintf("failed to set %T from embedded struct %T", slice, maybeCompany))
+			}
+		}
+	}
+
+	args := make(map[interface{}]struct{})
+	if singular {
+		if object.R == nil {
+			object.R = &companyR{}
+		}
+		args[object.ID] = struct{}{}
+	} else {
+		for _, obj := range slice {
+			if obj.R == nil {
+				obj.R = &companyR{}
+			}
+			args[obj.ID] = struct{}{}
+		}
+	}
+
+	if len(args) == 0 {
+		return nil
+	}
+
+	argsSlice := make([]interface{}, len(args))
+	i := 0
+	for arg := range args {
+		argsSlice[i] = arg
+		i++
+	}
+
+	query := NewQuery(
+		qm.From(`users`),
+		qm.WhereIn(`users.company_id in ?`, argsSlice...),
+	)
+	if mods != nil {
+		mods.Apply(query)
+	}
+
+	results, err := query.QueryContext(ctx, e)
+	if err != nil {
+		return errors.Wrap(err, "failed to eager load users")
+	}
+
+	var resultSlice []*User
+	if err = queries.Bind(results, &resultSlice); err != nil {
+		return errors.Wrap(err, "failed to bind eager loaded slice users")
+	}
+
+	if err = results.Close(); err != nil {
+		return errors.Wrap(err, "failed to close results in eager load on users")
+	}
+	if err = results.Err(); err != nil {
+		return errors.Wrap(err, "error occurred during iteration of eager loaded relations for users")
+	}
+
+	if len(userAfterSelectHooks) != 0 {
+		for _, obj := range resultSlice {
+			if err := obj.doAfterSelectHooks(ctx, e); err != nil {
+				return err
+			}
+		}
+	}
+	if singular {
+		object.R.Users = resultSlice
+		for _, foreign := range resultSlice {
+			if foreign.R == nil {
+				foreign.R = &userR{}
 			}
 			foreign.R.Company = object
 		}
@@ -687,9 +739,9 @@ func (companyL) LoadBiddings(ctx context.Context, e boil.ContextExecutor, singul
 	for _, foreign := range resultSlice {
 		for _, local := range slice {
 			if local.ID == foreign.CompanyID {
-				local.R.Biddings = append(local.R.Biddings, foreign)
+				local.R.Users = append(local.R.Users, foreign)
 				if foreign.R == nil {
-					foreign.R = &biddingR{}
+					foreign.R = &userR{}
 				}
 				foreign.R.Company = local
 				break
@@ -700,58 +752,156 @@ func (companyL) LoadBiddings(ctx context.Context, e boil.ContextExecutor, singul
 	return nil
 }
 
-// SetEmployer of the company to the related item.
-// Sets o.R.Employer to related.
-// Adds o to related.R.Companies.
-func (o *Company) SetEmployer(ctx context.Context, exec boil.ContextExecutor, insert bool, related *Employer) error {
+// AddAutoCategories adds the given related objects to the existing relationships
+// of the company, optionally inserting them as new records.
+// Appends related to o.R.AutoCategories.
+// Sets related.R.Companies appropriately.
+func (o *Company) AddAutoCategories(ctx context.Context, exec boil.ContextExecutor, insert bool, related ...*AutoCategory) error {
 	var err error
-	if insert {
-		if err = related.Insert(ctx, exec, boil.Infer()); err != nil {
-			return errors.Wrap(err, "failed to insert into foreign table")
+	for _, rel := range related {
+		if insert {
+			if err = rel.Insert(ctx, exec, boil.Infer()); err != nil {
+				return errors.Wrap(err, "failed to insert into foreign table")
+			}
 		}
 	}
 
-	updateQuery := fmt.Sprintf(
-		"UPDATE \"companies\" SET %s WHERE %s",
-		strmangle.SetParamNames("\"", "\"", 1, []string{"employer_id"}),
-		strmangle.WhereClause("\"", "\"", 2, companyPrimaryKeyColumns),
+	for _, rel := range related {
+		query := "insert into \"auto_stores_categories\" (\"company_id\", \"auto_category_id\") values ($1, $2)"
+		values := []interface{}{o.ID, rel.ID}
+
+		if boil.IsDebug(ctx) {
+			writer := boil.DebugWriterFrom(ctx)
+			fmt.Fprintln(writer, query)
+			fmt.Fprintln(writer, values)
+		}
+		_, err = exec.ExecContext(ctx, query, values...)
+		if err != nil {
+			return errors.Wrap(err, "failed to insert into join table")
+		}
+	}
+	if o.R == nil {
+		o.R = &companyR{
+			AutoCategories: related,
+		}
+	} else {
+		o.R.AutoCategories = append(o.R.AutoCategories, related...)
+	}
+
+	for _, rel := range related {
+		if rel.R == nil {
+			rel.R = &autoCategoryR{
+				Companies: CompanySlice{o},
+			}
+		} else {
+			rel.R.Companies = append(rel.R.Companies, o)
+		}
+	}
+	return nil
+}
+
+// SetAutoCategories removes all previously related items of the
+// company replacing them completely with the passed
+// in related items, optionally inserting them as new records.
+// Sets o.R.Companies's AutoCategories accordingly.
+// Replaces o.R.AutoCategories with related.
+// Sets related.R.Companies's AutoCategories accordingly.
+func (o *Company) SetAutoCategories(ctx context.Context, exec boil.ContextExecutor, insert bool, related ...*AutoCategory) error {
+	query := "delete from \"auto_stores_categories\" where \"company_id\" = $1"
+	values := []interface{}{o.ID}
+	if boil.IsDebug(ctx) {
+		writer := boil.DebugWriterFrom(ctx)
+		fmt.Fprintln(writer, query)
+		fmt.Fprintln(writer, values)
+	}
+	_, err := exec.ExecContext(ctx, query, values...)
+	if err != nil {
+		return errors.Wrap(err, "failed to remove relationships before set")
+	}
+
+	removeAutoCategoriesFromCompaniesSlice(o, related)
+	if o.R != nil {
+		o.R.AutoCategories = nil
+	}
+
+	return o.AddAutoCategories(ctx, exec, insert, related...)
+}
+
+// RemoveAutoCategories relationships from objects passed in.
+// Removes related items from R.AutoCategories (uses pointer comparison, removal does not keep order)
+// Sets related.R.Companies.
+func (o *Company) RemoveAutoCategories(ctx context.Context, exec boil.ContextExecutor, related ...*AutoCategory) error {
+	if len(related) == 0 {
+		return nil
+	}
+
+	var err error
+	query := fmt.Sprintf(
+		"delete from \"auto_stores_categories\" where \"company_id\" = $1 and \"auto_category_id\" in (%s)",
+		strmangle.Placeholders(dialect.UseIndexPlaceholders, len(related), 2, 1),
 	)
-	values := []interface{}{related.ID, o.ID}
+	values := []interface{}{o.ID}
+	for _, rel := range related {
+		values = append(values, rel.ID)
+	}
 
 	if boil.IsDebug(ctx) {
 		writer := boil.DebugWriterFrom(ctx)
-		fmt.Fprintln(writer, updateQuery)
+		fmt.Fprintln(writer, query)
 		fmt.Fprintln(writer, values)
 	}
-	if _, err = exec.ExecContext(ctx, updateQuery, values...); err != nil {
-		return errors.Wrap(err, "failed to update local table")
+	_, err = exec.ExecContext(ctx, query, values...)
+	if err != nil {
+		return errors.Wrap(err, "failed to remove relationships before set")
 	}
-
-	o.EmployerID = related.ID
+	removeAutoCategoriesFromCompaniesSlice(o, related)
 	if o.R == nil {
-		o.R = &companyR{
-			Employer: related,
-		}
-	} else {
-		o.R.Employer = related
+		return nil
 	}
 
-	if related.R == nil {
-		related.R = &employerR{
-			Companies: CompanySlice{o},
+	for _, rel := range related {
+		for i, ri := range o.R.AutoCategories {
+			if rel != ri {
+				continue
+			}
+
+			ln := len(o.R.AutoCategories)
+			if ln > 1 && i < ln-1 {
+				o.R.AutoCategories[i] = o.R.AutoCategories[ln-1]
+			}
+			o.R.AutoCategories = o.R.AutoCategories[:ln-1]
+			break
 		}
-	} else {
-		related.R.Companies = append(related.R.Companies, o)
 	}
 
 	return nil
 }
 
-// AddBiddings adds the given related objects to the existing relationships
+func removeAutoCategoriesFromCompaniesSlice(o *Company, related []*AutoCategory) {
+	for _, rel := range related {
+		if rel.R == nil {
+			continue
+		}
+		for i, ri := range rel.R.Companies {
+			if o.ID != ri.ID {
+				continue
+			}
+
+			ln := len(rel.R.Companies)
+			if ln > 1 && i < ln-1 {
+				rel.R.Companies[i] = rel.R.Companies[ln-1]
+			}
+			rel.R.Companies = rel.R.Companies[:ln-1]
+			break
+		}
+	}
+}
+
+// AddUsers adds the given related objects to the existing relationships
 // of the company, optionally inserting them as new records.
-// Appends related to o.R.Biddings.
+// Appends related to o.R.Users.
 // Sets related.R.Company appropriately.
-func (o *Company) AddBiddings(ctx context.Context, exec boil.ContextExecutor, insert bool, related ...*Bidding) error {
+func (o *Company) AddUsers(ctx context.Context, exec boil.ContextExecutor, insert bool, related ...*User) error {
 	var err error
 	for _, rel := range related {
 		if insert {
@@ -761,9 +911,9 @@ func (o *Company) AddBiddings(ctx context.Context, exec boil.ContextExecutor, in
 			}
 		} else {
 			updateQuery := fmt.Sprintf(
-				"UPDATE \"biddings\" SET %s WHERE %s",
+				"UPDATE \"users\" SET %s WHERE %s",
 				strmangle.SetParamNames("\"", "\"", 1, []string{"company_id"}),
-				strmangle.WhereClause("\"", "\"", 2, biddingPrimaryKeyColumns),
+				strmangle.WhereClause("\"", "\"", 2, userPrimaryKeyColumns),
 			)
 			values := []interface{}{o.ID, rel.ID}
 
@@ -782,15 +932,15 @@ func (o *Company) AddBiddings(ctx context.Context, exec boil.ContextExecutor, in
 
 	if o.R == nil {
 		o.R = &companyR{
-			Biddings: related,
+			Users: related,
 		}
 	} else {
-		o.R.Biddings = append(o.R.Biddings, related...)
+		o.R.Users = append(o.R.Users, related...)
 	}
 
 	for _, rel := range related {
 		if rel.R == nil {
-			rel.R = &biddingR{
+			rel.R = &userR{
 				Company: o,
 			}
 		} else {
