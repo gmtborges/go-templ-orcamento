@@ -5,15 +5,15 @@ templ Header() {
 		<nav class="flex py-2 px-2 justify-between items-center max-w-6xl mx-auto" x-data="{ showDropdown: false }">
 			<div class="flex items-center space-x-2">
 				<img src="/static/logo.svg" width="48" height="48" alt="Orçamento Auto logo"/>
-				<div class="font-bold hidden md:block md:text-xl uppercase">Orçamento Auto</div>
+				<div class="font-extrabold hidden md:block md:text-xl uppercase">Orçamento Auto</div>
 			</div>
-			<div x-show="showDropdown" x-transition class="absolute bg-gray-100 top-16 right-2 left-2 border rounded-md">
+			<div x-show="showDropdown" x-transition class="absolute bg-gray-100 top-[68px] right-2 left-2 border rounded-md">
 				<ul class="flex flex-col text-xl space-y-4 p-3 font-medium">
 					<li>
-						<a href="#" class="hover:text-cyan-700">Vantagens</a>
+						<a href="#" class="hover:text-primary">Vantagens</a>
 					</li>
 					<li>
-						<a href="#" class="hover:text-cyan-700">Como funciona</a>
+						<a href="#" class="hover:text-primary">Como funciona</a>
 					</li>
 				</ul>
 			</div>
@@ -37,16 +37,16 @@ templ Header() {
 				<div class="hidden md:block">
 					<ul class="flex space-x-5 font-medium">
 						<li>
-							<a href="#" class="font-medium hover:text-cyan-700">Vantagens</a>
+							<a href="#" class="font-medium hover:text-primary">Vantagens</a>
 						</li>
 						<li>
-							<a href="#" class="font-medium hover:text-cyan-700">Como funciona</a>
+							<a href="#" class="font-medium hover:text-primary">Como funciona</a>
 						</li>
 					</ul>
 				</div>
 				<a
 					href="/login"
-					class="inline-flex items-center justify-center px-4 py-2 font-medium tracking-wide text-white transition-colors duration-200 bg-cyan-600 rounded-md hover:bg-cyan-700 focus:ring-2 focus:ring-offset-2 focus:ring-cyan-700 focus:shadow-outline focus:outline-none"
+					class="btn btn-primary text-white"
 				>
 					Entrar
 				</a>
