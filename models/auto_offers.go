@@ -24,9 +24,9 @@ import (
 
 // AutoOffer is an object representing the database table.
 type AutoOffer struct {
-	ID           int         `boil:"id" json:"id" toml:"id" yaml:"id"`
-	BiddingID    int         `boil:"bidding_id" json:"bidding_id" toml:"bidding_id" yaml:"bidding_id"`
-	UserID       int         `boil:"user_id" json:"user_id" toml:"user_id" yaml:"user_id"`
+	ID           int64       `boil:"id" json:"id" toml:"id" yaml:"id"`
+	BiddingID    int64       `boil:"bidding_id" json:"bidding_id" toml:"bidding_id" yaml:"bidding_id"`
+	UserID       int64       `boil:"user_id" json:"user_id" toml:"user_id" yaml:"user_id"`
 	OfferDetails null.String `boil:"offer_details" json:"offer_details,omitempty" toml:"offer_details" yaml:"offer_details,omitempty"`
 	OfferDate    null.Time   `boil:"offer_date" json:"offer_date,omitempty" toml:"offer_date" yaml:"offer_date,omitempty"`
 	CreatedAt    null.Time   `boil:"created_at" json:"created_at,omitempty" toml:"created_at" yaml:"created_at,omitempty"`
@@ -125,17 +125,17 @@ func (w whereHelpernull_String) IsNull() qm.QueryMod    { return qmhelper.WhereI
 func (w whereHelpernull_String) IsNotNull() qm.QueryMod { return qmhelper.WhereIsNotNull(w.field) }
 
 var AutoOfferWhere = struct {
-	ID           whereHelperint
-	BiddingID    whereHelperint
-	UserID       whereHelperint
+	ID           whereHelperint64
+	BiddingID    whereHelperint64
+	UserID       whereHelperint64
 	OfferDetails whereHelpernull_String
 	OfferDate    whereHelpernull_Time
 	CreatedAt    whereHelpernull_Time
 	UpdatedAt    whereHelpernull_Time
 }{
-	ID:           whereHelperint{field: "\"auto_offers\".\"id\""},
-	BiddingID:    whereHelperint{field: "\"auto_offers\".\"bidding_id\""},
-	UserID:       whereHelperint{field: "\"auto_offers\".\"user_id\""},
+	ID:           whereHelperint64{field: "\"auto_offers\".\"id\""},
+	BiddingID:    whereHelperint64{field: "\"auto_offers\".\"bidding_id\""},
+	UserID:       whereHelperint64{field: "\"auto_offers\".\"user_id\""},
 	OfferDetails: whereHelpernull_String{field: "\"auto_offers\".\"offer_details\""},
 	OfferDate:    whereHelpernull_Time{field: "\"auto_offers\".\"offer_date\""},
 	CreatedAt:    whereHelpernull_Time{field: "\"auto_offers\".\"created_at\""},
@@ -861,7 +861,7 @@ func AutoOffers(mods ...qm.QueryMod) autoOfferQuery {
 
 // FindAutoOffer retrieves a single record by ID with an executor.
 // If selectCols is empty Find will return all columns.
-func FindAutoOffer(ctx context.Context, exec boil.ContextExecutor, iD int, selectCols ...string) (*AutoOffer, error) {
+func FindAutoOffer(ctx context.Context, exec boil.ContextExecutor, iD int64, selectCols ...string) (*AutoOffer, error) {
 	autoOfferObj := &AutoOffer{}
 
 	sel := "*"
@@ -1390,7 +1390,7 @@ func (o *AutoOfferSlice) ReloadAll(ctx context.Context, exec boil.ContextExecuto
 }
 
 // AutoOfferExists checks if the AutoOffer row exists.
-func AutoOfferExists(ctx context.Context, exec boil.ContextExecutor, iD int) (bool, error) {
+func AutoOfferExists(ctx context.Context, exec boil.ContextExecutor, iD int64) (bool, error) {
 	var exists bool
 	sql := "select exists(select 1 from \"auto_offers\" where \"id\"=$1 limit 1)"
 

@@ -12,6 +12,6 @@ func NewIndexHandler() *IndexHandler {
 	return &IndexHandler{}
 }
 
-func (h *IndexHandler) Show(c echo.Context) error {
+func (h *IndexHandler) Index(c echo.Context) error {
 	return views.Index().Render(c.Request().Context(), c.Response())
 }

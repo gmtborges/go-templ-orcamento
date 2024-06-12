@@ -1,0 +1,15 @@
+package views
+
+import "github.com/gustavomtborges/orcamento-auto/views/layouts"
+
+templ metaTags() {
+	<meta name="description" content="Lista de propostas"/>
+}
+
+templ OffersIndex() {
+	@layouts.Base("Orçamento Auto - Propostas", metaTags()) {
+		@layouts.SideBarAutoStore() {
+			<div>propostas</div>
+		}
+	}
+}

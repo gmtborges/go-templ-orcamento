@@ -11,15 +11,14 @@ import (
 )
 
 type LoginHandler struct {
-	loginSvc *services.LoginService
-	authSvc  *services.AuthService
+	authSvc *services.AuthService
 }
 
-func NewLoginHandler(loginSvc *services.LoginService, authSvc *services.AuthService) *LoginHandler {
-	return &LoginHandler{loginSvc: loginSvc, authSvc: authSvc}
+func NewLoginHandler(authSvc *services.AuthService) *LoginHandler {
+	return &LoginHandler{authSvc: authSvc}
 }
 
-func (h *LoginHandler) Show(c echo.Context) error {
+func (h *LoginHandler) Index(c echo.Context) error {
 	return views.LoginIndex(views.LoginIndexViewModel{}).Render(c.Request().Context(), c.Response())
 }
 
@@ -27,7 +26,7 @@ func (h *LoginHandler) Create(c echo.Context) error {
 	email := c.FormValue("email")
 	passwd := c.FormValue("password")
 
-	user, err := h.loginSvc.GetUserByEmail(c.Request().Context(), email)
+	user, err := h.authSvc.GetUserByEmail(c.Request().Context(), email)
 	if err == sql.ErrNoRows {
 		c.Response().WriteHeader(http.StatusBadRequest)
 		return views.LoginIndex(
@@ -76,5 +75,14 @@ func (h *LoginHandler) Create(c echo.Context) error {
 			}).Render(c.Request().Context(), c.Response())
 	}
 
-	return c.Redirect(http.StatusSeeOther, "/dashboard")
+	return c.Redirect(http.StatusSeeOther, "/orcamentos")
+}
+
+func (h *LoginHandler) Logout(c echo.Context) error {
+	if err := h.authSvc.RemoveAuthSession(c); err != nil {
+		// TODO: Send session error to the app layout toast alerts
+		c.String(http.StatusInternalServerError, "Error removing session")
+	}
+	c.Response().Writer.Header().Add("HX-Redirect", "/login")
+	return c.NoContent(http.StatusNoContent)
 }

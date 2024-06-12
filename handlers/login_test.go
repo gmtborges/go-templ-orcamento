@@ -26,15 +26,15 @@ func (m *MockUserStore) GetUserByEmail(ctx context.Context, email string) (*mode
 
 func TestLoginHandler_Create_Success(t *testing.T) {
 	e := echo.New()
-	authSvc := services.NewAuthService()
+	authSvc := services.NewAuthService(&MockUserStore{})
 	hash, _ := authSvc.GeneratePasswordHash("passwd123")
 	st := &MockUserStore{
 		MockFn: func() (*models.User, error) {
 			return &models.User{Password: hash}, nil
 		},
 	}
-	loginSvc := services.NewLoginService(st)
-	h := NewLoginHandler(loginSvc, authSvc)
+	authSvc = services.NewAuthService(st)
+	h := NewLoginHandler(authSvc)
 
 	req := httptest.NewRequest(http.MethodPost, "/login", strings.NewReader("email=test@example.com&password=passwd123"))
 	req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationForm)
@@ -57,9 +57,8 @@ func TestLoginHandler_Create_UserNotFound(t *testing.T) {
 			return nil, sql.ErrNoRows
 		},
 	}
-	loginSvc := services.NewLoginService(st)
-	authSvc := services.NewAuthService()
-	h := NewLoginHandler(loginSvc, authSvc)
+	authSvc := services.NewAuthService(st)
+	h := NewLoginHandler(authSvc)
 
 	req := httptest.NewRequest(http.MethodPost, "/login", strings.NewReader("email=test@example.com&password=passwd123"))
 	req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationForm)
@@ -84,9 +83,8 @@ func TestLoginHandler_Create_InvalidPassword(t *testing.T) {
 			return &models.User{Password: "wrong"}, nil
 		},
 	}
-	loginSvc := services.NewLoginService(st)
-	authSvc := services.NewAuthService()
-	h := NewLoginHandler(loginSvc, authSvc)
+	authSvc := services.NewAuthService(st)
+	h := NewLoginHandler(authSvc)
 	req := httptest.NewRequest(
 		http.MethodPost,
 		"/login",
@@ -114,9 +112,8 @@ func TestLoginHandler_Create_Error_Database(t *testing.T) {
 			return nil, errors.New("error on database")
 		},
 	}
-	loginSvc := services.NewLoginService(st)
-	authSvc := services.NewAuthService()
-	h := NewLoginHandler(loginSvc, authSvc)
+	authSvc := services.NewAuthService(st)
+	h := NewLoginHandler(authSvc)
 	req := httptest.NewRequest(
 		http.MethodPost,
 		"/login",

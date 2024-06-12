@@ -1,6 +1,7 @@
 package services
 
 import (
+	"context"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -8,10 +9,20 @@ import (
 	"github.com/gorilla/sessions"
 	"github.com/labstack/echo-contrib/session"
 	"github.com/labstack/echo/v4"
+
+	"github.com/gustavomtborges/orcamento-auto/models"
 )
 
+type MockUserStore struct {
+	MockFn func() (*models.User, error)
+}
+
+func (m *MockUserStore) GetUserByEmail(ctx context.Context, email string) (*models.User, error) {
+	return m.MockFn()
+}
+
 func TestAuthService_Generate_Verify_Password(t *testing.T) {
-	authSvc := NewAuthService()
+	authSvc := NewAuthService(&MockUserStore{})
 	hash, err := authSvc.GeneratePasswordHash("passwd123")
 	if err != nil {
 		t.Errorf("Error generating hash: %v", err)
@@ -41,7 +52,7 @@ func TestAuthService_SetAuthSession(t *testing.T) {
 	c := e.NewContext(req, rec)
 	c.Set("_session_store", sessions.NewCookieStore([]byte("secret")))
 
-	svc := NewAuthService()
+	svc := NewAuthService(&MockUserStore{})
 	err := svc.SetAuthSession(c, 123)
 	if err != nil {
 		t.Errorf("Expected no error, got %v", err)
@@ -65,7 +76,7 @@ func TestAuthService_RemoveAuthSession(t *testing.T) {
 	c := e.NewContext(req, rec)
 	c.Set("_session_store", sessions.NewCookieStore([]byte("secret")))
 
-	svc := NewAuthService()
+	svc := NewAuthService(&MockUserStore{})
 	if err := svc.SetAuthSession(c, 123); err != nil {
 		t.Errorf("Error setting session %v", err)
 	}

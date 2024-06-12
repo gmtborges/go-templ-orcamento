@@ -1,4 +1,4 @@
-package stores
+package repositories
 
 import (
 	"context"
@@ -9,19 +9,19 @@ import (
 	"github.com/gustavomtborges/orcamento-auto/models"
 )
 
-type UserStorer interface {
+type UserRepository interface {
 	GetUserByEmail(ctx context.Context, email string) (*models.User, error)
 }
 
-type PostgresUserStore struct {
+type PostgresUserRepository struct {
 	db *sql.DB
 }
 
-func NewPostgresUserStore(db *sql.DB) *PostgresUserStore {
-	return &PostgresUserStore{db: db}
+func NewPostgresUserRepository(db *sql.DB) *PostgresUserRepository {
+	return &PostgresUserRepository{db: db}
 }
 
-func (st *PostgresUserStore) GetUserByEmail(ctx context.Context, email string) (*models.User, error) {
+func (st *PostgresUserRepository) GetUserByEmail(ctx context.Context, email string) (*models.User, error) {
 	user, err := models.Users(qm.Where("email = ?", email)).One(ctx, st.db)
 	if err != nil {
 		return nil, err

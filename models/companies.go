@@ -24,9 +24,8 @@ import (
 
 // Company is an object representing the database table.
 type Company struct {
-	ID            int         `boil:"id" json:"id" toml:"id" yaml:"id"`
+	ID            int64       `boil:"id" json:"id" toml:"id" yaml:"id"`
 	Name          string      `boil:"name" json:"name" toml:"name" yaml:"name"`
-	Type          string      `boil:"type" json:"type" toml:"type" yaml:"type"`
 	Address       null.String `boil:"address" json:"address,omitempty" toml:"address" yaml:"address,omitempty"`
 	ContactNumber null.Int    `boil:"contact_number" json:"contact_number,omitempty" toml:"contact_number" yaml:"contact_number,omitempty"`
 	CreatedAt     null.Time   `boil:"created_at" json:"created_at,omitempty" toml:"created_at" yaml:"created_at,omitempty"`
@@ -39,7 +38,6 @@ type Company struct {
 var CompanyColumns = struct {
 	ID            string
 	Name          string
-	Type          string
 	Address       string
 	ContactNumber string
 	CreatedAt     string
@@ -47,7 +45,6 @@ var CompanyColumns = struct {
 }{
 	ID:            "id",
 	Name:          "name",
-	Type:          "type",
 	Address:       "address",
 	ContactNumber: "contact_number",
 	CreatedAt:     "created_at",
@@ -57,7 +54,6 @@ var CompanyColumns = struct {
 var CompanyTableColumns = struct {
 	ID            string
 	Name          string
-	Type          string
 	Address       string
 	ContactNumber string
 	CreatedAt     string
@@ -65,7 +61,6 @@ var CompanyTableColumns = struct {
 }{
 	ID:            "companies.id",
 	Name:          "companies.name",
-	Type:          "companies.type",
 	Address:       "companies.address",
 	ContactNumber: "companies.contact_number",
 	CreatedAt:     "companies.created_at",
@@ -113,17 +108,15 @@ func (w whereHelpernull_Int) IsNull() qm.QueryMod    { return qmhelper.WhereIsNu
 func (w whereHelpernull_Int) IsNotNull() qm.QueryMod { return qmhelper.WhereIsNotNull(w.field) }
 
 var CompanyWhere = struct {
-	ID            whereHelperint
+	ID            whereHelperint64
 	Name          whereHelperstring
-	Type          whereHelperstring
 	Address       whereHelpernull_String
 	ContactNumber whereHelpernull_Int
 	CreatedAt     whereHelpernull_Time
 	UpdatedAt     whereHelpernull_Time
 }{
-	ID:            whereHelperint{field: "\"companies\".\"id\""},
+	ID:            whereHelperint64{field: "\"companies\".\"id\""},
 	Name:          whereHelperstring{field: "\"companies\".\"name\""},
-	Type:          whereHelperstring{field: "\"companies\".\"type\""},
 	Address:       whereHelpernull_String{field: "\"companies\".\"address\""},
 	ContactNumber: whereHelpernull_Int{field: "\"companies\".\"contact_number\""},
 	CreatedAt:     whereHelpernull_Time{field: "\"companies\".\"created_at\""},
@@ -168,8 +161,8 @@ func (r *companyR) GetUsers() UserSlice {
 type companyL struct{}
 
 var (
-	companyAllColumns            = []string{"id", "name", "type", "address", "contact_number", "created_at", "updated_at"}
-	companyColumnsWithoutDefault = []string{"name", "type"}
+	companyAllColumns            = []string{"id", "name", "address", "contact_number", "created_at", "updated_at"}
+	companyColumnsWithoutDefault = []string{"name"}
 	companyColumnsWithDefault    = []string{"id", "address", "contact_number", "created_at", "updated_at"}
 	companyPrimaryKeyColumns     = []string{"id"}
 	companyGeneratedColumns      = []string{}
@@ -488,8 +481,8 @@ func (o *Company) AutoCategories(mods ...qm.QueryMod) autoCategoryQuery {
 	}
 
 	queryMods = append(queryMods,
-		qm.InnerJoin("\"auto_stores_categories\" on \"auto_categories\".\"id\" = \"auto_stores_categories\".\"auto_category_id\""),
-		qm.Where("\"auto_stores_categories\".\"company_id\"=?", o.ID),
+		qm.InnerJoin("\"companies_auto_categories\" on \"auto_categories\".\"id\" = \"companies_auto_categories\".\"auto_category_id\""),
+		qm.Where("\"companies_auto_categories\".\"company_id\"=?", o.ID),
 	)
 
 	return AutoCategories(queryMods...)
@@ -566,7 +559,7 @@ func (companyL) LoadAutoCategories(ctx context.Context, e boil.ContextExecutor, 
 	query := NewQuery(
 		qm.Select("\"auto_categories\".\"id\", \"auto_categories\".\"name\", \"auto_categories\".\"created_at\", \"auto_categories\".\"updated_at\", \"a\".\"company_id\""),
 		qm.From("\"auto_categories\""),
-		qm.InnerJoin("\"auto_stores_categories\" as \"a\" on \"auto_categories\".\"id\" = \"a\".\"auto_category_id\""),
+		qm.InnerJoin("\"companies_auto_categories\" as \"a\" on \"auto_categories\".\"id\" = \"a\".\"auto_category_id\""),
 		qm.WhereIn("\"a\".\"company_id\" in ?", argsSlice...),
 	)
 	if mods != nil {
@@ -580,10 +573,10 @@ func (companyL) LoadAutoCategories(ctx context.Context, e boil.ContextExecutor, 
 
 	var resultSlice []*AutoCategory
 
-	var localJoinCols []int
+	var localJoinCols []int64
 	for results.Next() {
 		one := new(AutoCategory)
-		var localJoinCol int
+		var localJoinCol int64
 
 		err = results.Scan(&one.ID, &one.Name, &one.CreatedAt, &one.UpdatedAt, &localJoinCol)
 		if err != nil {
@@ -767,7 +760,7 @@ func (o *Company) AddAutoCategories(ctx context.Context, exec boil.ContextExecut
 	}
 
 	for _, rel := range related {
-		query := "insert into \"auto_stores_categories\" (\"company_id\", \"auto_category_id\") values ($1, $2)"
+		query := "insert into \"companies_auto_categories\" (\"company_id\", \"auto_category_id\") values ($1, $2)"
 		values := []interface{}{o.ID, rel.ID}
 
 		if boil.IsDebug(ctx) {
@@ -807,7 +800,7 @@ func (o *Company) AddAutoCategories(ctx context.Context, exec boil.ContextExecut
 // Replaces o.R.AutoCategories with related.
 // Sets related.R.Companies's AutoCategories accordingly.
 func (o *Company) SetAutoCategories(ctx context.Context, exec boil.ContextExecutor, insert bool, related ...*AutoCategory) error {
-	query := "delete from \"auto_stores_categories\" where \"company_id\" = $1"
+	query := "delete from \"companies_auto_categories\" where \"company_id\" = $1"
 	values := []interface{}{o.ID}
 	if boil.IsDebug(ctx) {
 		writer := boil.DebugWriterFrom(ctx)
@@ -837,7 +830,7 @@ func (o *Company) RemoveAutoCategories(ctx context.Context, exec boil.ContextExe
 
 	var err error
 	query := fmt.Sprintf(
-		"delete from \"auto_stores_categories\" where \"company_id\" = $1 and \"auto_category_id\" in (%s)",
+		"delete from \"companies_auto_categories\" where \"company_id\" = $1 and \"auto_category_id\" in (%s)",
 		strmangle.Placeholders(dialect.UseIndexPlaceholders, len(related), 2, 1),
 	)
 	values := []interface{}{o.ID}
@@ -963,7 +956,7 @@ func Companies(mods ...qm.QueryMod) companyQuery {
 
 // FindCompany retrieves a single record by ID with an executor.
 // If selectCols is empty Find will return all columns.
-func FindCompany(ctx context.Context, exec boil.ContextExecutor, iD int, selectCols ...string) (*Company, error) {
+func FindCompany(ctx context.Context, exec boil.ContextExecutor, iD int64, selectCols ...string) (*Company, error) {
 	companyObj := &Company{}
 
 	sel := "*"
@@ -1492,7 +1485,7 @@ func (o *CompanySlice) ReloadAll(ctx context.Context, exec boil.ContextExecutor)
 }
 
 // CompanyExists checks if the Company row exists.
-func CompanyExists(ctx context.Context, exec boil.ContextExecutor, iD int) (bool, error) {
+func CompanyExists(ctx context.Context, exec boil.ContextExecutor, iD int64) (bool, error) {
 	var exists bool
 	sql := "select exists(select 1 from \"companies\" where \"id\"=$1 limit 1)"
 

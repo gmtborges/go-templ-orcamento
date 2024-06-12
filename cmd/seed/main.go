@@ -13,6 +13,7 @@ import (
 
 	"github.com/gustavomtborges/orcamento-auto/db"
 	"github.com/gustavomtborges/orcamento-auto/models"
+	"github.com/gustavomtborges/orcamento-auto/repositories"
 	"github.com/gustavomtborges/orcamento-auto/services"
 )
 
@@ -35,8 +36,9 @@ func main() {
 		panic(err)
 	}
 
-	authSvc := services.NewAuthService()
-	hash, err := authSvc.GeneratePasswordHash("admin123")
+	userRepo := repositories.NewPostgresUserRepository(db)
+	authSvc := services.NewAuthService(userRepo)
+	hash, err := authSvc.GeneratePasswordHash("123")
 	if err != nil {
 		log.Fatal(err)
 	}

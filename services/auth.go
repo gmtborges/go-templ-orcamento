@@ -1,6 +1,7 @@
 package services
 
 import (
+	"context"
 	"crypto/rand"
 	"crypto/subtle"
 	"encoding/base64"
@@ -12,6 +13,9 @@ import (
 	"github.com/labstack/echo-contrib/session"
 	"github.com/labstack/echo/v4"
 	"golang.org/x/crypto/argon2"
+
+	"github.com/gustavomtborges/orcamento-auto/models"
+	"github.com/gustavomtborges/orcamento-auto/repositories"
 )
 
 type argon2Params struct {
@@ -23,9 +27,10 @@ type argon2Params struct {
 
 type AuthService struct {
 	argon2Params
+	userRepo repositories.UserRepository
 }
 
-func NewAuthService() *AuthService {
+func NewAuthService(userRepo repositories.UserRepository) *AuthService {
 	params := &argon2Params{
 		time:    1,
 		memory:  64 * 1024,
@@ -33,7 +38,20 @@ func NewAuthService() *AuthService {
 		keyLen:  32,
 	}
 
-	return &AuthService{argon2Params: *params}
+	return &AuthService{argon2Params: *params, userRepo: userRepo}
+}
+
+func (s *AuthService) GetRolesByUserID(userID int) ([]string, error) {
+	return []string{"admin", "coop_admin"}, nil
+}
+
+func (s *AuthService) GetUserByEmail(ctx context.Context, email string) (*models.User, error) {
+	user, err := s.userRepo.GetUserByEmail(ctx, email)
+	if err != nil {
+		return nil, err
+	}
+
+	return user, nil
 }
 
 func (s *AuthService) GeneratePasswordHash(password string) (string, error) {

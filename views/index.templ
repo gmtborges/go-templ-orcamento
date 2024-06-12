@@ -1,13 +1,19 @@
 package views
 
 import "github.com/gustavomtborges/orcamento-auto/views/layouts"
+import "github.com/gustavomtborges/orcamento-auto/views/components"
+
+templ metaTags() {
+	<meta name="description" content="Para Associações, descomplique seus orcamentos e autmente sua eficiência. Para Auto Peças, aumente suas vendas."/>
+}
 
 templ Index() {
-	@layouts.Nav() {
-		<main class="px-2" style="background: linear-gradient(to top, rgb(165, 243, 252), rgb(34, 211, 238))">
-			<div class="pt-20 pb-44 md:pt-32 max-w-4xl mx-auto">
+	@layouts.Base("Orçamento Auto", metaTags()) {
+		@components.Header()
+		<main class="px-2 min-h-full" style="background: linear-gradient(to top, rgb(165, 243, 252), rgb(34, 211, 238))">
+			<div class="pt-28 md:pt-44 lg:pt-52 h-full max-w-4xl mx-auto">
 				<h1 class="text-6xl text-center font-bold my-5">
-					A Solução está nas <span class="underline decoration-amber-500">conexões.</span>
+					A solução está nas <span class="underline decoration-amber-500">conexões.</span>
 				</h1>
 				<h2 class="text-2xl text-center text-gray-700">
 					Simplifique seus orçamentos, resolva as demandas de seus associados e tenha total
@@ -37,7 +43,7 @@ templ Index() {
 						</span>
 					</button>
 					<button
-						class="w-56 btn bg-white text-base"
+						class="w-56 btn bg-white hover:bg-zinc-100 text-base"
 					>
 						Para Auto Peças
 						<span class="ml-2">

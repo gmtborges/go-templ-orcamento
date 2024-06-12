@@ -24,13 +24,13 @@ import (
 
 // Bidding is an object representing the database table.
 type Bidding struct {
-	ID          int         `boil:"id" json:"id" toml:"id" yaml:"id"`
-	UserID      int         `boil:"user_id" json:"user_id" toml:"user_id" yaml:"user_id"`
+	ID          int64       `boil:"id" json:"id" toml:"id" yaml:"id"`
+	UserID      int64       `boil:"user_id" json:"user_id" toml:"user_id" yaml:"user_id"`
 	Title       string      `boil:"title" json:"title" toml:"title" yaml:"title"`
 	Description null.String `boil:"description" json:"description,omitempty" toml:"description" yaml:"description,omitempty"`
 	StartDate   null.Time   `boil:"start_date" json:"start_date,omitempty" toml:"start_date" yaml:"start_date,omitempty"`
 	EndDate     null.Time   `boil:"end_date" json:"end_date,omitempty" toml:"end_date" yaml:"end_date,omitempty"`
-	CategoryID  int         `boil:"category_id" json:"category_id" toml:"category_id" yaml:"category_id"`
+	CategoryID  int64       `boil:"category_id" json:"category_id" toml:"category_id" yaml:"category_id"`
 	CreatedAt   null.Time   `boil:"created_at" json:"created_at,omitempty" toml:"created_at" yaml:"created_at,omitempty"`
 	UpdatedAt   null.Time   `boil:"updated_at" json:"updated_at,omitempty" toml:"updated_at" yaml:"updated_at,omitempty"`
 
@@ -85,23 +85,23 @@ var BiddingTableColumns = struct {
 // Generated where
 
 var BiddingWhere = struct {
-	ID          whereHelperint
-	UserID      whereHelperint
+	ID          whereHelperint64
+	UserID      whereHelperint64
 	Title       whereHelperstring
 	Description whereHelpernull_String
 	StartDate   whereHelpernull_Time
 	EndDate     whereHelpernull_Time
-	CategoryID  whereHelperint
+	CategoryID  whereHelperint64
 	CreatedAt   whereHelpernull_Time
 	UpdatedAt   whereHelpernull_Time
 }{
-	ID:          whereHelperint{field: "\"biddings\".\"id\""},
-	UserID:      whereHelperint{field: "\"biddings\".\"user_id\""},
+	ID:          whereHelperint64{field: "\"biddings\".\"id\""},
+	UserID:      whereHelperint64{field: "\"biddings\".\"user_id\""},
 	Title:       whereHelperstring{field: "\"biddings\".\"title\""},
 	Description: whereHelpernull_String{field: "\"biddings\".\"description\""},
 	StartDate:   whereHelpernull_Time{field: "\"biddings\".\"start_date\""},
 	EndDate:     whereHelpernull_Time{field: "\"biddings\".\"end_date\""},
-	CategoryID:  whereHelperint{field: "\"biddings\".\"category_id\""},
+	CategoryID:  whereHelperint64{field: "\"biddings\".\"category_id\""},
 	CreatedAt:   whereHelpernull_Time{field: "\"biddings\".\"created_at\""},
 	UpdatedAt:   whereHelpernull_Time{field: "\"biddings\".\"updated_at\""},
 }
@@ -1015,7 +1015,7 @@ func Biddings(mods ...qm.QueryMod) biddingQuery {
 
 // FindBidding retrieves a single record by ID with an executor.
 // If selectCols is empty Find will return all columns.
-func FindBidding(ctx context.Context, exec boil.ContextExecutor, iD int, selectCols ...string) (*Bidding, error) {
+func FindBidding(ctx context.Context, exec boil.ContextExecutor, iD int64, selectCols ...string) (*Bidding, error) {
 	biddingObj := &Bidding{}
 
 	sel := "*"
@@ -1544,7 +1544,7 @@ func (o *BiddingSlice) ReloadAll(ctx context.Context, exec boil.ContextExecutor)
 }
 
 // BiddingExists checks if the Bidding row exists.
-func BiddingExists(ctx context.Context, exec boil.ContextExecutor, iD int) (bool, error) {
+func BiddingExists(ctx context.Context, exec boil.ContextExecutor, iD int64) (bool, error) {
 	var exists bool
 	sql := "select exists(select 1 from \"biddings\" where \"id\"=$1 limit 1)"
 

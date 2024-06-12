@@ -4,19 +4,19 @@ import (
 	"context"
 
 	"github.com/gustavomtborges/orcamento-auto/models"
-	"github.com/gustavomtborges/orcamento-auto/stores"
+	"github.com/gustavomtborges/orcamento-auto/repositories"
 )
 
 type LoginService struct {
-	userStore stores.UserStorer
+	userRepo repositories.UserRepository
 }
 
-func NewLoginService(userStore stores.UserStorer) *LoginService {
-	return &LoginService{userStore: userStore}
+func NewLoginService(userRepo repositories.UserRepository) *LoginService {
+	return &LoginService{userRepo: userRepo}
 }
 
 func (s *LoginService) GetUserByEmail(ctx context.Context, email string) (*models.User, error) {
-	user, err := s.userStore.GetUserByEmail(ctx, email)
+	user, err := s.userRepo.GetUserByEmail(ctx, email)
 	if err != nil {
 		return nil, err
 	}

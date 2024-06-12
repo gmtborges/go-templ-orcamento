@@ -24,12 +24,11 @@ import (
 
 // User is an object representing the database table.
 type User struct {
-	ID        int         `boil:"id" json:"id" toml:"id" yaml:"id"`
+	ID        int64       `boil:"id" json:"id" toml:"id" yaml:"id"`
 	Email     null.String `boil:"email" json:"email,omitempty" toml:"email" yaml:"email,omitempty"`
 	Password  string      `boil:"password" json:"password" toml:"password" yaml:"password"`
 	Name      string      `boil:"name" json:"name" toml:"name" yaml:"name"`
-	Role      string      `boil:"role" json:"role" toml:"role" yaml:"role"`
-	CompanyID int         `boil:"company_id" json:"company_id" toml:"company_id" yaml:"company_id"`
+	CompanyID int64       `boil:"company_id" json:"company_id" toml:"company_id" yaml:"company_id"`
 	CreatedAt null.Time   `boil:"created_at" json:"created_at,omitempty" toml:"created_at" yaml:"created_at,omitempty"`
 	UpdatedAt null.Time   `boil:"updated_at" json:"updated_at,omitempty" toml:"updated_at" yaml:"updated_at,omitempty"`
 
@@ -42,7 +41,6 @@ var UserColumns = struct {
 	Email     string
 	Password  string
 	Name      string
-	Role      string
 	CompanyID string
 	CreatedAt string
 	UpdatedAt string
@@ -51,7 +49,6 @@ var UserColumns = struct {
 	Email:     "email",
 	Password:  "password",
 	Name:      "name",
-	Role:      "role",
 	CompanyID: "company_id",
 	CreatedAt: "created_at",
 	UpdatedAt: "updated_at",
@@ -62,7 +59,6 @@ var UserTableColumns = struct {
 	Email     string
 	Password  string
 	Name      string
-	Role      string
 	CompanyID string
 	CreatedAt string
 	UpdatedAt string
@@ -71,7 +67,6 @@ var UserTableColumns = struct {
 	Email:     "users.email",
 	Password:  "users.password",
 	Name:      "users.name",
-	Role:      "users.role",
 	CompanyID: "users.company_id",
 	CreatedAt: "users.created_at",
 	UpdatedAt: "users.updated_at",
@@ -80,21 +75,19 @@ var UserTableColumns = struct {
 // Generated where
 
 var UserWhere = struct {
-	ID        whereHelperint
+	ID        whereHelperint64
 	Email     whereHelpernull_String
 	Password  whereHelperstring
 	Name      whereHelperstring
-	Role      whereHelperstring
-	CompanyID whereHelperint
+	CompanyID whereHelperint64
 	CreatedAt whereHelpernull_Time
 	UpdatedAt whereHelpernull_Time
 }{
-	ID:        whereHelperint{field: "\"users\".\"id\""},
+	ID:        whereHelperint64{field: "\"users\".\"id\""},
 	Email:     whereHelpernull_String{field: "\"users\".\"email\""},
 	Password:  whereHelperstring{field: "\"users\".\"password\""},
 	Name:      whereHelperstring{field: "\"users\".\"name\""},
-	Role:      whereHelperstring{field: "\"users\".\"role\""},
-	CompanyID: whereHelperint{field: "\"users\".\"company_id\""},
+	CompanyID: whereHelperint64{field: "\"users\".\"company_id\""},
 	CreatedAt: whereHelpernull_Time{field: "\"users\".\"created_at\""},
 	UpdatedAt: whereHelpernull_Time{field: "\"users\".\"updated_at\""},
 }
@@ -104,10 +97,12 @@ var UserRels = struct {
 	Company    string
 	AutoOffers string
 	Biddings   string
+	Roles      string
 }{
 	Company:    "Company",
 	AutoOffers: "AutoOffers",
 	Biddings:   "Biddings",
+	Roles:      "Roles",
 }
 
 // userR is where relationships are stored.
@@ -115,6 +110,7 @@ type userR struct {
 	Company    *Company       `boil:"Company" json:"Company" toml:"Company" yaml:"Company"`
 	AutoOffers AutoOfferSlice `boil:"AutoOffers" json:"AutoOffers" toml:"AutoOffers" yaml:"AutoOffers"`
 	Biddings   BiddingSlice   `boil:"Biddings" json:"Biddings" toml:"Biddings" yaml:"Biddings"`
+	Roles      RoleSlice      `boil:"Roles" json:"Roles" toml:"Roles" yaml:"Roles"`
 }
 
 // NewStruct creates a new relationship struct
@@ -143,12 +139,19 @@ func (r *userR) GetBiddings() BiddingSlice {
 	return r.Biddings
 }
 
+func (r *userR) GetRoles() RoleSlice {
+	if r == nil {
+		return nil
+	}
+	return r.Roles
+}
+
 // userL is where Load methods for each relationship are stored.
 type userL struct{}
 
 var (
-	userAllColumns            = []string{"id", "email", "password", "name", "role", "company_id", "created_at", "updated_at"}
-	userColumnsWithoutDefault = []string{"password", "name", "role", "company_id"}
+	userAllColumns            = []string{"id", "email", "password", "name", "company_id", "created_at", "updated_at"}
+	userColumnsWithoutDefault = []string{"password", "name", "company_id"}
 	userColumnsWithDefault    = []string{"id", "email", "created_at", "updated_at"}
 	userPrimaryKeyColumns     = []string{"id"}
 	userGeneratedColumns      = []string{}
@@ -498,6 +501,21 @@ func (o *User) Biddings(mods ...qm.QueryMod) biddingQuery {
 	return Biddings(queryMods...)
 }
 
+// Roles retrieves all the role's Roles with an executor.
+func (o *User) Roles(mods ...qm.QueryMod) roleQuery {
+	var queryMods []qm.QueryMod
+	if len(mods) != 0 {
+		queryMods = append(queryMods, mods...)
+	}
+
+	queryMods = append(queryMods,
+		qm.InnerJoin("\"users_roles\" on \"roles\".\"id\" = \"users_roles\".\"role_id\""),
+		qm.Where("\"users_roles\".\"user_id\"=?", o.ID),
+	)
+
+	return Roles(queryMods...)
+}
+
 // LoadCompany allows an eager lookup of values, cached into the
 // loaded structs of the objects. This is for an N-1 relationship.
 func (userL) LoadCompany(ctx context.Context, e boil.ContextExecutor, singular bool, maybeUser interface{}, mods queries.Applicator) error {
@@ -844,6 +862,136 @@ func (userL) LoadBiddings(ctx context.Context, e boil.ContextExecutor, singular 
 	return nil
 }
 
+// LoadRoles allows an eager lookup of values, cached into the
+// loaded structs of the objects. This is for a 1-M or N-M relationship.
+func (userL) LoadRoles(ctx context.Context, e boil.ContextExecutor, singular bool, maybeUser interface{}, mods queries.Applicator) error {
+	var slice []*User
+	var object *User
+
+	if singular {
+		var ok bool
+		object, ok = maybeUser.(*User)
+		if !ok {
+			object = new(User)
+			ok = queries.SetFromEmbeddedStruct(&object, &maybeUser)
+			if !ok {
+				return errors.New(fmt.Sprintf("failed to set %T from embedded struct %T", object, maybeUser))
+			}
+		}
+	} else {
+		s, ok := maybeUser.(*[]*User)
+		if ok {
+			slice = *s
+		} else {
+			ok = queries.SetFromEmbeddedStruct(&slice, maybeUser)
+			if !ok {
+				return errors.New(fmt.Sprintf("failed to set %T from embedded struct %T", slice, maybeUser))
+			}
+		}
+	}
+
+	args := make(map[interface{}]struct{})
+	if singular {
+		if object.R == nil {
+			object.R = &userR{}
+		}
+		args[object.ID] = struct{}{}
+	} else {
+		for _, obj := range slice {
+			if obj.R == nil {
+				obj.R = &userR{}
+			}
+			args[obj.ID] = struct{}{}
+		}
+	}
+
+	if len(args) == 0 {
+		return nil
+	}
+
+	argsSlice := make([]interface{}, len(args))
+	i := 0
+	for arg := range args {
+		argsSlice[i] = arg
+		i++
+	}
+
+	query := NewQuery(
+		qm.Select("\"roles\".\"id\", \"roles\".\"name\", \"roles\".\"created_at\", \"roles\".\"updated_at\", \"a\".\"user_id\""),
+		qm.From("\"roles\""),
+		qm.InnerJoin("\"users_roles\" as \"a\" on \"roles\".\"id\" = \"a\".\"role_id\""),
+		qm.WhereIn("\"a\".\"user_id\" in ?", argsSlice...),
+	)
+	if mods != nil {
+		mods.Apply(query)
+	}
+
+	results, err := query.QueryContext(ctx, e)
+	if err != nil {
+		return errors.Wrap(err, "failed to eager load roles")
+	}
+
+	var resultSlice []*Role
+
+	var localJoinCols []int64
+	for results.Next() {
+		one := new(Role)
+		var localJoinCol int64
+
+		err = results.Scan(&one.ID, &one.Name, &one.CreatedAt, &one.UpdatedAt, &localJoinCol)
+		if err != nil {
+			return errors.Wrap(err, "failed to scan eager loaded results for roles")
+		}
+		if err = results.Err(); err != nil {
+			return errors.Wrap(err, "failed to plebian-bind eager loaded slice roles")
+		}
+
+		resultSlice = append(resultSlice, one)
+		localJoinCols = append(localJoinCols, localJoinCol)
+	}
+
+	if err = results.Close(); err != nil {
+		return errors.Wrap(err, "failed to close results in eager load on roles")
+	}
+	if err = results.Err(); err != nil {
+		return errors.Wrap(err, "error occurred during iteration of eager loaded relations for roles")
+	}
+
+	if len(roleAfterSelectHooks) != 0 {
+		for _, obj := range resultSlice {
+			if err := obj.doAfterSelectHooks(ctx, e); err != nil {
+				return err
+			}
+		}
+	}
+	if singular {
+		object.R.Roles = resultSlice
+		for _, foreign := range resultSlice {
+			if foreign.R == nil {
+				foreign.R = &roleR{}
+			}
+			foreign.R.Users = append(foreign.R.Users, object)
+		}
+		return nil
+	}
+
+	for i, foreign := range resultSlice {
+		localJoinCol := localJoinCols[i]
+		for _, local := range slice {
+			if local.ID == localJoinCol {
+				local.R.Roles = append(local.R.Roles, foreign)
+				if foreign.R == nil {
+					foreign.R = &roleR{}
+				}
+				foreign.R.Users = append(foreign.R.Users, local)
+				break
+			}
+		}
+	}
+
+	return nil
+}
+
 // SetCompany of the user to the related item.
 // Sets o.R.Company to related.
 // Adds o to related.R.Users.
@@ -997,6 +1145,151 @@ func (o *User) AddBiddings(ctx context.Context, exec boil.ContextExecutor, inser
 	return nil
 }
 
+// AddRoles adds the given related objects to the existing relationships
+// of the user, optionally inserting them as new records.
+// Appends related to o.R.Roles.
+// Sets related.R.Users appropriately.
+func (o *User) AddRoles(ctx context.Context, exec boil.ContextExecutor, insert bool, related ...*Role) error {
+	var err error
+	for _, rel := range related {
+		if insert {
+			if err = rel.Insert(ctx, exec, boil.Infer()); err != nil {
+				return errors.Wrap(err, "failed to insert into foreign table")
+			}
+		}
+	}
+
+	for _, rel := range related {
+		query := "insert into \"users_roles\" (\"user_id\", \"role_id\") values ($1, $2)"
+		values := []interface{}{o.ID, rel.ID}
+
+		if boil.IsDebug(ctx) {
+			writer := boil.DebugWriterFrom(ctx)
+			fmt.Fprintln(writer, query)
+			fmt.Fprintln(writer, values)
+		}
+		_, err = exec.ExecContext(ctx, query, values...)
+		if err != nil {
+			return errors.Wrap(err, "failed to insert into join table")
+		}
+	}
+	if o.R == nil {
+		o.R = &userR{
+			Roles: related,
+		}
+	} else {
+		o.R.Roles = append(o.R.Roles, related...)
+	}
+
+	for _, rel := range related {
+		if rel.R == nil {
+			rel.R = &roleR{
+				Users: UserSlice{o},
+			}
+		} else {
+			rel.R.Users = append(rel.R.Users, o)
+		}
+	}
+	return nil
+}
+
+// SetRoles removes all previously related items of the
+// user replacing them completely with the passed
+// in related items, optionally inserting them as new records.
+// Sets o.R.Users's Roles accordingly.
+// Replaces o.R.Roles with related.
+// Sets related.R.Users's Roles accordingly.
+func (o *User) SetRoles(ctx context.Context, exec boil.ContextExecutor, insert bool, related ...*Role) error {
+	query := "delete from \"users_roles\" where \"user_id\" = $1"
+	values := []interface{}{o.ID}
+	if boil.IsDebug(ctx) {
+		writer := boil.DebugWriterFrom(ctx)
+		fmt.Fprintln(writer, query)
+		fmt.Fprintln(writer, values)
+	}
+	_, err := exec.ExecContext(ctx, query, values...)
+	if err != nil {
+		return errors.Wrap(err, "failed to remove relationships before set")
+	}
+
+	removeRolesFromUsersSlice(o, related)
+	if o.R != nil {
+		o.R.Roles = nil
+	}
+
+	return o.AddRoles(ctx, exec, insert, related...)
+}
+
+// RemoveRoles relationships from objects passed in.
+// Removes related items from R.Roles (uses pointer comparison, removal does not keep order)
+// Sets related.R.Users.
+func (o *User) RemoveRoles(ctx context.Context, exec boil.ContextExecutor, related ...*Role) error {
+	if len(related) == 0 {
+		return nil
+	}
+
+	var err error
+	query := fmt.Sprintf(
+		"delete from \"users_roles\" where \"user_id\" = $1 and \"role_id\" in (%s)",
+		strmangle.Placeholders(dialect.UseIndexPlaceholders, len(related), 2, 1),
+	)
+	values := []interface{}{o.ID}
+	for _, rel := range related {
+		values = append(values, rel.ID)
+	}
+
+	if boil.IsDebug(ctx) {
+		writer := boil.DebugWriterFrom(ctx)
+		fmt.Fprintln(writer, query)
+		fmt.Fprintln(writer, values)
+	}
+	_, err = exec.ExecContext(ctx, query, values...)
+	if err != nil {
+		return errors.Wrap(err, "failed to remove relationships before set")
+	}
+	removeRolesFromUsersSlice(o, related)
+	if o.R == nil {
+		return nil
+	}
+
+	for _, rel := range related {
+		for i, ri := range o.R.Roles {
+			if rel != ri {
+				continue
+			}
+
+			ln := len(o.R.Roles)
+			if ln > 1 && i < ln-1 {
+				o.R.Roles[i] = o.R.Roles[ln-1]
+			}
+			o.R.Roles = o.R.Roles[:ln-1]
+			break
+		}
+	}
+
+	return nil
+}
+
+func removeRolesFromUsersSlice(o *User, related []*Role) {
+	for _, rel := range related {
+		if rel.R == nil {
+			continue
+		}
+		for i, ri := range rel.R.Users {
+			if o.ID != ri.ID {
+				continue
+			}
+
+			ln := len(rel.R.Users)
+			if ln > 1 && i < ln-1 {
+				rel.R.Users[i] = rel.R.Users[ln-1]
+			}
+			rel.R.Users = rel.R.Users[:ln-1]
+			break
+		}
+	}
+}
+
 // Users retrieves all the records using an executor.
 func Users(mods ...qm.QueryMod) userQuery {
 	mods = append(mods, qm.From("\"users\""))
@@ -1010,7 +1303,7 @@ func Users(mods ...qm.QueryMod) userQuery {
 
 // FindUser retrieves a single record by ID with an executor.
 // If selectCols is empty Find will return all columns.
-func FindUser(ctx context.Context, exec boil.ContextExecutor, iD int, selectCols ...string) (*User, error) {
+func FindUser(ctx context.Context, exec boil.ContextExecutor, iD int64, selectCols ...string) (*User, error) {
 	userObj := &User{}
 
 	sel := "*"
@@ -1539,7 +1832,7 @@ func (o *UserSlice) ReloadAll(ctx context.Context, exec boil.ContextExecutor) er
 }
 
 // UserExists checks if the User row exists.
-func UserExists(ctx context.Context, exec boil.ContextExecutor, iD int) (bool, error) {
+func UserExists(ctx context.Context, exec boil.ContextExecutor, iD int64) (bool, error) {
 	var exists bool
 	sql := "select exists(select 1 from \"users\" where \"id\"=$1 limit 1)"
 

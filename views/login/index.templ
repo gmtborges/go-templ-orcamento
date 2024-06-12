@@ -9,8 +9,11 @@ type LoginIndexViewModel struct {
 	Warnings []string
 }
 
+templ metaTags() {
+}
+
 templ LoginIndex(vm LoginIndexViewModel) {
-	@layouts.Base() {
+	@layouts.Base("Orçamento Auto - Entrar", metaTags()) {
 		<div class="flex mt-44 flex-col justify-center px-6 lg:px-8">
 			<div class="sm:mx-auto sm:w-full sm:max-w-sm">
 				<img class="mx-auto h-36 w-auto" src="/static/logo-full.svg" alt="Orçamento Auto logo"/>

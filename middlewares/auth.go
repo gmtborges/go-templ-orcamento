@@ -13,10 +13,11 @@ func Authentication(next echo.HandlerFunc) echo.HandlerFunc {
 		if err != nil {
 			return c.Redirect(http.StatusSeeOther, "/login")
 		}
-		auth, ok := sess.Values["authenticated"].(bool)
-		if !ok || !auth {
+		userID, ok := sess.Values["user_id"].(string)
+		if !ok {
 			return c.Redirect(http.StatusSeeOther, "/login")
 		}
+		c.Set("user_id", userID)
 		return next(c)
 	}
 }
