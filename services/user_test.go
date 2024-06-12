@@ -21,21 +21,6 @@ func (m *MockUserStore) GetUserByEmail(ctx context.Context, email string) (*mode
 	return m.MockFn()
 }
 
-func TestAuthService_Generate_Verify_Password(t *testing.T) {
-	authSvc := NewAuthService(&MockUserStore{})
-	hash, err := authSvc.GeneratePasswordHash("passwd123")
-	if err != nil {
-		t.Errorf("Error generating hash: %v", err)
-	}
-	isValid, err := authSvc.VerifyPasswordHash("passwd123", hash)
-	if err != nil {
-		t.Errorf("Error verifying password: %v", err)
-	}
-	if !isValid {
-		t.Errorf("Expected isValid to be true, got %v", isValid)
-	}
-}
-
 type MockSessionStore struct {
 	session *sessions.Session
 	err     error
@@ -52,8 +37,8 @@ func TestAuthService_SetAuthSession(t *testing.T) {
 	c := e.NewContext(req, rec)
 	c.Set("_session_store", sessions.NewCookieStore([]byte("secret")))
 
-	svc := NewAuthService(&MockUserStore{})
-	err := svc.SetAuthSession(c, 123)
+	svc := NewUserService(&MockUserStore{})
+	err := svc.SetUserSession(c, 123, "assoc_admin,auto_admin")
 	if err != nil {
 		t.Errorf("Expected no error, got %v", err)
 	}
@@ -64,7 +49,10 @@ func TestAuthService_SetAuthSession(t *testing.T) {
 	if s.Values["authenticated"] != true {
 		t.Errorf("Expected authenticated to be true, got %v", s.Values["authenticated"])
 	}
-	if s.Values["user_id"] != 123 {
+	if s.Values["user_id"].(int64) != 123 {
+		t.Errorf("Expected user_id to be 123, got %v", s.Values["user_id"])
+	}
+	if s.Values["roles"] != "assoc_admin,auto_admin" {
 		t.Errorf("Expected user_id to be 123, got %v", s.Values["user_id"])
 	}
 }
@@ -76,11 +64,11 @@ func TestAuthService_RemoveAuthSession(t *testing.T) {
 	c := e.NewContext(req, rec)
 	c.Set("_session_store", sessions.NewCookieStore([]byte("secret")))
 
-	svc := NewAuthService(&MockUserStore{})
-	if err := svc.SetAuthSession(c, 123); err != nil {
+	svc := NewUserService(&MockUserStore{})
+	if err := svc.SetUserSession(c, 123, "admin"); err != nil {
 		t.Errorf("Error setting session %v", err)
 	}
-	err := svc.RemoveAuthSession(c)
+	err := svc.RemoveUserSession(c)
 	if err != nil {
 		t.Errorf("Error removing session %v", err)
 	}

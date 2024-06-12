@@ -11,10 +11,9 @@ import (
 	"github.com/volatiletech/null/v8"
 	"github.com/volatiletech/sqlboiler/v4/boil"
 
+	"github.com/gustavomtborges/orcamento-auto/auth"
 	"github.com/gustavomtborges/orcamento-auto/db"
 	"github.com/gustavomtborges/orcamento-auto/models"
-	"github.com/gustavomtborges/orcamento-auto/repositories"
-	"github.com/gustavomtborges/orcamento-auto/services"
 )
 
 func main() {
@@ -29,16 +28,13 @@ func main() {
 	cleanUp(ctx, db)
 
 	cp := models.Company{
-		Name: "Admin",
-		Type: "admin",
+		Name: "Orçamento Auto",
 	}
 	if err := cp.Insert(ctx, db, boil.Infer()); err != nil {
 		panic(err)
 	}
 
-	userRepo := repositories.NewPostgresUserRepository(db)
-	authSvc := services.NewAuthService(userRepo)
-	hash, err := authSvc.GeneratePasswordHash("123")
+	hash, err := auth.GeneratePasswordHash("123")
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -46,12 +42,12 @@ func main() {
 		Name:      "Gustavo",
 		Email:     null.StringFrom("admin@test.com"),
 		Password:  hash,
-		Role:      "admin",
 		CompanyID: cp.ID,
 	}
 	if err := u.Insert(ctx, db, boil.Infer()); err != nil {
 		panic(err)
 	}
+
 }
 
 func cleanUp(ctx context.Context, db *sql.DB) {

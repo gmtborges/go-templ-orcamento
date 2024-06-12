@@ -12,6 +12,7 @@ import (
 	"github.com/gorilla/sessions"
 	"github.com/labstack/echo/v4"
 
+	"github.com/gustavomtborges/orcamento-auto/auth"
 	"github.com/gustavomtborges/orcamento-auto/models"
 	"github.com/gustavomtborges/orcamento-auto/services"
 )
@@ -26,15 +27,14 @@ func (m *MockUserStore) GetUserByEmail(ctx context.Context, email string) (*mode
 
 func TestLoginHandler_Create_Success(t *testing.T) {
 	e := echo.New()
-	authSvc := services.NewAuthService(&MockUserStore{})
-	hash, _ := authSvc.GeneratePasswordHash("passwd123")
+	hash, _ := auth.GeneratePasswordHash("passwd123")
 	st := &MockUserStore{
 		MockFn: func() (*models.User, error) {
 			return &models.User{Password: hash}, nil
 		},
 	}
-	authSvc = services.NewAuthService(st)
-	h := NewLoginHandler(authSvc)
+	userSvc := services.NewUserService(st)
+	h := NewLoginHandler(userSvc)
 
 	req := httptest.NewRequest(http.MethodPost, "/login", strings.NewReader("email=test@example.com&password=passwd123"))
 	req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationForm)
@@ -57,8 +57,8 @@ func TestLoginHandler_Create_UserNotFound(t *testing.T) {
 			return nil, sql.ErrNoRows
 		},
 	}
-	authSvc := services.NewAuthService(st)
-	h := NewLoginHandler(authSvc)
+	userSvc := services.NewUserService(st)
+	h := NewLoginHandler(userSvc)
 
 	req := httptest.NewRequest(http.MethodPost, "/login", strings.NewReader("email=test@example.com&password=passwd123"))
 	req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationForm)
@@ -83,8 +83,8 @@ func TestLoginHandler_Create_InvalidPassword(t *testing.T) {
 			return &models.User{Password: "wrong"}, nil
 		},
 	}
-	authSvc := services.NewAuthService(st)
-	h := NewLoginHandler(authSvc)
+	userSvc := services.NewUserService(st)
+	h := NewLoginHandler(userSvc)
 	req := httptest.NewRequest(
 		http.MethodPost,
 		"/login",
@@ -112,8 +112,8 @@ func TestLoginHandler_Create_Error_Database(t *testing.T) {
 			return nil, errors.New("error on database")
 		},
 	}
-	authSvc := services.NewAuthService(st)
-	h := NewLoginHandler(authSvc)
+	userSvc := services.NewUserService(st)
+	h := NewLoginHandler(userSvc)
 	req := httptest.NewRequest(
 		http.MethodPost,
 		"/login",

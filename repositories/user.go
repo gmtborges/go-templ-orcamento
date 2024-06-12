@@ -21,8 +21,8 @@ func NewPostgresUserRepository(db *sql.DB) *PostgresUserRepository {
 	return &PostgresUserRepository{db: db}
 }
 
-func (st *PostgresUserRepository) GetUserByEmail(ctx context.Context, email string) (*models.User, error) {
-	user, err := models.Users(qm.Where("email = ?", email)).One(ctx, st.db)
+func (r *PostgresUserRepository) GetUserByEmail(ctx context.Context, email string) (*models.User, error) {
+	user, err := models.Users(qm.Where("email = ?", email), qm.Load(models.UserRels.Roles)).One(ctx, r.db)
 	if err != nil {
 		return nil, err
 	}

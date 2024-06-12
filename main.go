@@ -38,8 +38,8 @@ func main() {
 	e.GET("/politica-privacidade", policyHandler.Index)
 
 	userRepo := repositories.NewPostgresUserRepository(db)
-	authSvc := services.NewAuthService(userRepo)
-	loginHandler := handlers.NewLoginHandler(authSvc)
+	userSvc := services.NewUserService(userRepo)
+	loginHandler := handlers.NewLoginHandler(userSvc)
 	e.GET("/login", loginHandler.Index)
 	e.POST("/login", loginHandler.Create)
 	e.DELETE("/logout", loginHandler.Logout)

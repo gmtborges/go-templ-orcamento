@@ -19,8 +19,8 @@ func NewPostgresBiddingRepository(db *sql.DB) *PostgresBiddingRepository {
 	return &PostgresBiddingRepository{db: db}
 }
 
-func (st *PostgresBiddingRepository) AllBiddings(ctx context.Context, userID int) (models.BiddingSlice, error) {
-	biddings, err := models.Biddings().All(ctx, st.db)
+func (r *PostgresBiddingRepository) AllBiddings(ctx context.Context, userID int) (models.BiddingSlice, error) {
+	biddings, err := models.Biddings().All(ctx, r.db)
 	if err != nil {
 		return nil, err
 	}
