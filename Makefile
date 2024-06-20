@@ -1,29 +1,56 @@
-# Makefile for building and deploying a Go application to a Debian amd64 server.
-
 GOARCH := amd64
 GOOS := linux
+APP := "./bin/myapp"
 
-build: css-minify templ
-	GOOS=$(GOOS) GOARCH=$(GOARCH) go build -o bin/app .
+check-quality:
+	make lint
+	make fmt
+	make vet
 
-css-minify:
+# Append || true below if blocking local developement
+lint:
+	golangci-lint run --enable-all
+
+vet:
+	go vet ./...
+
+fmt:
+	go fmt ./...
+
+tidy:
+	go mod tidy
+
+build:
+	GOOS=$(GOOS) GOARCH=$(GOARCH) go build -o $(APP)
+
+css:
 	npx tailwindcss -i ./assets/input.css -o ./static/output.css --minify
+
+css-watch:
+	npx tailwindcss --watch -i ./assets/input.css -o ./static/output.css
 
 templ:
 	templ generate
 
-css:
-	@npx tailwindcss --watch -i ./assets/input.css -o ./static/output.css
-
-proxy:
+templ-proxy:
 	templ generate --watch --proxy=http://127.0.0.1:3000
 
 migrate:
-	@go run ./cmd/migrate up
+	go run ./cmd/migrate up
+
+rollback:
+	go run ./cmd/migrate down
 
 seed:
-	@go run ./cmd/seed
+	go run ./cmd/seed
 	
 clean:
-	rm -f bin/$(APP_NAME)
+	go clean
+	rm -f bin/*
+	rm -f coverage*.out
+
+all:
+	make check-quality
+	make test
+	make build
 
