@@ -15,7 +15,7 @@ vet:
 	go vet ./...
 
 fmt:
-	go fmt ./...
+	gofumpt -l -w .
 
 tidy:
 	go mod tidy
@@ -33,7 +33,13 @@ templ:
 	templ generate
 
 templ-proxy:
-	templ generate --watch --proxy=http://127.0.0.1:3000
+	@templ generate --watch --proxy=http://127.0.0.1:3000
+
+run:
+	@air
+
+dev:
+	@make -j3 run templ-proxy css-watch
 
 migrate:
 	go run ./cmd/migrate up

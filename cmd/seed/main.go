@@ -47,7 +47,6 @@ func main() {
 	if err := u.Insert(ctx, db, boil.Infer()); err != nil {
 		panic(err)
 	}
-
 }
 
 func cleanUp(ctx context.Context, db *sql.DB) {

@@ -25,7 +25,6 @@ func main() {
 	}
 	cmd := os.Args[1]
 	migrations(db, cmd)
-
 }
 
 //go:embed migrations/*.sql

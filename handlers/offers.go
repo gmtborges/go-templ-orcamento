@@ -1,4 +1,3 @@
 package handlers
 
-type OffersHandler struct {
-}
+type OffersHandler struct{}
