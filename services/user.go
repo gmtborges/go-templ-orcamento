@@ -7,8 +7,8 @@ import (
 	"github.com/labstack/echo-contrib/session"
 	"github.com/labstack/echo/v4"
 
-	"github.com/gustavomtborges/orcamento-auto/models"
-	"github.com/gustavomtborges/orcamento-auto/repositories"
+	"github.com/gmtborges/orcamento-auto/models"
+	"github.com/gmtborges/orcamento-auto/repositories"
 )
 
 type UserService struct {

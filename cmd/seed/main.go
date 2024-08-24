@@ -11,9 +11,9 @@ import (
 	"github.com/volatiletech/null/v8"
 	"github.com/volatiletech/sqlboiler/v4/boil"
 
-	"github.com/gustavomtborges/orcamento-auto/auth"
-	"github.com/gustavomtborges/orcamento-auto/db"
-	"github.com/gustavomtborges/orcamento-auto/models"
+	"github.com/gmtborges/orcamento-auto/auth"
+	"github.com/gmtborges/orcamento-auto/db"
+	"github.com/gmtborges/orcamento-auto/models"
 )
 
 func main() {

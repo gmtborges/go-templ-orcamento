@@ -1,6 +1,6 @@
 package services
 
-import "github.com/gustavomtborges/orcamento-auto/repositories"
+import "github.com/gmtborges/orcamento-auto/repositories"
 
 type BiddingService struct {
 	biddingRepo repositories.BiddingRepository

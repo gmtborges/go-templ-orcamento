@@ -4,7 +4,7 @@ import (
 	"context"
 	"database/sql"
 
-	"github.com/gustavomtborges/orcamento-auto/models"
+	"github.com/gmtborges/orcamento-auto/models"
 )
 
 type BiddingRepository interface {

@@ -1,12 +1,10 @@
 package handlers
 
 import (
-	"fmt"
-
 	"github.com/labstack/echo/v4"
 
-	"github.com/gustavomtborges/orcamento-auto/services"
-	"github.com/gustavomtborges/orcamento-auto/views/bidding"
+	"github.com/gmtborges/orcamento-auto/services"
+	"github.com/gmtborges/orcamento-auto/views/bidding"
 )
 
 type BiddingHandler struct {
@@ -18,6 +16,5 @@ func NewBiddingsHandler(dashSvc *services.BiddingService) *BiddingHandler {
 }
 
 func (h *BiddingHandler) Index(c echo.Context) error {
-	fmt.Print("why not here?")
 	return views.BiddingIndex().Render(c.Request().Context(), c.Response())
 }

@@ -12,9 +12,9 @@ import (
 	"github.com/gorilla/sessions"
 	"github.com/labstack/echo/v4"
 
-	"github.com/gustavomtborges/orcamento-auto/auth"
-	"github.com/gustavomtborges/orcamento-auto/models"
-	"github.com/gustavomtborges/orcamento-auto/services"
+	"github.com/gmtborges/orcamento-auto/auth"
+	"github.com/gmtborges/orcamento-auto/models"
+	"github.com/gmtborges/orcamento-auto/services"
 )
 
 type MockUserStore struct {

@@ -20,9 +20,6 @@ fmt:
 tidy:
 	go mod tidy
 
-build:
-	GOOS=$(GOOS) GOARCH=$(GOARCH) go build -o $(APP)
-
 css:
 	npx tailwindcss -i ./assets/input.css -o ./static/output.css --minify
 
@@ -33,7 +30,15 @@ templ:
 	templ generate
 
 templ-proxy:
-	@templ generate --watch --proxy=http://127.0.0.1:3000
+	@templ generate --watch --proxy=http://localhost:3000
+
+build:
+	make templ
+	make css
+	GOOS=$(GOOS) GOARCH=$(GOARCH) go build -o $(APP)
+
+test:
+	go test ./...
 
 run:
 	@air
@@ -56,7 +61,6 @@ clean:
 	rm -f coverage*.out
 
 all:
-	make check-quality
 	make test
 	make build
 

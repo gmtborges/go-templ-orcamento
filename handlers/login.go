@@ -6,9 +6,9 @@ import (
 
 	"github.com/labstack/echo/v4"
 
-	"github.com/gustavomtborges/orcamento-auto/auth"
-	"github.com/gustavomtborges/orcamento-auto/services"
-	"github.com/gustavomtborges/orcamento-auto/views/login"
+	"github.com/gmtborges/orcamento-auto/auth"
+	"github.com/gmtborges/orcamento-auto/services"
+	"github.com/gmtborges/orcamento-auto/views/login"
 )
 
 type LoginHandler struct {

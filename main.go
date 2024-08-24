@@ -9,11 +9,11 @@ import (
 	"github.com/labstack/echo-contrib/session"
 	"github.com/labstack/echo/v4"
 
-	"github.com/gustavomtborges/orcamento-auto/db"
-	"github.com/gustavomtborges/orcamento-auto/handlers"
-	"github.com/gustavomtborges/orcamento-auto/middlewares"
-	"github.com/gustavomtborges/orcamento-auto/repositories"
-	"github.com/gustavomtborges/orcamento-auto/services"
+	"github.com/gmtborges/orcamento-auto/db"
+	"github.com/gmtborges/orcamento-auto/handlers"
+	"github.com/gmtborges/orcamento-auto/middlewares"
+	"github.com/gmtborges/orcamento-auto/repositories"
+	"github.com/gmtborges/orcamento-auto/services"
 )
 
 func main() {

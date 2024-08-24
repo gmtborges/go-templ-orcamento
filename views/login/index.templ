@@ -1,6 +1,6 @@
 package views
 
-import "github.com/gustavomtborges/orcamento-auto/views/layouts"
+import "github.com/gmtborges/orcamento-auto/views/layouts"
 
 type LoginIndexViewModel struct {
 	Email    string
@@ -16,37 +16,52 @@ templ LoginIndex(vm LoginIndexViewModel) {
 	@layouts.Base("Orçamento Auto - Entrar", metaTags()) {
 		<div class="flex mt-44 flex-col justify-center px-6 lg:px-8">
 			<div class="sm:mx-auto sm:w-full sm:max-w-sm">
-				<img class="mx-auto h-36 w-auto" src="/static/logo-full.svg" alt="Orçamento Auto logo"/>
-				<h2 class="mt-2 text-center text-2xl font-bold leading-9 tracking-tight text-gray-900">Entre em sua conta</h2>
+				<img class="mx-auto h-36 w-auto" :src="$store.darkMode ? '/static/logo-full-dark.svg' : '/static/logo-full.svg'" alt="Orçamento Auto logo"/>
+				<h2 class="mt-2 text-center text-2xl font-bold leading-9 tracking-tight">Entre em sua conta</h2>
 			</div>
 			<div class="mt-2 sm:mx-auto sm:w-full sm:max-w-sm">
 				<form class="space-y-6 w-full max-w-xs mx-auto" action="/login" method="POST">
-					<input name="email" type="email" placeholder="E-mail" value={ vm.Email } class="flex w-full h-10 px-3 py-2 text-sm bg-white border rounded-md border-neutral-300 ring-offset-background placeholder:text-neutral-500 focus:border-neutral-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-neutral-400 disabled:cursor-not-allowed disabled:opacity-50"/>
+					<input name="email" type="email" autocomplete="email" placeholder="E-mail" value={ vm.Email } class="flex w-full h-10 px-3 py-2 text-sm border rounded-md border-neutral-300 ring-offset-background placeholder:text-neutral-500 focus:border-neutral-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-neutral-400 disabled:cursor-not-allowed disabled:opacity-50"/>
 					<div class="flex flex-col">
-						<input name="password" type="password" placeholder="Senha" value={ vm.Password } class="flex w-full h-10 px-3 py-2 text-sm bg-white border rounded-md border-neutral-300 ring-offset-background placeholder:text-neutral-500 focus:border-neutral-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-neutral-400 disabled:cursor-not-allowed disabled:opacity-50"/>
-						<a href="#" class="font-semibold text-primary hover:text-primary text-sm self-end mt-1">Esqueceu a senha?</a>
+						<input name="password" type="password" placeholder="Senha" value={ vm.Password } class="flex w-full h-10 px-3 py-2 text-sm border rounded-md border-neutral-300 ring-offset-background placeholder:text-neutral-500 focus:border-neutral-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-neutral-400 disabled:cursor-not-allowed disabled:opacity-50"/>
+						<a href="#" class="font-semibold text-sm self-end mt-1">Esqueceu a senha?</a>
 					</div>
 					<div class="w-full max-w-xs mx-auto">
-						<button type="submit" class="btn btn-primary btn-block text-lg text-white">Entrar</button>
+						<button type="submit" class="btn btn-primary btn-block text-lg">Entrar</button>
 					</div>
 				</form>
-				<p class="mt-4 text-center text-sm text-gray-500">
-					Voltar
-					<a href="/" class="font-semibold leading-6 text-primary hover:text-primary">para início</a>
+				<p class="mt-4 text-center text-sm">
+					<a href="/" class="font-semibold leading-6">Voltar para o início</a>
 				</p>
 				<div class="mt-4">
 					for _, v := range vm.Warnings {
-						<ul class="flex justify-center text-amber-700 p-2 py-1 my-2 bg-amber-100 border rounded-md">
+						<ul class="flex justify-center text-warning font-bold p-2 py-1 my-2">
 							<li>{ v }</li>
 						</ul>
 					}
 					for _, v := range vm.Errors {
-						<ul class="flex justify-center text-red-700 p-2 py-1 my-2 bg-red-100 border rounded-md">
+						<ul class="flex justify-center text-error font-bold p-2 py-1 my-2">
 							<li>{ v }</li>
 						</ul>
 					}
 				</div>
 			</div>
 		</div>
+		<script>
+    function getTheme() {
+      return {
+        getThemeFromPreferences() {
+          const storedTheme = localStorage.getItem('theme');
+          if (storedTheme) {
+            this.isDark = (storedTheme === 'dark');
+          }
+          else {
+            const theme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+            this.isDark = (theme === 'dark');
+          }
+        }
+      }
+    }
+  </script>
 	}
 }

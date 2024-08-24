@@ -1,6 +1,7 @@
 /** @type {import('tailwindcss').Config} */
 module.exports = {
-  content: ["./**/*.html", "./**/*.templ", "./**/*.go"],
+  content: ["./**/*.templ", "./**/*.go"],
+  darkMode: "selector",
   theme: {
     extend: {
       fontFamily: {
@@ -8,14 +9,24 @@ module.exports = {
       },
     },
   },
-  plugins: [require("daisyui"), require("@tailwindcss/forms")],
+  plugins: [require("daisyui")],
   daisyui: {
     themes: [
       {
-        myThemes: {
-          primary: "#0d9488",
+        light: {
+          ...require("daisyui/src/theming/themes")["light"],
+          primary: "#0a776e",
           secondary: "#0369a1",
-          "base-content": "#222",
+          accent: "#d97706",
+          warning: "#f7b708",
+        },
+        dark: {
+          ...require("daisyui/src/theming/themes")["dark"],
+          primary: "#0a776e",
+          secondary: "#0369a1",
+          accent: "#b35c00",
+          warning: "#f7b708",
+          "base-content": "#ECECEC",
         },
       },
     ],

@@ -11,5 +11,5 @@ import (
 var assets embed.FS
 
 func static() http.Handler {
-	return http.StripPrefix("/static/", http.FileServer(http.FS(assets)))
+	return http.FileServer(http.FS(assets))
 }

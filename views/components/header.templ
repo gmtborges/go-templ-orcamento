@@ -1,19 +1,19 @@
 package components
 
 templ Header() {
-	<header class="w-full border-b shadow">
-		<nav class="flex py-2 px-2 justify-between items-center max-w-6xl mx-auto" x-data="{ showDropdown: false }">
+	<header class="flex items-center w-full shadow">
+		<nav class="w-full flex py-2 px-2 justify-between items-center max-w-6xl mx-auto" x-data="{ showDropdown: false }">
 			<div class="flex items-center space-x-2">
-				<img src="/static/logo.svg" width="48" height="48" alt="Orçamento Auto logo"/>
+				<img :src="$store.theme.isDark ? '/static/logo-site-dark.svg' : '/static/logo-site.svg'" width="48" height="48" alt="Orçamento Auto logo"/>
 				<div class="font-extrabold hidden md:block md:text-xl uppercase">Orçamento Auto</div>
 			</div>
 			<div x-show="showDropdown" x-transition class="absolute bg-gray-100 top-[68px] right-2 left-2 border rounded-md">
 				<ul class="flex flex-col text-xl space-y-4 p-3 font-medium">
 					<li>
-						<a href="#" class="font-medium hover:text-primary">Vantagens</a>
+						<a href="#">Vantagens</a>
 					</li>
 					<li>
-						<a href="#" class="font-medium hover:text-primary">Como funciona</a>
+						<a href="#">Como funciona</a>
 					</li>
 				</ul>
 			</div>
@@ -34,23 +34,27 @@ templ Header() {
 						<path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16"></path>
 					</svg>
 				</button>
-				<div class="hidden md:block">
-					<ul class="flex space-x-5 font-medium">
+				<div class="hidden md:block ml-auto">
+					<ul class="flex space-x-5 font-medium text-lg">
 						<li>
-							<a href="#" class="font-medium hover:text-primary">Vantagens</a>
+							<a href="#" class="hover:text-primary">Vantagens</a>
 						</li>
 						<li>
-							<a href="#" class="font-medium hover:text-primary">Como funciona</a>
+							<a href="#" class="hover:text-primary">Como funciona</a>
 						</li>
 					</ul>
 				</div>
 				<a
 					href="/login"
-					class="btn btn-primary text-white text-base"
+					class="btn btn-primary text-base"
 				>
 					Entrar
 				</a>
+				<div></div>
 			</div>
 		</nav>
+		<div class="mr-10">
+			@ThemeToggle()
+		</div>
 	</header>
 }

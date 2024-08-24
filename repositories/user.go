@@ -6,7 +6,7 @@ import (
 
 	"github.com/volatiletech/sqlboiler/v4/queries/qm"
 
-	"github.com/gustavomtborges/orcamento-auto/models"
+	"github.com/gmtborges/orcamento-auto/models"
 )
 
 type UserRepository interface {

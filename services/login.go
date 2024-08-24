@@ -3,8 +3,8 @@ package services
 import (
 	"context"
 
-	"github.com/gustavomtborges/orcamento-auto/models"
-	"github.com/gustavomtborges/orcamento-auto/repositories"
+	"github.com/gmtborges/orcamento-auto/models"
+	"github.com/gmtborges/orcamento-auto/repositories"
 )
 
 type LoginService struct {
