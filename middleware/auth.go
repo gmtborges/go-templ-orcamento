@@ -1,4 +1,4 @@
-package middlewares
+package middleware
 
 import (
 	"errors"
@@ -7,10 +7,10 @@ import (
 	"github.com/labstack/echo-contrib/session"
 	"github.com/labstack/echo/v4"
 
-	"github.com/gmtborges/orcamento-auto/services"
+	"github.com/gmtborges/orcamento-auto/svc"
 )
 
-func Authentication(userSvc *services.UserService) func(next echo.HandlerFunc) echo.HandlerFunc {
+func Authentication(userSvc *svc.UserService) func(next echo.HandlerFunc) echo.HandlerFunc {
 	return func(next echo.HandlerFunc) echo.HandlerFunc {
 		return func(c echo.Context) error {
 			if userID, roles, err := getSessionValues(c); err != nil {

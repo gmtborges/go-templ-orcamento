@@ -10,10 +10,10 @@ import (
 	"github.com/labstack/echo/v4"
 
 	"github.com/gmtborges/orcamento-auto/db"
-	"github.com/gmtborges/orcamento-auto/handlers"
-	"github.com/gmtborges/orcamento-auto/middlewares"
-	"github.com/gmtborges/orcamento-auto/repositories"
-	"github.com/gmtborges/orcamento-auto/services"
+	"github.com/gmtborges/orcamento-auto/handler"
+	"github.com/gmtborges/orcamento-auto/middleware"
+	"github.com/gmtborges/orcamento-auto/repo"
+	"github.com/gmtborges/orcamento-auto/svc"
 )
 
 func main() {
@@ -31,25 +31,25 @@ func main() {
 
 	e.GET("/static/*", echo.WrapHandler(static()))
 
-	indexHandler := handlers.NewIndexHandler()
+	indexHandler := handler.NewIndexHandler()
 	e.GET("/", indexHandler.Index)
 
-	policyHandler := handlers.NewPolicyHandler()
+	policyHandler := handler.NewPolicyHandler()
 	e.GET("/politica-privacidade", policyHandler.Index)
 
-	userRepo := repositories.NewPostgresUserRepository(db)
-	userSvc := services.NewUserService(userRepo)
-	loginHandler := handlers.NewLoginHandler(userSvc)
+	userRepo := repo.NewPostgresUserRepository(db)
+	userSvc := svc.NewUserService(userRepo)
+	loginHandler := handler.NewLoginHandler(userSvc)
 	e.GET("/login", loginHandler.Index)
 	e.POST("/login", loginHandler.Create)
 	e.DELETE("/logout", loginHandler.Logout)
 
-	biddingRepo := repositories.NewPostgresBiddingRepository(db)
-	biddingSvc := services.NewBiddingService(biddingRepo)
-	biddingHandler := handlers.NewBiddingsHandler(biddingSvc)
+	biddingRepo := repo.NewPostgresBiddingRepository(db)
+	biddingSvc := svc.NewBiddingService(biddingRepo)
+	biddingHandler := handler.NewBiddingsHandler(biddingSvc)
 
 	authGroup := e.Group("")
-	authGroup.Use(middlewares.Authentication(userSvc))
+	authGroup.Use(middleware.Authentication(userSvc))
 	authGroup.GET("/orcamentos", biddingHandler.Index)
 	authGroup.GET("/ofertas", biddingHandler.Index)
 

@@ -1,4 +1,4 @@
-package repositories
+package repo
 
 import (
 	"context"
@@ -13,6 +13,9 @@ type MockUserRepository struct {
 
 func (m *MockUserRepository) GetUserByEmail(ctx context.Context, email string) (*types.UserAuth, error) {
 	data, err := m.MockFn()
+	if data == nil {
+		return nil, err
+	}
 	userAuth, ok := data.(types.UserAuth)
 	if !ok {
 		return nil, fmt.Errorf("failed to assert data as types.UserAuth")

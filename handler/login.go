@@ -1,4 +1,4 @@
-package handlers
+package handler
 
 import (
 	"database/sql"
@@ -7,15 +7,15 @@ import (
 	"github.com/labstack/echo/v4"
 
 	"github.com/gmtborges/orcamento-auto/auth"
-	"github.com/gmtborges/orcamento-auto/services"
+	"github.com/gmtborges/orcamento-auto/svc"
 	"github.com/gmtborges/orcamento-auto/views/login"
 )
 
 type LoginHandler struct {
-	userSvc *services.UserService
+	userSvc *svc.UserService
 }
 
-func NewLoginHandler(userSvc *services.UserService) *LoginHandler {
+func NewLoginHandler(userSvc *svc.UserService) *LoginHandler {
 	return &LoginHandler{userSvc: userSvc}
 }
 
@@ -35,7 +35,6 @@ func (h *LoginHandler) Create(c echo.Context) error {
 				Email:    email,
 				Warnings: []string{"E-mail e/ou senha incorretos"},
 			}).Render(c.Request().Context(), c.Response())
-
 	}
 	if err != sql.ErrNoRows && err != nil {
 		c.Response().WriteHeader(http.StatusInternalServerError)

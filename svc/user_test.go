@@ -1,4 +1,4 @@
-package services
+package svc
 
 import (
 	"net/http"
@@ -9,7 +9,7 @@ import (
 	"github.com/labstack/echo-contrib/session"
 	"github.com/labstack/echo/v4"
 
-	"github.com/gmtborges/orcamento-auto/repositories"
+	"github.com/gmtborges/orcamento-auto/repo"
 )
 
 func TestUserService_SetAuthSession(t *testing.T) {
@@ -19,7 +19,7 @@ func TestUserService_SetAuthSession(t *testing.T) {
 	c := e.NewContext(req, rec)
 	c.Set("_session_store", sessions.NewCookieStore([]byte("secret")))
 
-	svc := NewUserService(&repositories.MockUserRepository{})
+	svc := NewUserService(&repo.MockUserRepository{})
 	err := svc.SetSession(c, 123, "assoc_admin,auto_admin")
 	if err != nil {
 		t.Errorf("Expected no error, got %v", err)
@@ -46,7 +46,7 @@ func TestUserService_RemoveAuthSession(t *testing.T) {
 	c := e.NewContext(req, rec)
 	c.Set("_session_store", sessions.NewCookieStore([]byte("secret")))
 
-	svc := NewUserService(&repositories.MockUserRepository{})
+	svc := NewUserService(&repo.MockUserRepository{})
 	if err := svc.SetSession(c, 123, "admin"); err != nil {
 		t.Errorf("Error setting session %v", err)
 	}

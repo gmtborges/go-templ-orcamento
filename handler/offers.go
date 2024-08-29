@@ -1,3 +1,3 @@
-package handlers
+package handler
 
 type OffersHandler struct{}

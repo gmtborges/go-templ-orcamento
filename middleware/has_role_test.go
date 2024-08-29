@@ -1,4 +1,4 @@
-package middlewares
+package middleware
 
 import (
 	"net/http"
@@ -7,8 +7,8 @@ import (
 
 	"github.com/labstack/echo/v4"
 
-	"github.com/gmtborges/orcamento-auto/repositories"
-	"github.com/gmtborges/orcamento-auto/services"
+	"github.com/gmtborges/orcamento-auto/repo"
+	"github.com/gmtborges/orcamento-auto/svc"
 )
 
 func TestHasRoleAllowAssoc(t *testing.T) {
@@ -17,6 +17,6 @@ func TestHasRoleAllowAssoc(t *testing.T) {
 	rec := httptest.NewRecorder()
 	c := e.NewContext(req, rec)
 
-	userSvc := services.NewUserService(&repositories.MockUserRepository{})
+	userSvc := svc.NewUserService(&repo.MockUserRepository{})
 	userSvc.SetSession(c, 123, "assoc")
 }

@@ -1,17 +1,17 @@
-package handlers
+package handler
 
 import (
 	"github.com/labstack/echo/v4"
 
-	"github.com/gmtborges/orcamento-auto/services"
+	"github.com/gmtborges/orcamento-auto/svc"
 	"github.com/gmtborges/orcamento-auto/views/bidding"
 )
 
 type BiddingHandler struct {
-	BiddingSvc *services.BiddingService
+	BiddingSvc *svc.BiddingService
 }
 
-func NewBiddingsHandler(biddingSvc *services.BiddingService) *BiddingHandler {
+func NewBiddingsHandler(biddingSvc *svc.BiddingService) *BiddingHandler {
 	return &BiddingHandler{BiddingSvc: biddingSvc}
 }
 

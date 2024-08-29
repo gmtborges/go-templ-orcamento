@@ -1,4 +1,4 @@
-package services
+package svc
 
 import (
 	"context"
@@ -7,11 +7,11 @@ import (
 	"github.com/labstack/echo-contrib/session"
 	"github.com/labstack/echo/v4"
 
-	"github.com/gmtborges/orcamento-auto/repositories"
+	"github.com/gmtborges/orcamento-auto/repo"
 )
 
 type UserService struct {
-	userRepo repositories.UserRepository
+	userRepo repo.UserRepository
 }
 
 type UserAuth struct {
@@ -21,7 +21,7 @@ type UserAuth struct {
 	roles    []string
 }
 
-func NewUserService(userRepo repositories.UserRepository) *UserService {
+func NewUserService(userRepo repo.UserRepository) *UserService {
 	return &UserService{userRepo: userRepo}
 }
 
