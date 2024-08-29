@@ -47,12 +47,11 @@ func main() {
 	biddingRepo := repositories.NewPostgresBiddingRepository(db)
 	biddingSvc := services.NewBiddingService(biddingRepo)
 	biddingHandler := handlers.NewBiddingsHandler(biddingSvc)
-	// e.GET("/orcamentos", biddingHandler.Index, middlewares.Authentication)
-	compGroup := e.Group("")
-	compGroup.Use(middlewares.Authentication)
-	compGroup.Use(middlewares.Authentication)
-	e.GET("/orcamentos", biddingHandler.Index)
-	e.GET("/ofertas", biddingHandler.Index)
+
+	authGroup := e.Group("")
+	authGroup.Use(middlewares.Authentication(userSvc))
+	authGroup.GET("/orcamentos", biddingHandler.Index)
+	authGroup.GET("/ofertas", biddingHandler.Index)
 
 	e.Logger.Fatal(e.Start(":3000"))
 }

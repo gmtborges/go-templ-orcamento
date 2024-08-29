@@ -2,6 +2,8 @@ GOARCH := amd64
 GOOS := linux
 APP := "./bin/myapp"
 
+.PHONY: all clean build models
+
 check-quality:
 	make lint
 	make fmt
@@ -51,6 +53,9 @@ migrate:
 
 rollback:
 	go run ./cmd/migrate down
+
+models:
+	sqlboiler psql
 
 seed:
 	go run ./cmd/seed

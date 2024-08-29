@@ -1,19 +1,17 @@
 package main
 
 import (
-	"context"
-	"database/sql"
 	"log"
 	"os"
+	"time"
 
+	"github.com/jmoiron/sqlx"
 	"github.com/joho/godotenv"
 	_ "github.com/lib/pq"
-	"github.com/volatiletech/null/v8"
-	"github.com/volatiletech/sqlboiler/v4/boil"
 
 	"github.com/gmtborges/orcamento-auto/auth"
 	"github.com/gmtborges/orcamento-auto/db"
-	"github.com/gmtborges/orcamento-auto/models"
+	"github.com/gmtborges/orcamento-auto/types"
 )
 
 func main() {
@@ -23,34 +21,53 @@ func main() {
 	}
 	connStr := os.Getenv("DB_URL")
 	db := db.Conn(connStr)
-	ctx := context.Background()
+	cleanUp(db)
 
-	cleanUp(ctx, db)
-
-	cp := models.Company{
-		Name: "Orçamento Auto",
+	cp := types.Company{
+		Name:      "Orçamento Auto",
+		CreatedAt: time.Now(),
+		UpdatedAt: time.Now(),
 	}
-	if err := cp.Insert(ctx, db, boil.Infer()); err != nil {
-		panic(err)
+
+	tx := db.MustBegin()
+	compID := int64(0)
+	err = tx.QueryRow(`INSERT INTO companies 
+  (name, created_at, updated_at) 
+  VALUES ($1, $2, $3) RETURNING id`, cp.Name, cp.CreatedAt, cp.UpdatedAt).Scan(&compID)
+	if err != nil {
+		log.Fatal(err)
+	}
+	if err = tx.Commit(); err != nil {
+		log.Fatal(err)
 	}
 
 	hash, err := auth.GeneratePasswordHash("123")
 	if err != nil {
 		log.Fatal(err)
 	}
-	u := models.User{
+	u := types.User{
 		Name:      "Gustavo",
-		Email:     null.StringFrom("admin@test.com"),
+		Email:     "admin@test.com",
 		Password:  hash,
-		CompanyID: cp.ID,
+		CompanyID: compID,
+		CreatedAt: time.Now(),
+		UpdatedAt: time.Now(),
 	}
-	if err := u.Insert(ctx, db, boil.Infer()); err != nil {
-		panic(err)
+
+	tx = db.MustBegin()
+	_, err = tx.NamedExec(`INSERT INTO users 
+  (name, email, password, company_id, created_at, updated_at) 
+  VALUES (:name, :email, :password, :company_id, :created_at, :updated_at)`, u)
+	if err != nil {
+		log.Fatal(err)
+	}
+	if err = tx.Commit(); err != nil {
+		log.Fatal(err)
 	}
 }
 
-func cleanUp(ctx context.Context, db *sql.DB) {
-	_, err := models.Companies().DeleteAll(ctx, db)
+func cleanUp(db *sqlx.DB) {
+	_, err := db.Exec("DELETE FROM companies")
 	if err != nil {
 		log.Fatal(err)
 	}

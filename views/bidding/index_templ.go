@@ -28,7 +28,7 @@ func metaTags() templ.Component {
 			templ_7745c5c3_Var1 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<meta name=\"description\" content=\"Lista de orcamentos\">")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<meta name=\"description\" content=\"Lista de orçamentos\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -78,7 +78,7 @@ func BiddingIndex() templ.Component {
 					}()
 				}
 				ctx = templ.InitializeContext(ctx)
-				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<div class=\"flex flex-col items-center m-10\"><h1 class=\"font-bold text-4xl mb-3\">Orçamentos</h1><div class=\"w-full my-5\"><div class=\"overflow-x-auto\"><table class=\"table table-zebra\"><!-- head --><thead class=\"text-lg text-primary-content uppercase bg-primary\"><tr><th></th><th>Associado</th><th>Veículo</th><th>Serviços</th><th>Status</th></tr></thead> <tbody class=\"text-lg\"><tr><th>1</th><td>Tião Galinha</td><td>Fiat 147</td><td>Lanternagem, pintura, reposição</td><td class=\"font-bold text-info\">Aguardando proposta</td></tr><!-- row 1 --><tr><th>1</th><td>Cy Ganderton</td><td>Quality Control Specialist</td><td>Blue</td><td class=\"font-bold text-warning\">Pendente</td></tr><!-- row 2 --><tr><th>2</th><td>Hart Hagerty</td><td>Desktop Support Technician</td><td>Purple</td><td class=\"font-bold text-success\">Finalizado</td></tr><!-- row 3 --><tr><th>3</th><td>Brice Swyre</td><td>Tax Accountant</td><td>Red</td><td class=\"font-bold text-error\">Cancelado</td></tr></tbody></table></div></div><button class=\"btn btn-outline btn-primary px-10 self-start\"><svg xmlns=\"http://www.w3.org/2000/svg\" fill=\"none\" viewBox=\"0 0 24 24\" stroke-width=\"1.5\" stroke=\"currentColor\" class=\"w-6\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" d=\"M12 4.5v15m7.5-7.5h-15\"></path></svg> <span class=\"text-lg font-semibold\">Novo Orçamento</span></button></div>")
+				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<div class=\"flex flex-col items-center m-10\"><h1 class=\"font-bold text-4xl mb-3\">Orçamentos</h1><div class=\"w-full my-5\"><div class=\"overflow-x-auto\"><table class=\"table table-zebra\"><thead class=\"text-lg text-primary-content uppercase bg-primary\"><tr><th></th><th>Associado</th><th>Veículo</th><th>Serviços</th><th>Status</th></tr></thead> <tbody class=\"text-lg\"><tr><th>1</th><td>Tião Galinha</td><td>Fiat 147</td><td>Lanternagem, pintura, reposição</td><td class=\"font-bold text-info\">Aguardando proposta</td></tr><tr><th>1</th><td>Cy Ganderton</td><td>Quality Control Specialist</td><td>Blue</td><td class=\"font-bold text-warning\">Pendente</td></tr><tr><th>2</th><td>Hart Hagerty</td><td>Desktop Support Technician</td><td>Purple</td><td class=\"font-bold text-success\">Finalizado</td></tr><tr><th>3</th><td>Brice Swyre</td><td>Tax Accountant</td><td>Red</td><td class=\"font-bold text-error\">Cancelado</td></tr></tbody></table></div></div><button class=\"btn btn-outline btn-primary px-10 self-start\"><svg xmlns=\"http://www.w3.org/2000/svg\" fill=\"none\" viewBox=\"0 0 24 24\" stroke-width=\"1.5\" stroke=\"currentColor\" class=\"w-6\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" d=\"M12 4.5v15m7.5-7.5h-15\"></path></svg> <span class=\"text-lg font-semibold\">Novo Orçamento</span></button></div>")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}

@@ -67,7 +67,7 @@ func (h *LoginHandler) Create(c echo.Context) error {
 			}).Render(c.Request().Context(), c.Response())
 	}
 
-	if err := h.userSvc.SetUserSession(c, user.ID, "admin"); err != nil {
+	if err := h.userSvc.SetSession(c, user.ID, ""); err != nil {
 		c.Response().WriteHeader(http.StatusInternalServerError)
 		return views.LoginIndex(
 			views.LoginIndexViewModel{

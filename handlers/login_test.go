@@ -1,7 +1,6 @@
 package handlers
 
 import (
-	"context"
 	"database/sql"
 	"errors"
 	"net/http"
@@ -13,34 +12,31 @@ import (
 	"github.com/labstack/echo/v4"
 
 	"github.com/gmtborges/orcamento-auto/auth"
-	"github.com/gmtborges/orcamento-auto/models"
+	"github.com/gmtborges/orcamento-auto/repositories"
 	"github.com/gmtborges/orcamento-auto/services"
+	"github.com/gmtborges/orcamento-auto/types"
 )
 
-type MockUserStore struct {
-	MockFn func() (*models.User, error)
-}
-
-func (m *MockUserStore) GetUserByEmail(ctx context.Context, email string) (*models.User, error) {
-	return m.MockFn()
-}
-
-func TestLoginHandler_Create_Success(t *testing.T) {
+func TestLoginHandler_Success(t *testing.T) {
 	e := echo.New()
 	hash, _ := auth.GeneratePasswordHash("passwd123")
-	st := &MockUserStore{
-		MockFn: func() (*models.User, error) {
-			return &models.User{Password: hash}, nil
-		},
-	}
-	userSvc := services.NewUserService(st)
-	h := NewLoginHandler(userSvc)
-
-	req := httptest.NewRequest(http.MethodPost, "/login", strings.NewReader("email=test@example.com&password=passwd123"))
+	req := httptest.NewRequest(http.MethodPost, "/", strings.NewReader("email=test@example.com&password=passwd123"))
 	req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationForm)
 	rec := httptest.NewRecorder()
 	c := e.NewContext(req, rec)
 	c.Set("_session_store", sessions.NewCookieStore([]byte("secret")))
+	repo := &repositories.MockUserRepository{
+		MockFn: func() (interface{}, error) {
+			return &types.UserAuth{
+				ID:       1,
+				Name:     "Tiao",
+				Password: hash,
+				Roles:    []string{"admin"},
+			}, nil
+		},
+	}
+	userSvc := services.NewUserService(repo)
+	h := NewLoginHandler(userSvc)
 
 	if err := h.Create(c); err != nil {
 		t.Errorf("Expected no error, got: %v", err)
@@ -50,17 +46,17 @@ func TestLoginHandler_Create_Success(t *testing.T) {
 	}
 }
 
-func TestLoginHandler_Create_UserNotFound(t *testing.T) {
+func TestLoginHandler_UserNotFound(t *testing.T) {
 	e := echo.New()
-	st := &MockUserStore{
-		MockFn: func() (*models.User, error) {
+	repo := &repositories.MockUserRepository{
+		MockFn: func() (interface{}, error) {
 			return nil, sql.ErrNoRows
 		},
 	}
-	userSvc := services.NewUserService(st)
+	userSvc := services.NewUserService(repo)
 	h := NewLoginHandler(userSvc)
 
-	req := httptest.NewRequest(http.MethodPost, "/login", strings.NewReader("email=test@example.com&password=passwd123"))
+	req := httptest.NewRequest(http.MethodPost, "/", strings.NewReader("email=test@example.com&password=passwd123"))
 	req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationForm)
 	rec := httptest.NewRecorder()
 	c := e.NewContext(req, rec)
@@ -76,18 +72,18 @@ func TestLoginHandler_Create_UserNotFound(t *testing.T) {
 	}
 }
 
-func TestLoginHandler_Create_InvalidPassword(t *testing.T) {
+func TestLoginHandler_InvalidPassword(t *testing.T) {
 	e := echo.New()
-	st := &MockUserStore{
-		MockFn: func() (*models.User, error) {
-			return &models.User{Password: "wrong"}, nil
+	repo := &repositories.MockUserRepository{
+		MockFn: func() (interface{}, error) {
+			return &types.UserAuth{Password: "wrong"}, nil
 		},
 	}
-	userSvc := services.NewUserService(st)
+	userSvc := services.NewUserService(repo)
 	h := NewLoginHandler(userSvc)
 	req := httptest.NewRequest(
 		http.MethodPost,
-		"/login",
+		"/",
 		strings.NewReader("email=test@example.com&password=passwd123"),
 	)
 	req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationForm)
@@ -105,14 +101,14 @@ func TestLoginHandler_Create_InvalidPassword(t *testing.T) {
 	}
 }
 
-func TestLoginHandler_Create_Error_Database(t *testing.T) {
+func TestLoginHandler_ErrorDatabase(t *testing.T) {
 	e := echo.New()
-	st := &MockUserStore{
-		MockFn: func() (*models.User, error) {
+	repo := &repositories.MockUserRepository{
+		MockFn: func() (interface{}, error) {
 			return nil, errors.New("error on database")
 		},
 	}
-	userSvc := services.NewUserService(st)
+	userSvc := services.NewUserService(repo)
 	h := NewLoginHandler(userSvc)
 	req := httptest.NewRequest(
 		http.MethodPost,

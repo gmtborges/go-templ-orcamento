@@ -11,8 +11,8 @@ type BiddingHandler struct {
 	BiddingSvc *services.BiddingService
 }
 
-func NewBiddingsHandler(dashSvc *services.BiddingService) *BiddingHandler {
-	return &BiddingHandler{BiddingSvc: dashSvc}
+func NewBiddingsHandler(biddingSvc *services.BiddingService) *BiddingHandler {
+	return &BiddingHandler{BiddingSvc: biddingSvc}
 }
 
 func (h *BiddingHandler) Index(c echo.Context) error {
