@@ -1,31 +1,36 @@
 package main
 
 import (
-	"log"
+	"net/http"
 	"os"
 
 	"github.com/gorilla/sessions"
 	"github.com/joho/godotenv"
 	"github.com/labstack/echo-contrib/session"
 	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v4/middleware"
+	"github.com/rs/zerolog"
+	"github.com/rs/zerolog/log"
 
 	"github.com/gmtborges/orcamento-auto/db"
 	"github.com/gmtborges/orcamento-auto/handler"
-	"github.com/gmtborges/orcamento-auto/middleware"
+	"github.com/gmtborges/orcamento-auto/middlewares"
 	"github.com/gmtborges/orcamento-auto/repo"
 	"github.com/gmtborges/orcamento-auto/svc"
 )
 
 func main() {
+	zerolog.TimeFieldFormat = zerolog.TimeFormatUnix
 	err := godotenv.Load()
 	if err != nil {
-		log.Fatalf("Error loading .env file: %v", err)
+		log.Fatal().Err(err).Msg("Error loading .env file")
 	}
+
 	connStr := os.Getenv("DB_URL")
 	db := db.Conn(connStr)
 
 	e := echo.New()
-
+	e.Use(middleware.Recover())
 	sessionKey := os.Getenv("SESSION_KEY_SECRET")
 	e.Use(session.Middleware(sessions.NewCookieStore([]byte(sessionKey))))
 
@@ -49,9 +54,15 @@ func main() {
 	biddingHandler := handler.NewBiddingsHandler(biddingSvc)
 
 	authGroup := e.Group("")
-	authGroup.Use(middleware.Authentication(userSvc))
+	authGroup.Use(middlewares.Authentication(userSvc))
 	authGroup.GET("/orcamentos", biddingHandler.Index)
-	authGroup.GET("/ofertas", biddingHandler.Index)
+	authGroup.GET("/orcamentos/novo", biddingHandler.New)
 
-	e.Logger.Fatal(e.Start(":3000"))
+	port := os.Getenv("PORT")
+	if port == "" {
+		port = "3000"
+	}
+	if err := e.Start(":" + port); err != http.ErrServerClosed {
+		log.Fatal().Err(err).Msg("Error on starting server")
+	}
 }

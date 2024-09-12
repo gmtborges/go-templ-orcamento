@@ -1,0 +1,55 @@
+package views
+
+import (
+	"github.com/gmtborges/orcamento-auto/views/layouts"
+	"github.com/gmtborges/orcamento-auto/types"
+)
+
+templ biddingShowMetaTags() {
+	<meta name="description" content="Visualizar orçamento"/>
+}
+
+templ BiddingShow(bidding types.BiddingModel) {
+	@layouts.Base("Orçamento Auto - Visualizar Orçamento", biddingShowMetaTags()) {
+		@layouts.SideBarOrg() {
+			<div class="flex flex-col items-center mx-20 mt-10">
+				<h1 class="font-bold text-4xl mb-12">Visualizar Orçamento</h1>
+				<div class="flex flex-col w-1/2">
+					<div class="flex flex-col mb-4">
+						<label for="title" class="font-bold">Título</label>
+						<input type="text" name="title" id="title" value="{ bidding.Title }" class="input" readonly/>
+					</div>
+					<div class="flex flex-col mb-4">
+						<label for="description" class="font-bold">Descrição</label>
+						<textarea name="description" id="description" class="input" readonly>{ bidding.Description.String }</textarea>
+					</div>
+					<div class="flex flex-col mb-4">
+						<label for="status" class="font-bold">Status</label>
+						<select name="status" id="status" class="input" readonly>
+							<option value="awaiting_offers" selected="{ bidding.Status == types.BiddingStatusAwaitingOffers }">Aguardando propostas</option>
+							<option value="pending" selected="{ bidding.Status == types.BiddingStatusPending }">Pendente</option>
+							<option value="finished" selected="{ bidding.Status == types.BiddingStatusFinished }">Finalizado</option>
+							<option value="canceled" selected="{ bidding.Status == types.BiddingStatusCanceled }">Cancelado</option>
+						</select>
+					</div>
+					<div class="flex flex-col mb-4">
+						<label for="items" class="font-bold">Itens</label>
+						<div class="flex flex-col">
+							<div class="flex flex-row items-center mb-2">
+								<div class="font-bold w-1/3">Nome</div>
+								<div class="font-bold w-1/3">Quantidade</div>
+								<div class="font-bold w-1/3">Preço</div>
+							</div>
+							for _, item := range bidding.Items {
+								<div class="flex">
+									<div class="w-1/3">{ item.AutoCategoryType }</div>
+									<div class="w-1/3">{ item.AutoCategoryName }</div>
+								</div>
+							}
+						</div>
+					</div>
+				</div>
+			</div>
+		}
+	}
+}

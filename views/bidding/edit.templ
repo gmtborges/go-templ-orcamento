@@ -1,0 +1,63 @@
+package views
+
+import (
+	"github.com/gmtborges/orcamento-auto/views/layouts"
+	"github.com/gmtborges/orcamento-auto/types"
+)
+
+templ biddingEditMetaTags() {
+	<meta name="description" content="Editar orçamento"/>
+}
+
+templ BiddingEdit(bidding types.BiddingModel, errors []string) {
+	@layouts.Base("Orçamento Auto - Editar Orçamento", biddingEditMetaTags()) {
+		@layouts.SideBarOrg() {
+			<div class="flex flex-col items-center mx-20 mt-10">
+				<h1 class="font-bold text-4xl mb-12">Editar Orçamento</h1>
+				<form action="/biddings/{ bidding.ID }" method="POST" class="flex flex-col w-1/2">
+					<input type="hidden" name="_method" value="PUT"/>
+					<div class="flex flex-col mb-4">
+						<label for="title" class="font-bold">Título</label>
+						<input type="text" name="title" id="title" value="{ bidding.Title }" class="input"/>
+					</div>
+					<div class="flex flex-col mb-4">
+						<label for="description" class="font-bold">Descrição</label>
+						<textarea name="description" id="description" class="input">{ bidding.Description.String }</textarea>
+					</div>
+					<div class="flex flex-col mb-4">
+						<label for="status" class="font-bold">Status</label>
+						<select name="status" id="status" class="input">
+							<option value="awaiting_offers" selected="{ bidding.Status == types.BiddingStatusAwaitingOffers }">Aguardando propostas</option>
+							<option value="pending" selected="{ bidding.Status == types.BiddingStatusPending }">Pendente</option>
+							<option value="finished" selected="{ bidding.Status == types.BiddingStatusFinished }">Finalizado</option>
+							<option value="canceled" selected="{ bidding.Status == types.BiddingStatusCanceled }">Cancelado</option>
+						</select>
+					</div>
+					<div class="flex flex-col mb-4">
+						<label for="items" class="font-bold">Itens</label>
+						<div class="flex flex-col">
+							<div class="flex flex-row items-center mb-2">
+								<input type="text" name="name" value="test" class="input"/>
+								<input type="number" name="items[{ i }].quantity" value="{ item.Quantity }" class="input"/>
+								<input type="number" name="items[{ i }].price" value="{ item.Price }" class="input"/>
+								<button type="button" class="btn btn-error" onclick="this.parentElement.remove()">Remover</button>
+							</div>
+						</div>
+						<button type="button" class="btn btn-primary" onclick="this.previousElementSibling.insertAdjacentHTML('beforeend', '<div class=\'flex flex-row items-center mb-2\'><input type=\'text\' name=\'items[{{ len(bidding.Items) }}].name\' class=\'input\'/><input type=\'number\' name=\'items[{{ len(bidding.Items) }}].quantity\' class=\'input\'/><input type=\'number\' name=\'items[{{ len(bidding.Items) }}].price\' class=\'input\'/><button type=\'button\' class=\'btn btn-error\' onclick=\'this.parentElement.remove()\'>Remover</button></div>')">Adicionar</button>
+					</div>
+					<button type="submit" class="btn btn-primary">Salvar</button>
+				</form>
+				if len(errors) > 0 {
+					<div class="flex flex-col w-1/2 mt-4">
+						<h2 class="font-bold text-error">Erros</h2>
+						<ul class="list-disc list-inside">
+							for _, error := range errors {
+								<li>{ error }</li>
+							}
+						</ul>
+					</div>
+				}
+			</div>
+		}
+	}
+}

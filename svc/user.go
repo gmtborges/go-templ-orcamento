@@ -8,33 +8,28 @@ import (
 	"github.com/labstack/echo/v4"
 
 	"github.com/gmtborges/orcamento-auto/repo"
+	"github.com/gmtborges/orcamento-auto/types"
 )
 
 type UserService struct {
 	userRepo repo.UserRepository
 }
 
-type UserAuth struct {
-	ID       int64
-	Name     string
-	Password string
-	roles    []string
-}
-
 func NewUserService(userRepo repo.UserRepository) *UserService {
 	return &UserService{userRepo: userRepo}
 }
 
-func (s *UserService) GetUserByEmail(ctx context.Context, email string) (*UserAuth, error) {
+func (s *UserService) GetUserByEmail(ctx context.Context, email string) (*types.UserAuth, error) {
 	user, err := s.userRepo.GetUserByEmail(ctx, email)
 	if err != nil {
 		return nil, err
 	}
-	return &UserAuth{
-		ID:       user.ID,
-		Name:     user.Name,
-		Password: user.Password,
-		roles:    user.Roles,
+	return &types.UserAuth{
+		ID:        user.ID,
+		CompanyID: user.CompanyID,
+		Name:      user.Name,
+		Password:  user.Password,
+		Roles:     user.Roles,
 	}, nil
 }
 
@@ -42,7 +37,7 @@ func (s *UserService) GetByID(ctx context.Context, userID int64) (int64, error) 
 	return s.userRepo.GetByID(ctx, userID)
 }
 
-func (s *UserService) SetSession(c echo.Context, userID int64, roles string) error {
+func (s *UserService) SetSession(c echo.Context, companyID int64, userID int64, roles []string) error {
 	session, err := session.Get("auth-session", c)
 	if err != nil {
 		return err
@@ -56,6 +51,7 @@ func (s *UserService) SetSession(c echo.Context, userID int64, roles string) err
 
 	session.Values["authenticated"] = true
 	session.Values["user_id"] = userID
+	session.Values["company_id"] = companyID
 	session.Values["roles"] = roles
 	return session.Save(c.Request(), c.Response())
 }

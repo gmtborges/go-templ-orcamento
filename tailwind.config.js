@@ -1,11 +1,11 @@
 /** @type {import('tailwindcss').Config} */
 module.exports = {
   content: ["./**/*.templ", "./**/*.go"],
-  darkMode: "selector",
+  darkMode: ["selector", '[data-theme="dark"]'],
   theme: {
     extend: {
       fontFamily: {
-        sans: ["Lato", "sans-serif"],
+        sans: ["Nunito", "sans-serif"],
       },
     },
   },

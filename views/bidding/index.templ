@@ -1,70 +1,36 @@
 package views
 
-import "github.com/gmtborges/orcamento-auto/views/layouts"
+import (
+	"github.com/gmtborges/orcamento-auto/views/layouts"
+	"github.com/gmtborges/orcamento-auto/views/bidding/partials"
+	"github.com/gmtborges/orcamento-auto/types"
+)
 
-templ metaTags() {
+templ biddingIndexMetaTags() {
 	<meta name="description" content="Lista de orçamentos"/>
 }
 
-templ BiddingIndex() {
-	@layouts.Base("Orçamento Auto - Orçamentos", metaTags()) {
-		@layouts.SideBarCompany() {
-			<div class="flex flex-col items-center m-10">
-				<h1 class="font-bold text-4xl mb-3">Orçamentos</h1>
-				<div class="w-full my-5">
-					<div class="overflow-x-auto">
-						<table class="table table-zebra">
-							<thead class="text-lg text-primary-content uppercase bg-primary">
-								<tr>
-									<th></th>
-									<th>Associado</th>
-									<th>Veículo</th>
-									<th>Serviços</th>
-									<th>Status</th>
-								</tr>
-							</thead>
-							<tbody class="text-lg">
-								<tr>
-									<th>1</th>
-									<td>Tião Galinha</td>
-									<td>Fiat 147</td>
-									<td>Lanternagem, pintura, reposição</td>
-									<td class="font-bold text-info">Aguardando proposta</td>
-								</tr>
-								<tr>
-									<th>1</th>
-									<td>Cy Ganderton</td>
-									<td>Quality Control Specialist</td>
-									<td>Blue</td>
-									<td class="font-bold text-warning">Pendente</td>
-								</tr>
-								<tr>
-									<th>2</th>
-									<td>Hart Hagerty</td>
-									<td>Desktop Support Technician</td>
-									<td>Purple</td>
-									<td class="font-bold text-success">Finalizado</td>
-								</tr>
-								<tr>
-									<th>3</th>
-									<td>Brice Swyre</td>
-									<td>Tax Accountant</td>
-									<td>Red</td>
-									<td class="font-bold text-error">Cancelado</td>
-								</tr>
-							</tbody>
-						</table>
-					</div>
-				</div>
-				<button class="btn btn-outline btn-primary px-10 self-start">
+templ BiddingIndex(vm types.BiddingIndexViewModel) {
+	@layouts.Base("Orçamento Auto - Lista de orçamentos", biddingIndexMetaTags()) {
+		@layouts.SideBarOrg() {
+			<main class="flex flex-col items-center mx-20 mt-6">
+				<h1 class="font-bold text-4xl mb-10">Orçamentos</h1>
+				<a class="btn btn-primary px-10 self-end min-w-max text-lg font-semibold" href="/orcamentos/novo">
 					<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6">
 						<path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"></path>
 					</svg>
-					<span class="text-lg font-semibold">
-						Novo Orçamento
-					</span>
-				</button>
-			</div>
+					Novo Orçamento
+				</a>
+				if len(vm.Errors) > 0 {
+					<div class="flex justify-center items-center text-2xl alert alert-error mt-32 max-w-4xl min-w-max">
+						for _, error := range vm.Errors {
+							<p>{ error }</p>
+						}
+					</div>
+				} else {
+					@partials.BiddingList(vm)
+				}
+			</main>
 		}
 	}
 }

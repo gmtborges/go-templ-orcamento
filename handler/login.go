@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	"github.com/labstack/echo/v4"
+	"github.com/rs/zerolog/log"
 
 	"github.com/gmtborges/orcamento-auto/auth"
 	"github.com/gmtborges/orcamento-auto/svc"
@@ -66,7 +67,8 @@ func (h *LoginHandler) Create(c echo.Context) error {
 			}).Render(c.Request().Context(), c.Response())
 	}
 
-	if err := h.userSvc.SetSession(c, user.ID, ""); err != nil {
+	if err := h.userSvc.SetSession(c, user.CompanyID, user.ID, user.Roles); err != nil {
+		log.Error().Err(err).Msg("Failed to set session")
 		c.Response().WriteHeader(http.StatusInternalServerError)
 		return views.LoginIndex(
 			views.LoginIndexViewModel{

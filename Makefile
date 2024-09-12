@@ -1,17 +1,21 @@
+include .env
+
 GOARCH := amd64
 GOOS := linux
-APP := "./bin/myapp"
+APP := "./bin/webapp"
 
-.PHONY: all clean build models
+all: test qa build
 
-check-quality:
-	make lint
-	make fmt
-	make vet
+build: templ css
+	GOOS=$(GOOS) GOARCH=$(GOARCH) go build -o $(APP)
 
-# Append || true below if blocking local developement
+dev:
+	@make -j3 run templ-proxy css-watch
+
+qa: lint fmt vet
+
 lint:
-	golangci-lint run --enable-all
+	golangci-lint run
 
 vet:
 	go vet ./...
@@ -32,12 +36,7 @@ templ:
 	templ generate
 
 templ-proxy:
-	@templ generate --watch --proxy=http://localhost:3000
-
-build:
-	make templ
-	make css
-	GOOS=$(GOOS) GOARCH=$(GOARCH) go build -o $(APP)
+	@templ generate --watch --proxy=http://localhost:${PORT}
 
 test:
 	go test ./...
@@ -45,17 +44,11 @@ test:
 run:
 	@air
 
-dev:
-	@make -j3 run templ-proxy css-watch
-
 migrate:
 	go run ./cmd/migrate up
 
 rollback:
 	go run ./cmd/migrate down
-
-models:
-	sqlboiler psql
 
 seed:
 	go run ./cmd/seed
@@ -64,8 +57,3 @@ clean:
 	go clean
 	rm -f bin/*
 	rm -f coverage*.out
-
-all:
-	make test
-	make build
-

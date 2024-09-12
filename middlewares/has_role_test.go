@@ -1,4 +1,4 @@
-package middleware
+package middlewares
 
 import (
 	"net/http"
@@ -11,12 +11,12 @@ import (
 	"github.com/gmtborges/orcamento-auto/svc"
 )
 
-func TestHasRoleAllowAssoc(t *testing.T) {
+func TestHasRole_AllowCompany(t *testing.T) {
 	e := echo.New()
 	req := httptest.NewRequest(http.MethodGet, "/bidding", nil)
 	rec := httptest.NewRecorder()
 	c := e.NewContext(req, rec)
 
 	userSvc := svc.NewUserService(&repo.MockUserRepository{})
-	userSvc.SetSession(c, 123, "assoc")
+	userSvc.SetSession(c, 321, 123, []string{"admin"})
 }

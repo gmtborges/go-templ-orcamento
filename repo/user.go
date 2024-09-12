@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/jmoiron/sqlx"
+	"github.com/rs/zerolog/log"
 
 	"github.com/gmtborges/orcamento-auto/types"
 )
@@ -22,13 +23,10 @@ func NewPostgresUserRepository(db *sqlx.DB) *PostgresUserRepository {
 }
 
 func (r *PostgresUserRepository) GetUserByEmail(ctx context.Context, email string) (*types.UserAuth, error) {
-	u := struct {
-		ID       int64
-		Name     string
-		Password string
-	}{}
-	err := r.db.GetContext(ctx, &u, "SELECT id, name, password FROM users WHERE email = $1 LIMIT 1", email)
+	u := types.UserAuth{}
+	err := r.db.GetContext(ctx, &u, "SELECT id, company_id, name, password FROM users WHERE email = $1 LIMIT 1", email)
 	if err != nil {
+		log.Error().Err(err).Msg("Failed to get user by email")
 		return nil, err
 	}
 	rs := []string{}
@@ -36,15 +34,12 @@ func (r *PostgresUserRepository) GetUserByEmail(ctx context.Context, email strin
   LEFT JOIN users_roles ur ON ur.role_id = r.id 
   WHERE ur.user_id = $1`, u.ID)
 	if err != nil {
+		log.Error().Err(err).Msg("Failed to get user roles")
 		return nil, err
 	}
+	u.Roles = rs
 
-	return &types.UserAuth{
-		ID:       u.ID,
-		Name:     u.Name,
-		Password: u.Password,
-		Roles:    rs,
-	}, nil
+	return &u, nil
 }
 
 func (r *PostgresUserRepository) GetByID(ctx context.Context, userID int64) (int64, error) {
