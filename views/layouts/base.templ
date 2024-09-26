@@ -15,26 +15,20 @@ templ Base(title string, metaTags templ.Component) {
 			<title>{ title }</title>
 			@metaTags
 		</head>
-		<body x-data="data()" class="h-svh">
+		<body x-init="setTheme" class="h-svh">
 			{ children... }
 		</body>
 		<script>
-    document.addEventListener('alpine:init', () => {
-        Alpine.store('darkMode', false)
-    });
-    function data() {
-      return {
-        init() {
-          const storedTheme = localStorage.getItem('theme');
-          if (storedTheme) {
-            Alpine.store('darkMode', storedTheme === 'dark');
-            document.querySelector("html").setAttribute('data-theme', storedTheme);
-          }
-          else {
-            const theme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
-            Alpine.store("darkMode", theme === 'dark');
-          }
-        }
+    function setTheme() {
+      Alpine.store('darkMode', false)
+      const storedTheme = localStorage.getItem('theme');
+      if (storedTheme) {
+        Alpine.store('darkMode', storedTheme === 'dark');
+        document.querySelector("html").setAttribute('data-theme', storedTheme);
+      }
+      else {
+        const theme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+        Alpine.store("darkMode", theme === 'dark');
       }
     }
     </script>

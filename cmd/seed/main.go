@@ -26,39 +26,39 @@ func main() {
 	db := db.Conn(connStr)
 	cleanUp(db)
 
-	org := types.Company{
-		Name:     "Org 1",
-		Type:     types.CompanyTypeOrg,
-		Province: "GO",
-		City:     "Goiania",
+	org := types.Empresa{
+		Nome:   "Org 1",
+		Tipo:   types.EmpresaTipoOrg,
+		Estado: "GO",
+		Cidade: "Goiania",
 	}
 
 	tx := db.MustBegin()
 	orgID := int64(0)
-	err = tx.QueryRow(`INSERT INTO companies 
-  (name, type, province, city, created_at, updated_at) 
-  VALUES ($1, $2, $3, $4, now(), now()) RETURNING id`, org.Name, org.Type, org.Province, org.City).Scan(&orgID)
+	err = tx.QueryRow(`INSERT INTO empresas 
+  (nome, tipo, estado, cidade, data_criacao, data_atualizacao) 
+  VALUES ($1, $2, $3, $4, now(), now()) RETURNING id`, org.Nome, org.Tipo, org.Estado, org.Cidade).Scan(&orgID)
 	if err != nil {
-		log.Fatal().Err(err).Msg("Failed to insert company")
+		log.Fatal().Err(err).Msg("Failed to insert into empresas")
 	}
 	if err = tx.Commit(); err != nil {
 		log.Fatal().Err(err).Msg("Failed to commit transaction")
 	}
 
-	auto := types.Company{
-		Name:     "Auto 1",
-		Type:     types.CompanyTypeAuto,
-		Province: "GO",
-		City:     "Goiania",
+	auto := types.Empresa{
+		Nome:   "Auto 1",
+		Tipo:   types.EmpresaTipoAuto,
+		Estado: "GO",
+		Cidade: "Goiania",
 	}
 
 	tx = db.MustBegin()
 	autoID := int64(0)
-	err = tx.QueryRow(`INSERT INTO companies 
-  (name, type, province, city, created_at, updated_at) 
-  VALUES ($1, $2, $3, $4, $5, $6) RETURNING id`, auto.Name, auto.Type, auto.Province, auto.City, auto.CreatedAt, auto.UpdatedAt).Scan(&autoID)
+	err = tx.QueryRow(`INSERT INTO empresas 
+  (nome, tipo, estado, cidade, data_criacao, data_atualizacao) 
+  VALUES ($1, $2, $3, $4, now(), now()) RETURNING id`, auto.Nome, auto.Tipo, auto.Estado, auto.Cidade).Scan(&autoID)
 	if err != nil {
-		log.Fatal().Err(err).Msg("Failed to insert company")
+		log.Fatal().Err(err).Msg("Failed to insert into empresas")
 	}
 	if err = tx.Commit(); err != nil {
 		log.Fatal().Err(err).Msg("Failed to commit transaction")
@@ -68,61 +68,63 @@ func main() {
 	if err != nil {
 		log.Fatal().Err(err).Msg("Failed to generate password hash")
 	}
-	users := []types.User{
+	usuarios := []types.Usuario{
 		{
-			Name:      "User Org",
+			Nome:      "User Org",
 			Email:     "org@test.com",
-			Password:  hash,
-			CompanyID: sql.NullInt64{Int64: orgID, Valid: true},
+			Senha:     hash,
+			EmpresaID: sql.NullInt64{Int64: orgID, Valid: true},
 		},
 		{
-			Name:      "User Auto",
+			Nome:      "User Auto",
 			Email:     "auto@test.com",
-			Password:  hash,
-			CompanyID: sql.NullInt64{Int64: autoID, Valid: true},
+			Senha:     hash,
+			EmpresaID: sql.NullInt64{Int64: autoID, Valid: true},
 		},
 		{
-			Name:      "User Standalone",
+			Nome:      "User Standalone",
 			Email:     "stand@test.com",
-			CompanyID: sql.NullInt64{Int64: 0, Valid: false},
-			Password:  hash,
+			EmpresaID: sql.NullInt64{Valid: false},
+			Senha:     hash,
 		},
 	}
 
 	tx = db.MustBegin()
-	for i, u := range users {
-		var userID int64
-		err = tx.QueryRow(`INSERT INTO users 
-	      (name, email, password, company_id, created_at, updated_at) 
-	      VALUES ($1, $2, $3, $4, now(), now()) RETURNING id`, u.Name, u.Email, u.Password, u.CompanyID).Scan(&userID)
+	for i, u := range usuarios {
+		var uID int64
+		err = tx.QueryRow(`INSERT INTO usuarios 
+	      (nome, email, senha, empresa_id, data_criacao, data_atualizacao) 
+	      VALUES ($1, $2, $3, $4, now(), now()) RETURNING id`, u.Nome, u.Email, u.Senha, u.EmpresaID).Scan(&uID)
 		if err != nil {
-			log.Fatal().Err(err).Msg("Failed to insert user")
+			log.Fatal().Err(err).Msg("Failed to insert into usuarios")
 		}
-		users[i].ID = userID
+		usuarios[i].ID = uID
 	}
 	if err = tx.Commit(); err != nil {
 		log.Fatal().Err(err).Msg("Failed to commit transaction")
 	}
 
-	setUserRoles(db, users)
-	autoCategoryIDs := seedAutoCategories(db)
-	seedBidding(db, orgID, autoCategoryIDs)
+	setUsuarioFuncoes(db, usuarios)
+	autoCategoriaIDs := seedAutoCategorias(db)
+	seedOrcamentos(db, orgID, autoCategoriaIDs)
 }
 
-func setUserRoles(db *sqlx.DB, users []types.User) {
+func setUsuarioFuncoes(db *sqlx.DB, usuarios []types.Usuario) {
 	var roleID int64
-	err := db.Get(&roleID, `SELECT id FROM roles WHERE name = 'ADMIN'`)
+	err := db.Get(&roleID, `SELECT id FROM funcoes WHERE nome = 'ADMIN'`)
 	if err != nil {
-		log.Fatal().Err(err).Msg("Failed to get role ID")
+		log.Fatal().Err(err).Msg("Failed to get funcao ID")
 	}
 
 	tx := db.MustBegin()
-	for _, u := range users {
-		_, err = tx.Exec(`INSERT INTO users_roles (user_id, role_id, created_at, updated_at) VALUES ($1, $2, now(), now())`,
+	for _, u := range usuarios {
+		_, err = tx.Exec(`INSERT INTO usuarios_funcoes 
+    (usuario_id, funcao_id, data_criacao, data_atualizacao) 
+    VALUES ($1, $2, now(), now())`,
 			u.ID, roleID)
 		if err != nil {
 			tx.Rollback()
-			log.Fatal().Err(err).Msg("Failed to insert user role")
+			log.Fatal().Err(err).Msg("Failed to insert into usuarios_funcoes")
 		}
 	}
 	if err = tx.Commit(); err != nil {
@@ -130,54 +132,81 @@ func setUserRoles(db *sqlx.DB, users []types.User) {
 	}
 }
 
-func seedBidding(db *sqlx.DB, orgID int64, categoryIDs []int64) {
-	var userID int64
-	err := db.Get(&userID, `SELECT id FROM users WHERE company_id = $1`, orgID)
+func seedOrcamentos(db *sqlx.DB, orgID int64, categoriaIDs []int64) {
+	var uID int64
+	err := db.Get(&uID, `SELECT id FROM usuarios WHERE empresa_id = $1`, orgID)
 	if err != nil {
-		log.Fatal().Err(err).Msg("Failed to get user")
+		log.Fatal().Err(err).Msg("Failed to get usuario")
 	}
 	for i := 1; i <= 34; i++ {
 
-		b := types.Bidding{
-			CompanyID:    orgID,
-			UserID:       userID,
-			CustomerName: fmt.Sprintf("Customer %d", i),
-			VehicleBrand: "Ford",
-			VehicleName:  fmt.Sprintf("Vehicle %d", i),
-			VehicleYear:  1990 + i,
-			VehicleColor: "Black",
-			Status:       getRandomStatus(),
-			CreatedAt:    time.Now().AddDate(0, 0, -i),
+		b := types.Orcamento{
+			EmpresaID:     orgID,
+			UsuarioID:     uID,
+			AssociadoNome: fmt.Sprintf("Associado %d", i),
+			VeiculoMarca:  "Ford",
+			VeiculoNome:   fmt.Sprintf("veiculo %d", i),
+			VeiculoAno:    1990 + i,
+			VeiculoCor:    "Preto",
+			Observacao:    "veiculo todo fudido",
+			Status:        getRandomStatus(),
+			DataCriacao:   time.Now().AddDate(0, 0, -i),
 		}
 
-		bi := []types.BiddingItem{
-			{Description: sql.NullString{String: fmt.Sprintf("Description %d", i)}, AutoCategoryID: categoryIDs[0]},
-			{Description: sql.NullString{String: fmt.Sprintf("Description %d", i)}, AutoCategoryID: categoryIDs[1]},
-			{Description: sql.NullString{String: fmt.Sprintf("Description %d", i)}, AutoCategoryID: categoryIDs[2]},
-			{Description: sql.NullString{String: fmt.Sprintf("Description %d", i)}, AutoCategoryID: categoryIDs[3]},
-			{Description: sql.NullString{String: fmt.Sprintf("Description %d", i)}, AutoCategoryID: categoryIDs[4]},
-			{Description: sql.NullString{String: fmt.Sprintf("Description %d", i)}, AutoCategoryID: categoryIDs[5]},
+		oi := []types.OrcamentoItem{
+			{
+				AutoCategoriaID: categoriaIDs[0],
+				Observacao:      "",
+				Status:          types.OrcamentoItemStatusAberto,
+			},
+			{
+				AutoCategoriaID: categoriaIDs[1],
+				Observacao:      "Uma observacao bem grande que passa de 30 caracteres.",
+				Status:          types.OrcamentoItemStatusPropostaAceita,
+			},
+			{
+				AutoCategoriaID: categoriaIDs[2],
+				Observacao:      "Uma observacao bem grande que passa de 30 caracteres.",
+				Status:          types.OrcamentoItemStatusPropostaRecebida,
+			},
+			{
+				AutoCategoriaID: categoriaIDs[3],
+				Observacao:      "",
+				Status:          types.OrcamentoItemStatusAberto,
+			},
+			{
+				AutoCategoriaID: categoriaIDs[4],
+				Observacao:      "",
+				Status:          types.OrcamentoItemStatusCancelado,
+			},
+			{
+				AutoCategoriaID: categoriaIDs[5],
+				Observacao:      "",
+				Status:          types.OrcamentoItemStatusAberto,
+			},
 		}
 
 		tx := db.MustBegin()
-		var biddingID int64
+		var orcamentoID int64
 		err := tx.QueryRow(`
-		INSERT INTO biddings (company_id, user_id, customer_name, vehicle_brand, vehicle_name, vehicle_year, vehicle_color, status, created_at)
-		VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
-		RETURNING id`, b.CompanyID, b.UserID, b.CustomerName, b.VehicleBrand, b.VehicleName, b.VehicleYear, b.VehicleColor, b.Status, b.CreatedAt).Scan(&biddingID)
+		INSERT INTO orcamentos (empresa_id, usuario_id, associado_nome, veiculo_marca, veiculo_nome, 
+    veiculo_ano, veiculo_cor, observacao, status, data_criacao, data_atualizacao)
+		VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, now())
+		RETURNING id`, b.EmpresaID, b.UsuarioID, b.AssociadoNome, b.VeiculoMarca, b.VeiculoNome, b.VeiculoAno,
+			b.VeiculoCor, b.Observacao, b.Status, b.DataCriacao).Scan(&orcamentoID)
 		if err != nil {
 			tx.Rollback()
-			log.Fatal().Err(err).Msg("Failed to insert bidding")
+			log.Fatal().Err(err).Msg("Failed to insert into orcamentos")
 		}
 
-		for _, item := range bi {
-			item.BiddingID = biddingID
+		for _, item := range oi {
+			item.OrcamentoID = orcamentoID
 			_, err := tx.Exec(`
-			INSERT INTO bidding_items (bidding_id, description, auto_category_id)
-			VALUES ($1, $2, $3)`, item.BiddingID, item.Description, item.AutoCategoryID)
+			INSERT INTO orcamento_itens (orcamento_id, auto_categoria_id, observacao, status)
+			VALUES ($1, $2, $3, $4)`, item.OrcamentoID, item.AutoCategoriaID, item.Observacao, item.Status)
 			if err != nil {
 				tx.Rollback()
-				log.Fatal().Err(err).Msg("Failed to insert bidding item")
+				log.Fatal().Err(err).Msg("Failed to insert into orcamento_itens")
 			}
 		}
 
@@ -187,24 +216,24 @@ func seedBidding(db *sqlx.DB, orgID int64, categoryIDs []int64) {
 	}
 }
 
-func getRandomStatus() types.BiddingStatus {
-	statuses := []types.BiddingStatus{
-		types.BiddingStatusAwaitingOffers,
-		types.BiddingStatusPending,
-		types.BiddingStatusFinished,
-		types.BiddingStatusCanceled,
+func getRandomStatus() types.OrcamentoStatus {
+	status := []types.OrcamentoStatus{
+		types.OrcamentoStatusAguardandoProposta,
+		types.OrcamentoStatusPendente,
+		types.OrcamentoStatusFinalizado,
+		types.OrcamentoStatusCancelado,
 	}
-	return statuses[rand.Intn(len(statuses))]
+	return status[rand.Intn(len(status))]
 }
 
-func seedAutoCategories(db *sqlx.DB) []int64 {
-	autoCategories := []types.AutoCategory{
-		{Name: "Lanternagem", Type: types.CategoryTypeService},
-		{Name: "Pintura", Type: types.CategoryTypeService},
-		{Name: "Mecânica", Type: types.CategoryTypeService},
-		{Name: "Parachoque", Type: types.CategoryTypeProduct},
-		{Name: "Retrovisor", Type: types.CategoryTypeProduct},
-		{Name: "Porta", Type: types.CategoryTypeProduct},
+func seedAutoCategorias(db *sqlx.DB) []int64 {
+	autoCategorias := []types.AutoCategoria{
+		{Descricao: "Lanternagem", Tipo: types.AutoCategoriaTipoServico},
+		{Descricao: "Pintura", Tipo: types.AutoCategoriaTipoServico},
+		{Descricao: "Mecânica", Tipo: types.AutoCategoriaTipoServico},
+		{Descricao: "Parachoque", Tipo: types.AutoCategoriaTipoProduto},
+		{Descricao: "Retrovisor", Tipo: types.AutoCategoriaTipoProduto},
+		{Descricao: "Porta", Tipo: types.AutoCategoriaTipoProduto},
 	}
 
 	tx, err := db.Beginx()
@@ -213,15 +242,15 @@ func seedAutoCategories(db *sqlx.DB) []int64 {
 	}
 	var autoCategoryIDs []int64
 
-	for _, c := range autoCategories {
+	for _, ac := range autoCategorias {
 		var autoCategoryID int64
 		err = tx.QueryRow(`
-			INSERT INTO auto_categories (name, type)
+			INSERT INTO auto_categorias (descricao, tipo)
 			VALUES ($1, $2)
-			RETURNING id`, c.Name, c.Type).Scan(&autoCategoryID)
+			RETURNING id`, ac.Descricao, ac.Tipo).Scan(&autoCategoryID)
 		if err != nil {
 			tx.Rollback()
-			log.Fatal().Err(err).Msg("Failed to insert category")
+			log.Fatal().Err(err).Msg("Failed to insert into auto_categorias")
 		}
 
 		autoCategoryIDs = append(autoCategoryIDs, autoCategoryID)
@@ -236,11 +265,11 @@ func seedAutoCategories(db *sqlx.DB) []int64 {
 
 func cleanUp(db *sqlx.DB) {
 	_, err := db.Exec(`
-		DELETE FROM users_roles;
-		DELETE FROM users;
-		DELETE FROM companies;
-		DELETE FROM auto_categories;
-		DELETE FROM biddings;
+		DELETE FROM usuarios_funcoes;
+		DELETE FROM usuarios;
+		DELETE FROM empresas;
+		DELETE FROM auto_categorias;
+		DELETE FROM orcamentos;
 	`)
 	if err != nil {
 		log.Fatal().Err(err).Msg("Failed to clean up database")

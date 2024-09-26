@@ -39,24 +39,35 @@ func main() {
 	indexHandler := handler.NewIndexHandler()
 	e.GET("/", indexHandler.Index)
 
-	policyHandler := handler.NewPolicyHandler()
-	e.GET("/politica-privacidade", policyHandler.Index)
+	politicaPrivacidadeHandler := handler.NewPoliticaPrivacidadeHandler()
+	e.GET("/politica-privacidade", politicaPrivacidadeHandler.Index)
 
-	userRepo := repo.NewPostgresUserRepository(db)
-	userSvc := svc.NewUserService(userRepo)
-	loginHandler := handler.NewLoginHandler(userSvc)
-	e.GET("/login", loginHandler.Index)
-	e.POST("/login", loginHandler.Create)
-	e.DELETE("/logout", loginHandler.Logout)
+	usuarioRepo := repo.NewPostgresUsuarioRepository(db)
+	usuarioSvc := svc.NewUsuarioService(usuarioRepo)
+	autenticacaoHandler := handler.NewAutenticacaoHandler(usuarioSvc)
+	e.GET("/entrar", autenticacaoHandler.Index)
+	e.POST("/entrar", autenticacaoHandler.Login)
+	e.DELETE("/sair", autenticacaoHandler.Logout)
 
-	biddingRepo := repo.NewPostgresBiddingRepository(db)
-	biddingSvc := svc.NewBiddingService(biddingRepo)
-	biddingHandler := handler.NewBiddingsHandler(biddingSvc)
+	orcamentoRepo := repo.NewPgOrcamentoRepository(db)
+	autoCategoriaRepo := repo.NewPgAutoCategoriaRepository(db)
+	orcamentoSvc := svc.NewOrcamentoService(orcamentoRepo, autoCategoriaRepo)
+	orcamentoHandler := handler.NewOrcamentoHandler(orcamentoSvc)
+
+	propostaRepo := repo.NewPgPropostaRepository(db)
+	propostaSvc := svc.NewPropostaService(propostaRepo)
+	propostaHandler := handler.NewPropostaHandler(propostaSvc)
 
 	authGroup := e.Group("")
-	authGroup.Use(middlewares.Authentication(userSvc))
-	authGroup.GET("/orcamentos", biddingHandler.Index)
-	authGroup.GET("/orcamentos/novo", biddingHandler.New)
+	authGroup.Use(middlewares.Autenticacao(usuarioSvc))
+
+	authGroup.GET("/orcamentos", orcamentoHandler.Index)
+	authGroup.GET("/orcamentos/novo", orcamentoHandler.Create)
+	authGroup.GET("/orcamentos/visualizar/:id", orcamentoHandler.Show)
+	authGroup.GET("/orcamentos/editar/:id", orcamentoHandler.Edit)
+	authGroup.POST("/orcamentos/salvar", orcamentoHandler.Save)
+
+	authGroup.GET("/propostas/item/:id", propostaHandler.GetPropostasByOrcamentoItemID)
 
 	port := os.Getenv("PORT")
 	if port == "" {

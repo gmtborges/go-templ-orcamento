@@ -1,0 +1,15 @@
+package views
+
+import "github.com/gmtborges/orcamento-auto/views/layouts"
+
+templ propostasIndexMetaTags() {
+	<meta name="description" content="Lista de propostas"/>
+}
+
+templ IndexPropostas() {
+	@layouts.Base("Orçamento Auto - Propostas", propostasIndexMetaTags()) {
+		@layouts.SideBarAuto() {
+			<div>propostas</div>
+		}
+	}
+}

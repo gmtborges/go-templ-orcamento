@@ -69,7 +69,7 @@ func LoginIndex(vm LoginIndexViewModel) templ.Component {
 				}()
 			}
 			ctx = templ.InitializeContext(ctx)
-			templ_7745c5c3_Err = templ.WriteWatchModeString(templ_7745c5c3_Buffer, 1)
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<div class=\"flex mt-44 flex-col justify-center px-6 lg:px-8\"><div class=\"sm:mx-auto sm:w-full sm:max-w-sm\"><img class=\"mx-auto h-36 w-auto\" :src=\"$store.darkMode ? &#39;/static/logo-full-dark.svg&#39; : &#39;/static/logo-full.svg&#39;\" alt=\"Orçamento Auto logo\"><h2 class=\"mt-2 text-center text-2xl font-bold leading-9 tracking-tight\">Entre em sua conta</h2></div><div class=\"mt-2 sm:mx-auto sm:w-full sm:max-w-sm\"><form class=\"space-y-6 w-full max-w-xs mx-auto\" action=\"/entrar\" method=\"POST\"><input name=\"email\" type=\"email\" autocomplete=\"email\" placeholder=\"E-mail\" value=\"")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -82,7 +82,7 @@ func LoginIndex(vm LoginIndexViewModel) templ.Component {
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templ.WriteWatchModeString(templ_7745c5c3_Buffer, 2)
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("\" class=\"flex w-full h-10 px-3 py-2 text-sm border rounded-md border-neutral-300 ring-offset-background placeholder:text-neutral-500 focus:border-neutral-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-neutral-400 disabled:cursor-not-allowed disabled:opacity-50\"><div class=\"flex flex-col\"><input name=\"password\" type=\"password\" placeholder=\"Senha\" value=\"")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -95,12 +95,12 @@ func LoginIndex(vm LoginIndexViewModel) templ.Component {
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templ.WriteWatchModeString(templ_7745c5c3_Buffer, 3)
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("\" class=\"flex w-full h-10 px-3 py-2 text-sm border rounded-md border-neutral-300 ring-offset-background placeholder:text-neutral-500 focus:border-neutral-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-neutral-400 disabled:cursor-not-allowed disabled:opacity-50\"> <a href=\"#\" class=\"font-semibold text-sm self-end mt-1\">Esqueceu a senha?</a></div><div class=\"w-full max-w-xs mx-auto\"><button type=\"submit\" class=\"btn btn-primary btn-block text-lg\">Entrar</button></div></form><p class=\"mt-4 text-center text-sm\"><a href=\"/\" class=\"font-semibold leading-6\">Voltar para o início</a></p><div class=\"mt-4\">")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			for _, v := range vm.Warnings {
-				templ_7745c5c3_Err = templ.WriteWatchModeString(templ_7745c5c3_Buffer, 4)
+				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<ul class=\"flex justify-center text-warning font-bold p-2 py-1 my-2\"><li>")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
@@ -113,13 +113,13 @@ func LoginIndex(vm LoginIndexViewModel) templ.Component {
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				templ_7745c5c3_Err = templ.WriteWatchModeString(templ_7745c5c3_Buffer, 5)
+				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</li></ul>")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
 			}
 			for _, v := range vm.Errors {
-				templ_7745c5c3_Err = templ.WriteWatchModeString(templ_7745c5c3_Buffer, 6)
+				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<ul class=\"flex justify-center text-error font-bold p-2 py-1 my-2\"><li>")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
@@ -132,12 +132,12 @@ func LoginIndex(vm LoginIndexViewModel) templ.Component {
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				templ_7745c5c3_Err = templ.WriteWatchModeString(templ_7745c5c3_Buffer, 7)
+				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</li></ul>")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
 			}
-			templ_7745c5c3_Err = templ.WriteWatchModeString(templ_7745c5c3_Buffer, 8)
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</div></div></div><script>\n    function getTheme() {\n      return {\n        getThemeFromPreferences() {\n          const storedTheme = localStorage.getItem('theme');\n          if (storedTheme) {\n            this.isDark = (storedTheme === 'dark');\n          }\n          else {\n            const theme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';\n            this.isDark = (theme === 'dark');\n          }\n        }\n      }\n    }\n  </script>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}

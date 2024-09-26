@@ -2,24 +2,36 @@ package types
 
 import "time"
 
-type AutoOffer struct {
-	ID           int64     `db:"id"`
-	BiddingID    int64     `db:"bidding_id"`
-	OfferDetails string    `db:"offer_details"`
-	OfferDate    time.Time `db:"offer_date"`
-	CreatedAt    time.Time `db:"created_at"`
-	UpdatedAt    time.Time `db:"updated_at"`
+type Proposta struct {
+	ID              int64
+	OrcamentoItemID int64 `db:"orcamento_item_id"`
+	EmpresaID       int64 `db:"empresa_id"`
+	Detalhes        string
+	Preco           float32
+	Aceita          bool
+	DataCriacao     time.Time `db:"data_criacao"`
+	DataAtualizacao time.Time `db:"data_atualizacao"`
 }
 
-type CategoryType string
+type PropostaModel struct {
+	Proposta
+	EmpresaNome string `db:"empresa_nome"`
+}
+
+type PropostaOrcamentoItensViewModel struct {
+	Propostas []PropostaModel
+	Errors    map[string]string
+}
+
+type AutoCategoriaTipo string
 
 const (
-	CategoryTypeProduct CategoryType = "PRODUCT"
-	CategoryTypeService CategoryType = "SERVICE"
+	AutoCategoriaTipoProduto AutoCategoriaTipo = "PRODUTO"
+	AutoCategoriaTipoServico AutoCategoriaTipo = "SERVICO"
 )
 
-type AutoCategory struct {
-	ID   int64
-	Name string
-	Type CategoryType
+type AutoCategoria struct {
+	ID        int64
+	Descricao string
+	Tipo      AutoCategoriaTipo
 }
