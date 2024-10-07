@@ -1,0 +1,28 @@
+package views
+
+import (
+	"fmt"
+
+	"github.com/gmtborges/orcamento-auto/views/layouts"
+	"github.com/gmtborges/orcamento-auto/types"
+)
+
+templ biddingEditMetaTags() {
+	<meta name="description" content="Editar orçamento"/>
+}
+
+templ BiddingEdit(vm types.BiddingShowViewModel) {
+	@layouts.Base("Orçamento Auto - Editar Orçamento", biddingEditMetaTags()) {
+		@layouts.SideBarOrg() {
+			<main class="flex flex-col items-center p-5">
+				<h1 class="font-bold text-4xl mb-10">Orçamentos</h1>
+				<a class="btn btn-primary px-10 self-end min-w-max text-lg font-semibold" href="/orcamentos/novo">
+					<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6">
+						<path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"></path>
+					</svg>
+					Orçamento { vm.VehicleName } / { fmt.Sprintf("%d", vm.VehicleYear) }
+				</a>
+			</main>
+		}
+	}
+}

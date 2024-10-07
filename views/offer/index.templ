@@ -1,0 +1,30 @@
+package views
+
+import (
+	"github.com/gmtborges/orcamento-auto/views/layouts"
+	"github.com/gmtborges/orcamento-auto/views/offer/partials"
+	"github.com/gmtborges/orcamento-auto/types"
+)
+
+templ offerIndexMetaTags() {
+	<meta name="description" content="Lista de Propostas"/>
+}
+
+templ OfferIndex(vm types.OfferIndexViewModel) {
+	@layouts.Base("Orçamento Auto - Propostas", offerIndexMetaTags()) {
+		@layouts.SideBarAuto() {
+			<main class="flex flex-col items-center p-5">
+				<h1 class="font-bold text-4xl mb-10">Propostas</h1>
+				if len(vm.Errors) > 0 {
+					<div class="flex justify-center items-center text-2xl alert alert-error mt-32 max-w-4xl min-w-max">
+						for _, error := range vm.Errors {
+							<p>{ error }</p>
+						}
+					</div>
+				} else {
+					@partials.OfferList(vm)
+				}
+			</main>
+		}
+	}
+}

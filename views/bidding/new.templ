@@ -1,0 +1,244 @@
+package views
+
+import (
+	"fmt"
+	"encoding/json"
+
+	"github.com/gmtborges/orcamento-auto/views/layouts"
+	"github.com/gmtborges/orcamento-auto/types"
+)
+
+templ biddingNewMetaTags() {
+	<meta name="description" content="Lista de orçamentos"/>
+}
+
+func vmToAlpine(vm types.BiddingCreateViewModel) string {
+	productJson, _ := json.Marshal(vm.AutoCategories["acProduct"])
+	serviceJson, _ := json.Marshal(vm.AutoCategories["acService"])
+	return fmt.Sprintf(`
+  {
+    items: [],
+    acType: "",
+    acID: "",
+    acDesc: "",
+    acNotes: "",
+    acProduct: %s,  
+    acService: %s,
+    addItem() {
+      this.items.push({
+        acType: this.acType,
+        acID: this.acID,
+        acDesc: this.acDesc,
+        acNotes: this.acNotes
+        });
+      this.acType = "";
+      this.acID = "";
+      this.acDesc = "";
+      this.acNotes = "";
+    }
+  }`,
+		productJson,
+		serviceJson,
+	)
+}
+
+templ selectVehicleColor() {
+	<select id="vehicleColor" name="vehicleColor" class="select select-bordered mb-5" required>
+		<option value="branco">Branco</option>
+		<option value="preto">Preto</option>
+		<option value="cinza">Cinza</option>
+		<option value="prata">Prata</option>
+		<option value="vermelho">Vermelho</option>
+		<option value="azul">Azul</option>
+		<option value="outro">Outro (informe na observação)</option>
+	</select>
+}
+
+templ BiddingNew(vm types.BiddingCreateViewModel) {
+	@layouts.Base("Orçamento Auto - Novo orçamento", biddingNewMetaTags()) {
+		@layouts.SideBarOrg() {
+			<div class="flex flex-col items-center mx-20 mt-6">
+				<h1 class="font-bold text-4xl mb-10">Novo orçamento</h1>
+				<main
+					x-data={ vmToAlpine(vm) }
+					class="mt-5 flex flex-col items-center w-full max-w-5xl"
+				>
+					<form
+						hx-boost="false"
+						action="/orcamentos/salvar"
+						method="POST"
+						class="flex flex-col bg-gray-50 dark:bg-gray-950 p-5 rounded-lg w-full mb-6"
+					>
+						<div class="flex flex-col lg:flex-row gap-10">
+							<div class="form-control w-full">
+								<label for="customerName" class="label">Nome do associado *</label>
+								<input
+									id="customerName"
+									name="customerName"
+									type="text"
+									class="input input-bordered mb-5"
+									placeholder="João da Silva"
+									value={ vm.CustomerName }
+									required
+								/>
+							</div>
+							<div class="form-control w-full">
+								<label for="vehicleBrand" class="label">Marca do veículo *</label>
+								<input
+									id="vehicleBrand"
+									name="vehicleBrand"
+									class="input input-bordered mb-5"
+									placeholder="Ford, Hyunday, Volkswagen ..."
+									value={ vm.VehicleBrand }
+									required
+								/>
+							</div>
+						</div>
+						<div class="flex flex-col lg:flex-row gap-10">
+							<div class="form-control w-full">
+								<label for="vehicleName" class="label">Nome do veículo *</label>
+								<input
+									id="vehicleName"
+									name="vehicleName"
+									type="text"
+									class="input input-bordered mb-5"
+									placeholder="Gol, Creta, Hilux ..."
+									value={ vm.VehicleName }
+									required
+								/>
+							</div>
+							<div class="form-control w-full">
+								<label for="vehicleYear" class="label">Ano do veículo *</label>
+								<input
+									id="vehicleYear"
+									name="vehicleYear"
+									class="input input-bordered mb-5"
+									type="number"
+									min="1950"
+									max="2024"
+									value={ fmt.Sprintf("%d", vm.VehicleYear) }
+									required
+								/>
+							</div>
+						</div>
+						<div class="flex flex-col lg:flex-row gap-10">
+							<div class="form-control w-full">
+								<label for="vehicleColor" class="label">Cor do veículo *</label>
+								@selectVehicleColor()
+							</div>
+							<div class="form-control w-full">
+								<label for="notes" class="label">Observação</label>
+								<textarea
+									id="notes"
+									name="notes"
+									class="textarea textarea-bordered mb-5"
+									rows="3"
+									placeholder="Alguma observação sobre o associado ou veículo."
+								></textarea>
+							</div>
+						</div>
+						<h2 class="font-bold text-2xl">Items</h2>
+						<p class="text-error font-bold my-2">{ vm.Errors["items"] }</p>
+						<div class="flex flex-col mt-5 overflow-y-auto max-h-64">
+							<table class="table table-zebra">
+								<thead class="text-base">
+									<tr>
+										<th>#</th>
+										<th>Tipo</th>
+										<th>Descrição</th>
+										<th>Observação</th>
+										<th>Remover</th>
+									</tr>
+								</thead>
+								<tbody>
+									<template x-for="(item, i) in items.reverse()">
+										<tr>
+											<td x-text="items.length - i"></td>
+											<td x-text="item.acType === 'service' ? 'Serviço' : 'Peça'"></td>
+											<td x-text="item.acDesc"></td>
+											<td x-text="item.acNotes"></td>
+											<td>
+												<button
+													class="text-error p-1 hover:bg-base-300 rounded"
+													@click="items = [...items.slice(i + 1), ...items.slice(0, i)]"
+												>
+													<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6">
+														<path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"></path>
+													</svg>
+												</button>
+											</td>
+										</tr>
+									</template>
+									<input
+										type="hidden"
+										name="items"
+										:value="JSON.stringify(items.map(i => ({ AutoCategoryID: parseInt(i.acID), Notes: i.acNotes })))"
+									/>
+								</tbody>
+							</table>
+						</div>
+						<div class="flex items-center mt-10 justify-end gap-4">
+							<p class="text-error font-bold">{ vm.Errors["db"] }</p>
+							<p class="text-error font-bold">{ vm.Errors["json"] }</p>
+							<button
+								class="text-lg self-end btn btn-wide btn-primary"
+								type="submit"
+								:disabled="!items.length"
+							>Salvar</button>
+						</div>
+					</form>
+					<div class="flex flex-col w-full rounded-lg bg-gray-50 dark:bg-gray-950 p-5">
+						<p class="text-error font-bold mb-2">{ vm.Errors["ac"] }</p>
+						<div class="flex flex-col gap-5 lg:flex-row w-full">
+							<select
+								name="acType"
+								class="select select-bordered mb-5 w-full lg:w-1/2"
+								x-model="acType"
+								@change="acID = ''"
+							>
+								<option value="" disabled selected>Selecione o tipo</option>
+								<option value="service">Serviço</option>
+								<option value="product">Peça</option>
+							</select>
+							<select
+								name="descItem"
+								class="select select-bordered mb-5 w-full"
+								x-model="acID"
+								@change="acDesc = $el.options[$el.selectedIndex].innerHTML"
+							>
+								<option value="" disabled selected>Selecione o serviço ou peça</option>
+								<template x-if="acType === 'service'">
+									<template x-for="ac in acService">
+										<option :value="ac.ID" x-text="ac.Description"></option>
+									</template>
+								</template>
+								<template x-if="acType === 'product'">
+									<template x-for="ac in acProduct">
+										<option :value="ac.ID" x-text="ac.Description"></option>
+									</template>
+								</template>
+							</select>
+							<textarea
+								name="acNotes"
+								x-model="acNotes"
+								class="textarea textarea-bordered mb-5 w-full"
+								rows="1"
+								placeholder="Observação sobre o serviço ou peça"
+							></textarea>
+						</div>
+						<button
+							:disabled="acType == '' || acID == ''"
+							class="mt-2 btn btn-primary text-lg font-semibold"
+							@click="addItem()"
+						>
+							<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6">
+								<path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"></path>
+							</svg>
+							Adicionar item no orçamento
+						</button>
+					</div>
+				</main>
+			</div>
+		}
+	}
+}

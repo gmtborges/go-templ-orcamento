@@ -15,7 +15,7 @@ templ Base(title string, metaTags templ.Component) {
 			<title>{ title }</title>
 			@metaTags
 		</head>
-		<body x-init="setTheme" class="h-svh">
+		<body x-init="setTheme">
 			{ children... }
 		</body>
 		<script>

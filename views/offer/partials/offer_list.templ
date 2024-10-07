@@ -1,0 +1,104 @@
+package partials
+
+import (
+	"fmt"
+	"time"
+
+	"github.com/gmtborges/orcamento-auto/types"
+)
+
+func getAutoCategoryNameFromBiddingItems(biddingItems []types.BiddingItemModel) string {
+	var autoCategoryDesc string
+	if len(biddingItems) < 3 {
+		for i, item := range biddingItems {
+			if i > 0 {
+				autoCategoryDesc += ", "
+			}
+			autoCategoryDesc += item.AutoCategoryDescription
+		}
+	} else {
+		autoCategoryDesc = fmt.Sprintf("%s, %s, %s ...",
+			biddingItems[0].AutoCategoryDescription,
+			biddingItems[1].AutoCategoryDescription,
+			biddingItems[2].AutoCategoryDescription,
+		)
+	}
+	return autoCategoryDesc
+}
+
+templ biddingStatus(status types.BiddingStatus) {
+	switch status {
+		case types.BiddingStatusAwaitingOffer:
+			<td class="font-bold text-info">Aguardando proposta</td>
+		case types.BiddingStatusPending:
+			<td class="font-bold text-warning">Pendente</td>
+		case types.BiddingStatusFinished:
+			<td class="font-bold text-success">Finalizado</td>
+		case types.BiddingStatusCanceled:
+			<td class="font-bold text-error">Cancelado</td>
+	}
+}
+
+func formatRelativeTime(t time.Time) string {
+	now := time.Now()
+	diff := now.Sub(t)
+	if diff.Seconds() < 60 {
+		return fmt.Sprintf("agora a pouco")
+	}
+	if diff.Minutes() < 60 {
+		if int(diff.Minutes()) == 1 {
+			return fmt.Sprintf("1 minuto atrás")
+		}
+		return fmt.Sprintf("%d minutos atrás", int(diff.Minutes()))
+	}
+	if diff.Hours() < 24 {
+		if int(diff.Hours()) == 1 {
+			return fmt.Sprintf("1 hora atrás")
+		}
+		return fmt.Sprintf("%d horas atrás", int(diff.Hours()))
+	}
+	if diff.Hours() < 48 {
+		return fmt.Sprintf("ontem")
+	}
+	if diff.Hours() < 168 {
+		if int(diff.Hours()/24) == 1 {
+			return fmt.Sprintf("1 dia atrás")
+		}
+		return fmt.Sprintf("%d dias atrás", int(diff.Hours()/24))
+	}
+	if diff.Hours() < 720 {
+		if int(diff.Hours()/168) == 1 {
+			return fmt.Sprintf("1 semana atrás")
+		}
+		return fmt.Sprintf("%d semanas atrás", int(diff.Hours()/168))
+	}
+	if diff.Hours() < 8760 {
+		if int(diff.Hours()/720) == 1 {
+			return fmt.Sprintf("1 mês atrás")
+		}
+		return fmt.Sprintf("%d meses atrás", int(diff.Hours()/720))
+	}
+	return t.Format("02/01/2006")
+}
+
+templ OfferList(vm types.OfferIndexViewModel) {
+	<div id="bidding-table" class="flex flex-col w-full overflow-x-auto md:overflow-hidden">
+		<div class="min-w-[1200px] w-full">Carro agrupado com items do orçamento e propostas de cada item</div>
+		<div class="flex justify-end items-center gap-4">
+			<p class="mt-2">Total: { fmt.Sprintf("%d", vm.Count) }</p>
+			<div class="join mt-2">
+				for i := 1; i <= vm.TotalPages; i++ {
+					<button
+						class={ "join-item", "btn", templ.KV("btn-active", vm.CurrentPage == i) }
+						hx-get={ string(templ.URL(fmt.Sprintf("/propostas?p=%d", i))) }
+						hx-target="#bidding-table"
+						hx-swap="innerHTML"
+						hx-push-url="true"
+					>
+						{ fmt.Sprintf("%d", i) }
+					</button>
+				}
+			</div>
+		</div>
+	</div>
+}

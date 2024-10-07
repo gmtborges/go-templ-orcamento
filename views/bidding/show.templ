@@ -1,0 +1,187 @@
+package views
+
+import (
+	"fmt"
+
+	"github.com/gmtborges/orcamento-auto/views/layouts"
+	"github.com/gmtborges/orcamento-auto/types"
+)
+
+templ biddingShowMetaTags() {
+	<meta name="description" content="Visualizar orçamento"/>
+}
+
+templ biddingStatus(status types.BiddingStatus) {
+	switch status {
+		case types.BiddingStatusAwaitingOffer:
+			<p class="font-bold text-info">Aguardando proposta</p>
+		case types.BiddingStatusPending:
+			<p class="font-bold text-warning">Pendente</p>
+		case types.BiddingStatusFinished:
+			<p class="font-bold text-success">Finalizado</p>
+		case types.BiddingStatusCanceled:
+			<p class="font-bold text-error">Cancelado</p>
+	}
+}
+
+templ formatBiddingItemStatus(status types.BiddingItemStatus) {
+	switch status {
+		case types.BiddingItemStatusOpen:
+			<p class="font-bold text-info">Aberto</p>
+		case types.BiddingItemStatusOfferAccepted:
+			<p class="font-bold text-success">Proposta aceita</p>
+		case types.BiddingItemStatusOfferReceived:
+			<p class="font-bold text-warning">Proposta recebida</p>
+		case types.BiddingItemStatusCanceled:
+			<p class="font-bold text-error">Cancelado</p>
+	}
+}
+
+func formatAutoCategoryType(categoryType string) string {
+	if categoryType == "SERVICE" {
+		return "Serviço"
+	}
+	return "Peça"
+}
+
+func trimNotes(notes string) string {
+	if len(notes) > 40 {
+		return notes[:40] + "..."
+	}
+	return notes
+}
+
+templ BiddingShow(vm types.BiddingShowViewModel) {
+	@layouts.Base("Orçamento Auto - Visualizar Orçamento", biddingShowMetaTags()) {
+		@layouts.SideBarOrg() {
+			<main class="flex flex-col items-center p-5">
+				if vm.Errors["404"] != "" {
+					<div class="mt-64 flex flex-col items-center justify-center">
+						<h1 class="text-7xl font-bold mb-5">404</h1>
+						<p class="text-2xl">Orçamento não encontrado. =(</p>
+					</div>
+				} else {
+					<h1 class="font-bold text-4xl mb-2">Orçamento </h1>
+					<h2 class="font-bold text-2xl mb-10">
+						{ vm.VehicleBrand } { vm.VehicleName } / { fmt.Sprintf("%d", vm.VehicleYear) }
+					</h2>
+					<section class="w-full max-w-5xl mx-auto bg-gray-50 dark:bg-gray-950 p-5 rounded-lg">
+						<div class="flex mb-4">
+							<div class="w-1/3">
+								<p class="font-bold">Nome</p>
+								<p>{ vm.CustomerName }</p>
+							</div>
+							<div>
+								<p class="font-bold">Cor do veículo</p>
+								<p>{ vm.VehicleColor }</p>
+							</div>
+						</div>
+						<div class="flex">
+							<div class="w-1/3">
+								<p class="font-bold">Status</p>
+								@biddingStatus(vm.Status)
+							</div>
+							<div>
+								<p class="font-bold">Observações</p>
+								<p>{ vm.Notes }</p>
+							</div>
+						</div>
+					</section>
+					<section class="w-full max-w-5xl mx-auto bg-gray-50 dark:bg-gray-950 p-5 rounded-lg mt-4">
+						<h2 class="text-xl font-bold">Itens do orçamento</h2>
+						for i, bi := range vm.Items {
+							<div x-data="{open: false}" class="my-2 border border-gray-200 dark:border-gray-800 p-3 min-w-max rounded-lg">
+								<div class="flex items-center">
+									<div class="w-1/4 mx-1">
+										<p>{ formatAutoCategoryType(bi.AutoCategoryType) }</p>
+									</div>
+									<div class="w-1/4 mx-2">
+										<p>
+											{ bi.AutoCategoryDescription }
+										</p>
+									</div>
+									<div class="w-1/5 mx-2">
+										<button
+											hx-get={ string(templ.URL(fmt.Sprintf("/propostas/item/%d", bi.ID))) }
+											hx-target="#offers-table"
+											hx-swap="innerHTML"
+											class="link link-secondary"
+										>
+											Propostas
+										</button>
+									</div>
+									<div class="w-1/5 mx-2">
+										@formatBiddingItemStatus(bi.Status)
+									</div>
+									<template x-if="!open">
+										<label
+											class="h-8 flex items-center justify-center cursor-pointer"
+											for={ fmt.Sprintf("item-%d", i) }
+										>
+											<svg
+												mlns="http://www.w3.org/2000/svg"
+												fill="none"
+												viewBox="0 0 24 24"
+												stroke-width="1.5"
+												stroke="currentColor"
+												class="size-5"
+											>
+												<path stroke-linecap="round" stroke-linejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5"></path>
+											</svg>
+											<input
+												class="appearance-none"
+												type="checkbox"
+												id={ fmt.Sprintf("item-%d", i) }
+												name={ fmt.Sprintf("item-%d", i) }
+												x-model="open"
+											/>
+										</label>
+									</template>
+									<template x-if="open">
+										<label
+											class="h-8 flex items-center justify-center cursor-pointer"
+											for={ fmt.Sprintf("item-%d", i) }
+										>
+											<svg
+												mlns="http://www.w3.org/2000/svg"
+												fill="none"
+												viewBox="0 0 24 24"
+												stroke-width="1.5"
+												stroke="currentColor"
+												class="size-5"
+											>
+												<path stroke-linecap="round" stroke-linejoin="round" d="m4.5 15.75 7.5-7.5 7.5 7.5"></path>
+											</svg>
+											<input
+												class="appearance-none"
+												type="checkbox"
+												id={ fmt.Sprintf("item-%d", i) }
+												name={ fmt.Sprintf("item-%d", i) }
+												x-model="open"
+											/>
+										</label>
+									</template>
+								</div>
+								<template x-if="open" class="collapse-content">
+									<p class="mt-4">
+										if bi.Notes == "" {
+											Sem Observações
+										} else {
+											{ bi.Notes }
+										}
+									</p>
+								</template>
+							</div>
+						}
+					</section>
+					<section class="w-full flex flex-col items-center max-w-5xl mx-auto bg-gray-50 dark:bg-gray-950 p-5 rounded-lg mt-4">
+						<h2 class="text-xl font-bold mb-5">Propostas</h2>
+						<div id="offers-table">
+							<p>Clique em Propostas para visulizá-las aqui</p>
+						</div>
+					</section>
+				}
+			</main>
+		}
+	}
+}

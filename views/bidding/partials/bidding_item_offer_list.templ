@@ -1,0 +1,30 @@
+package partials
+
+import (
+	"fmt"
+
+	"github.com/gmtborges/orcamento-auto/types"
+)
+
+templ BiddingItemOfferList(vm types.BiddingItemOffersViewModel) {
+	<table class="table table-zebra">
+		<thead>
+			<tr>
+				<th>Empresa</th>
+				<th>Detalhes</th>
+				<th>Estimativa de preço</th>
+				<th>Aceita</th>
+			</tr>
+		</thead>
+		<tbody>
+			for _, o := range vm.Offers {
+				<tr>
+					<td>{ o.CompanyName }</td>
+					<td>{ o.Notes }</td>
+					<td>{ fmt.Sprintf("%f", o.Price) }</td>
+					<td>{ fmt.Sprintf("%v", o.Accepted) }</td>
+				</tr>
+			}
+		</tbody>
+	</table>
+}

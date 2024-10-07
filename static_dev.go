@@ -1,6 +1,6 @@
 //go:build dev
 
-package main
+package static
 
 import (
 	"fmt"
@@ -8,7 +8,7 @@ import (
 	"os"
 )
 
-func static() http.Handler {
+func Serve() http.Handler {
 	fmt.Println("building static files for development...")
 	return http.StripPrefix("/static/", http.FileServerFS(os.DirFS("static")))
 }

@@ -27,10 +27,10 @@ tidy:
 	go mod tidy
 
 css:
-	npx tailwindcss -i ./assets/input.css -o ./static/output.css --minify
+	npx tailwindcss -i ./css/input.css -o ./static/output.css --minify
 
 css-watch:
-	npx tailwindcss --watch -i ./assets/input.css -o ./static/output.css
+	npx tailwindcss --watch -i ./css/input.css -o ./static/output.css
 
 templ:
 	templ generate
