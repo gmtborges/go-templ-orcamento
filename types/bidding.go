@@ -25,6 +25,7 @@ const (
 type Bidding struct {
 	ID           int64
 	CompanyID    int64  `db:"company_id"`
+	CompanyPhone string `db:"company_phone"`
 	UserID       int64  `db:"user_id"`
 	CustomerName string `db:"customer_name" form:"customerName"`
 	VehicleBrand string `db:"vehicle_brand" form:"vehicleBrand"`
@@ -38,64 +39,30 @@ type Bidding struct {
 }
 
 type BiddingItem struct {
-	ID             int64
-	BiddingID      int64 `db:"bidding_id"`
-	Notes          string
-	Status         BiddingItemStatus
-	AutoCategoryID int64     `db:"auto_category_id"`
-	CreatedAt      time.Time `db:"created_at"`
-	UpdatedAt      time.Time `db:"updated_at"`
+	ID                      int64
+	BiddingID               int64 `db:"bidding_id"`
+	Notes                   string
+	Status                  BiddingItemStatus
+	AutoCategoryID          int64     `db:"auto_category_id"`
+	AutoCategoryDescription string    `db:"auto_category_description"`
+	AutoCategoryType        string    `db:"auto_category_type"`
+	CreatedAt               time.Time `db:"created_at"`
+	UpdatedAt               time.Time `db:"updated_at"`
 }
 
-type BiddingItemModel struct {
+type BiddingItemOffers struct {
 	BiddingItem
-	AutoCategoryDescription string `db:"auto_category_description"`
-	AutoCategoryType        string `db:"auto_category_type"`
+	Offers []Offer
 }
 
-type BiddingItemOfferModel struct {
-	BiddingItem
-	Offer
-}
-
-type BiddingModel struct {
+type BiddingBiddingItems struct {
 	Bidding
-	Items []BiddingItemModel
+	Items []BiddingItem
 }
 
-type BiddingAutoModel struct {
+type BiddingBiddingItemsOffers struct {
 	Bidding
-	Items []BiddingItemOfferModel
-}
-
-type BiddingResultSet struct {
-	Count int
-	Data  []BiddingModel
-}
-
-type BiddingAutoResultSet struct {
-	Count int
-	Data  []BiddingAutoModel
-}
-
-type BiddingIndexViewModel struct {
-	Count       int
-	CurrentPage int
-	TotalPages  int
-	SeqNumber   int
-	Biddings    []BiddingModel
-	Errors      []string
-}
-
-type BiddingCreateViewModel struct {
-	BiddingModel
-	AutoCategories map[string][]AutoCategory
-	Errors         map[string]string
-}
-
-type BiddingShowViewModel struct {
-	BiddingModel
-	Errors map[string]string
+	Items []BiddingItemOffers
 }
 
 type BiddingFilters struct {
@@ -107,7 +74,37 @@ type BiddingFilters struct {
 	SearchTerm string
 }
 
+type BiddingResultSet struct {
+	Count int
+	Data  []BiddingBiddingItems
+}
+
+type BiddingAutoResultSet struct {
+	Count int
+	Data  []BiddingBiddingItemsOffers
+}
+
+type BiddingIndexViewModel struct {
+	Count       int
+	CurrentPage int
+	TotalPages  int
+	SeqNumber   int
+	Biddings    []BiddingBiddingItems
+	Errors      []string
+}
+
+type BiddingNewViewModel struct {
+	BiddingBiddingItems
+	AutoCategories map[string][]AutoCategory
+	Errors         map[string]string
+}
+
+type BiddingShowViewModel struct {
+	BiddingBiddingItems
+	Errors map[string]string
+}
+
 type BiddingItemOffersViewModel struct {
-	Offers []OfferModel
+	Offers []Offer
 	Errors map[string]string
 }

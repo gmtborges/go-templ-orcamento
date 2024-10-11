@@ -28,22 +28,25 @@ func main() {
 
 	companies := []types.Company{
 		{
-			Name:  "Org",
-			Type:  types.CompanyTypeOrg,
-			State: "GO",
-			City:  "Goiania",
+			Name:      "Org",
+			Type:      types.CompanyTypeOrg,
+			State:     "GO",
+			City:      "Goiania",
+			Telephone: "62998765432",
 		},
 		{
-			Name:  "Auto Product",
-			Type:  types.CompanyTypeAuto,
-			State: "GO",
-			City:  "Goiania",
+			Name:      "Auto Service",
+			Type:      types.CompanyTypeAuto,
+			State:     "GO",
+			City:      "Goiania",
+			Telephone: "62998765432",
 		},
 		{
-			Name:  "Auto Service",
-			Type:  types.CompanyTypeAuto,
-			State: "GO",
-			City:  "Goiania",
+			Name:      "Auto Product",
+			Type:      types.CompanyTypeAuto,
+			State:     "GO",
+			City:      "Goiania",
+			Telephone: "62998765432",
 		},
 	}
 
@@ -51,8 +54,10 @@ func main() {
 	for i, c := range companies {
 		var id int64
 		err := tx.QueryRow(`INSERT INTO companies 
-    (name, type, state, city, created_at, updated_at) 
-    VALUES ($1, $2, $3, $4, now(), now()) RETURNING id`, c.Name, c.Type, c.State, c.City).Scan(&id)
+    (name, type, state, city, telephone, created_at, updated_at) 
+    VALUES ($1, $2, $3, $4, $5, now(), now()) 
+    RETURNING id;
+    `, c.Name, c.Type, c.State, c.City, c.Telephone).Scan(&id)
 		if err != nil {
 			log.Fatal().Err(err).Msg("Failed to insert into companies")
 		}
@@ -98,7 +103,9 @@ func main() {
 		var userID int64
 		err = tx.QueryRow(`INSERT INTO users 
 	      (name, email, password, company_id, created_at, updated_at) 
-	      VALUES ($1, $2, $3, $4, now(), now()) RETURNING id`, u.Name, u.Email, u.Password, u.CompanyID).Scan(&userID)
+	      VALUES ($1, $2, $3, $4, now(), now()) 
+        RETURNING id;
+        `, u.Name, u.Email, u.Password, u.CompanyID).Scan(&userID)
 		if err != nil {
 			log.Fatal().Err(err).Msg("Failed to insert into users")
 		}
@@ -110,22 +117,25 @@ func main() {
 
 	setUserRoles(db, users)
 	autoCategoryIDs := seedAutoCategories(db)
+	autoCategoriesCompanies := map[int64][]int64{
+		companies[1].ID: autoCategoryIDs[:3],
+		companies[2].ID: autoCategoryIDs[3:],
+	}
+	joinAutoCategoriesCompanies(db, autoCategoriesCompanies)
 	seedBiddings(db, companies[0].ID, autoCategoryIDs)
 }
 
 func setUserRoles(db *sqlx.DB, users []types.User) {
 	var roleID int64
-	err := db.Get(&roleID, `SELECT id FROM roles WHERE name = 'ADMIN' LIMIT 1`)
+	err := db.Get(&roleID, `SELECT id FROM roles WHERE name = 'ADMIN' LIMIT 1;`)
 	if err != nil {
 		log.Fatal().Err(err).Msg("Failed to get roles")
 	}
 
 	tx := db.MustBegin()
 	for _, u := range users {
-		_, err = tx.Exec(`INSERT INTO users_roles 
-    (user_id, role_id, created_at, updated_at) 
-    VALUES ($1, $2, now(), now())`,
-			u.ID, roleID)
+		_, err = tx.Exec(`INSERT INTO users_roles (user_id, role_id, created_at, updated_at) 
+    VALUES ($1, $2, now(), now());`, u.ID, roleID)
 		if err != nil {
 			tx.Rollback()
 			log.Fatal().Err(err).Msg("Failed to insert into users_roles")
@@ -138,7 +148,7 @@ func setUserRoles(db *sqlx.DB, users []types.User) {
 
 func seedBiddings(db *sqlx.DB, orgID int64, categoryIDs []int64) {
 	var uID int64
-	err := db.Get(&uID, `SELECT id FROM users WHERE company_id = $1`, orgID)
+	err := db.Get(&uID, `SELECT id FROM users WHERE company_id = $1;`, orgID)
 	if err != nil {
 		log.Fatal().Err(err).Msg("Failed to get user")
 	}
@@ -196,7 +206,7 @@ func seedBiddings(db *sqlx.DB, orgID int64, categoryIDs []int64) {
 		INSERT INTO biddings (company_id, user_id, customer_name, vehicle_brand, vehicle_name, 
     vehicle_year, vehicle_color, notes, status, created_at, updated_at)
 		VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, now())
-		RETURNING id`, b.CompanyID, b.UserID, b.CustomerName, b.VehicleBrand, b.VehicleName, b.VehicleYear,
+		RETURNING id;`, b.CompanyID, b.UserID, b.CustomerName, b.VehicleBrand, b.VehicleName, b.VehicleYear,
 			b.VehicleColor, b.Notes, b.Status, b.CreatedAt).Scan(&biddingID)
 		if err != nil {
 			tx.Rollback()
@@ -207,7 +217,7 @@ func seedBiddings(db *sqlx.DB, orgID int64, categoryIDs []int64) {
 			item.BiddingID = biddingID
 			_, err := tx.Exec(`
 			INSERT INTO bidding_items (bidding_id, auto_category_id, notes, status)
-			VALUES ($1, $2, $3, $4)`, item.BiddingID, item.AutoCategoryID, item.Notes, item.Status)
+			VALUES ($1, $2, $3, $4);`, item.BiddingID, item.AutoCategoryID, item.Notes, item.Status)
 			if err != nil {
 				tx.Rollback()
 				log.Fatal().Err(err).Msg("Failed to insert into bidding_items")
@@ -251,7 +261,8 @@ func seedAutoCategories(db *sqlx.DB) []int64 {
 		err = tx.QueryRow(`
 			INSERT INTO auto_categories (description, type)
 			VALUES ($1, $2)
-			RETURNING id`, ac.Description, ac.Type).Scan(&autoCategoryID)
+			RETURNING id;
+      `, ac.Description, ac.Type).Scan(&autoCategoryID)
 		if err != nil {
 			tx.Rollback()
 			log.Fatal().Err(err).Msg("Failed to insert into auto_categories")
@@ -267,13 +278,29 @@ func seedAutoCategories(db *sqlx.DB) []int64 {
 	return autoCategoryIDs
 }
 
+func joinAutoCategoriesCompanies(db *sqlx.DB, autoCategoriesCompanies map[int64][]int64) {
+	tx, err := db.Beginx()
+	if err != nil {
+		log.Fatal().Err(err).Msg("Failed to start transaction for companies_auto_categories")
+	}
+	for k, acIDs := range autoCategoriesCompanies {
+		for _, acID := range acIDs {
+			tx.Exec(`INSERT INTO companies_auto_categories (company_id, auto_category_id) 
+      VALUES ($1, $2);`, k, acID)
+		}
+	}
+	if err := tx.Commit(); err != nil {
+		log.Fatal().Err(err).Msg("Failed to commit companies_auto_categories")
+	}
+}
+
 func cleanUp(db *sqlx.DB) {
 	_, err := db.Exec(`
 		DELETE FROM users_roles;
 		DELETE FROM users;
+    DELETE FROM companies_auto_categories;
 		DELETE FROM companies;
 		DELETE FROM auto_categories;
-    DELETE FROM companies_auto_categories;
 		DELETE FROM biddings;
 	`)
 	if err != nil {

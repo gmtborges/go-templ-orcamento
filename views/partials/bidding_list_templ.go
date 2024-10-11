@@ -15,7 +15,7 @@ import (
 	"github.com/gmtborges/orcamento-auto/types"
 )
 
-func getAutoCategoryNameFromBiddingItems(biddingItems []types.BiddingItemModel) string {
+func getAutoCategoryNameFromBiddingItems(biddingItems []types.BiddingItem) string {
 	var autoCategoryDesc string
 	if len(biddingItems) < 3 {
 		for i, item := range biddingItems {
@@ -150,7 +150,7 @@ func BiddingList(vm types.BiddingIndexViewModel) templ.Component {
 			var templ_7745c5c3_Var3 string
 			templ_7745c5c3_Var3, templ_7745c5c3_Err = templ.JoinStringErrs(fmt.Sprintf("%d", vm.SeqNumber+i))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/bidding/partials/bidding_list.templ`, Line: 102, Col: 48}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/partials/bidding_list.templ`, Line: 102, Col: 48}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var3))
 			if templ_7745c5c3_Err != nil {
@@ -163,7 +163,7 @@ func BiddingList(vm types.BiddingIndexViewModel) templ.Component {
 			var templ_7745c5c3_Var4 string
 			templ_7745c5c3_Var4, templ_7745c5c3_Err = templ.JoinStringErrs(bidding.CustomerName)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/bidding/partials/bidding_list.templ`, Line: 103, Col: 33}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/partials/bidding_list.templ`, Line: 103, Col: 33}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var4))
 			if templ_7745c5c3_Err != nil {
@@ -176,7 +176,7 @@ func BiddingList(vm types.BiddingIndexViewModel) templ.Component {
 			var templ_7745c5c3_Var5 string
 			templ_7745c5c3_Var5, templ_7745c5c3_Err = templ.JoinStringErrs(bidding.VehicleName)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/bidding/partials/bidding_list.templ`, Line: 104, Col: 32}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/partials/bidding_list.templ`, Line: 104, Col: 32}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var5))
 			if templ_7745c5c3_Err != nil {
@@ -189,7 +189,7 @@ func BiddingList(vm types.BiddingIndexViewModel) templ.Component {
 			var templ_7745c5c3_Var6 string
 			templ_7745c5c3_Var6, templ_7745c5c3_Err = templ.JoinStringErrs(fmt.Sprintf("%d", bidding.VehicleYear))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/bidding/partials/bidding_list.templ`, Line: 104, Col: 77}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/partials/bidding_list.templ`, Line: 104, Col: 77}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var6))
 			if templ_7745c5c3_Err != nil {
@@ -202,7 +202,7 @@ func BiddingList(vm types.BiddingIndexViewModel) templ.Component {
 			var templ_7745c5c3_Var7 string
 			templ_7745c5c3_Var7, templ_7745c5c3_Err = templ.JoinStringErrs(getAutoCategoryNameFromBiddingItems(bidding.Items))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/bidding/partials/bidding_list.templ`, Line: 105, Col: 63}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/partials/bidding_list.templ`, Line: 105, Col: 63}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var7))
 			if templ_7745c5c3_Err != nil {
@@ -215,7 +215,7 @@ func BiddingList(vm types.BiddingIndexViewModel) templ.Component {
 			var templ_7745c5c3_Var8 string
 			templ_7745c5c3_Var8, templ_7745c5c3_Err = templ.JoinStringErrs(formatRelativeTime(bidding.CreatedAt))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/bidding/partials/bidding_list.templ`, Line: 106, Col: 50}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/partials/bidding_list.templ`, Line: 106, Col: 50}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var8))
 			if templ_7745c5c3_Err != nil {
@@ -259,7 +259,7 @@ func BiddingList(vm types.BiddingIndexViewModel) templ.Component {
 		var templ_7745c5c3_Var11 string
 		templ_7745c5c3_Var11, templ_7745c5c3_Err = templ.JoinStringErrs(fmt.Sprintf("%d", vm.Count))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/bidding/partials/bidding_list.templ`, Line: 135, Col: 55}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/partials/bidding_list.templ`, Line: 135, Col: 55}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var11))
 		if templ_7745c5c3_Err != nil {
@@ -282,7 +282,7 @@ func BiddingList(vm types.BiddingIndexViewModel) templ.Component {
 			var templ_7745c5c3_Var13 string
 			templ_7745c5c3_Var13, templ_7745c5c3_Err = templ.JoinStringErrs(templ.CSSClasses(templ_7745c5c3_Var12).String())
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/bidding/partials/bidding_list.templ`, Line: 1, Col: 0}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/partials/bidding_list.templ`, Line: 1, Col: 0}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var13))
 			if templ_7745c5c3_Err != nil {
@@ -295,7 +295,7 @@ func BiddingList(vm types.BiddingIndexViewModel) templ.Component {
 			var templ_7745c5c3_Var14 string
 			templ_7745c5c3_Var14, templ_7745c5c3_Err = templ.JoinStringErrs(string(templ.URL(fmt.Sprintf("/orcamentos?p=%d", i))))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/bidding/partials/bidding_list.templ`, Line: 140, Col: 68}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/partials/bidding_list.templ`, Line: 140, Col: 68}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var14))
 			if templ_7745c5c3_Err != nil {
@@ -308,7 +308,7 @@ func BiddingList(vm types.BiddingIndexViewModel) templ.Component {
 			var templ_7745c5c3_Var15 string
 			templ_7745c5c3_Var15, templ_7745c5c3_Err = templ.JoinStringErrs(fmt.Sprintf("%d", i))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/bidding/partials/bidding_list.templ`, Line: 145, Col: 28}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/partials/bidding_list.templ`, Line: 145, Col: 28}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var15))
 			if templ_7745c5c3_Err != nil {

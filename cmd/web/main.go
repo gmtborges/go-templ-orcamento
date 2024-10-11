@@ -57,7 +57,7 @@ func main() {
 
 	offerRepo := repos.NewPgOfferRepository(db)
 	offerSvc := services.NewOfferService(offerRepo)
-	offerHandler := handler.NewOfferHandler(offerSvc)
+	offerHandler := handler.NewOfferHandler(offerSvc, biddingSvc)
 
 	biddingGroup := e.Group("")
 	biddingGroup.Use(middlewares.Authentication(userSvc))

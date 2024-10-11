@@ -1,4 +1,4 @@
-package views
+package pages
 
 import (
 	"fmt"
@@ -12,7 +12,7 @@ templ biddingNewMetaTags() {
 	<meta name="description" content="Lista de orçamentos"/>
 }
 
-func vmToAlpine(vm types.BiddingCreateViewModel) string {
+func vmToAlpine(vm types.BiddingNewViewModel) string {
 	productJson, _ := json.Marshal(vm.AutoCategories["acProduct"])
 	serviceJson, _ := json.Marshal(vm.AutoCategories["acService"])
 	return fmt.Sprintf(`
@@ -54,7 +54,7 @@ templ selectVehicleColor() {
 	</select>
 }
 
-templ BiddingNew(vm types.BiddingCreateViewModel) {
+templ BiddingNew(vm types.BiddingNewViewModel) {
 	@layouts.Base("Orçamento Auto - Novo orçamento", biddingNewMetaTags()) {
 		@layouts.SideBarOrg() {
 			<div class="flex flex-col items-center mx-20 mt-6">

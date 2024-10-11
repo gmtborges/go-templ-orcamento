@@ -18,6 +18,6 @@ func NewOfferService(offerRepo repos.OfferRepository) *OfferService {
 func (s *OfferService) GetOfferByBiddingItemID(
 	ctx context.Context,
 	biddingItemID int64,
-) ([]types.OfferModel, error) {
+) ([]types.Offer, error) {
 	return s.offerRepo.GetOffersByBiddingItemID(ctx, biddingItemID)
 }

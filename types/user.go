@@ -28,3 +28,10 @@ type UserAuth struct {
 	Password    string
 	Roles       []string
 }
+
+type LoginIndexViewModel struct {
+	Email    string
+	Password string
+	Errors   []string
+	Warnings []string
+}

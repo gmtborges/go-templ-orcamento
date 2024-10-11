@@ -9,7 +9,7 @@ import (
 
 	"github.com/gmtborges/orcamento-auto/services"
 	"github.com/gmtborges/orcamento-auto/types"
-	"github.com/gmtborges/orcamento-auto/views/login"
+	"github.com/gmtborges/orcamento-auto/views/pages"
 )
 
 type AuthHandler struct {
@@ -21,7 +21,7 @@ func NewAuthHandler(userSvc *services.UserService) *AuthHandler {
 }
 
 func (h *AuthHandler) Index(c echo.Context) error {
-	return views.LoginIndex(views.LoginIndexViewModel{}).Render(c.Request().Context(), c.Response())
+	return pages.LoginIndex(types.LoginIndexViewModel{}).Render(c.Request().Context(), c.Response())
 }
 
 func (h *AuthHandler) Login(c echo.Context) error {
@@ -31,16 +31,16 @@ func (h *AuthHandler) Login(c echo.Context) error {
 	user, err := h.userSvc.GetUserByEmail(c.Request().Context(), email)
 	if err == sql.ErrNoRows {
 		c.Response().WriteHeader(http.StatusBadRequest)
-		return views.LoginIndex(
-			views.LoginIndexViewModel{
+		return pages.LoginIndex(
+			types.LoginIndexViewModel{
 				Email:    email,
 				Warnings: []string{"E-mail e/ou senha incorretos"},
 			}).Render(c.Request().Context(), c.Response())
 	}
 	if err != nil {
 		c.Response().WriteHeader(http.StatusInternalServerError)
-		return views.LoginIndex(
-			views.LoginIndexViewModel{
+		return pages.LoginIndex(
+			types.LoginIndexViewModel{
 				Email:  email,
 				Errors: []string{"Erro ao realizar login. Tente novamente mais tarde."},
 			}).Render(c.Request().Context(), c.Response())
@@ -50,8 +50,8 @@ func (h *AuthHandler) Login(c echo.Context) error {
 	if err != nil {
 		c.Response().WriteHeader(http.StatusBadRequest)
 		warnings := []string{"E-mail e/ou senha incorretos"}
-		return views.LoginIndex(
-			views.LoginIndexViewModel{
+		return pages.LoginIndex(
+			types.LoginIndexViewModel{
 				Email:    email,
 				Warnings: warnings,
 			}).Render(c.Request().Context(), c.Response())
@@ -60,8 +60,8 @@ func (h *AuthHandler) Login(c echo.Context) error {
 	if !isValid {
 		c.Response().WriteHeader(http.StatusUnauthorized)
 		warnings := []string{"E-mail e/ou senha incorretos"}
-		return views.LoginIndex(
-			views.LoginIndexViewModel{
+		return pages.LoginIndex(
+			types.LoginIndexViewModel{
 				Email:    email,
 				Warnings: warnings,
 			}).Render(c.Request().Context(), c.Response())
@@ -71,8 +71,8 @@ func (h *AuthHandler) Login(c echo.Context) error {
 	if err != nil {
 		log.Error().Err(err).Msg("Failed to set session")
 		c.Response().WriteHeader(http.StatusInternalServerError)
-		return views.LoginIndex(
-			views.LoginIndexViewModel{
+		return pages.LoginIndex(
+			types.LoginIndexViewModel{
 				Email:  email,
 				Errors: []string{"Erro ao realizar login. Tente novamente mais tarde."},
 			}).Render(c.Request().Context(), c.Response())

@@ -27,6 +27,18 @@ func (s *BiddingService) GetAllBiddingsByCompanyID(
 	return s.biddingRepo.GetAllBiddingsByCompanyID(ctx, companyID, filters)
 }
 
+func (s *BiddingService) GetAllBiddingsByAutoCategoryIDs(
+	ctx context.Context,
+	companyID int64,
+	filters types.BiddingFilters,
+) (*types.BiddingAutoResultSet, error) {
+	acIDs, err := s.autoCategoryRepo.GetAllAutoCategoryIDsByCompanyID(ctx, companyID)
+	if err != nil {
+		return nil, err
+	}
+	return s.biddingRepo.GetAllBiddingsByAutoCategoryIDs(ctx, acIDs, filters)
+}
+
 func (s *BiddingService) CreateBidding(
 	ctx context.Context,
 	userID, companyID int64,
@@ -36,7 +48,7 @@ func (s *BiddingService) CreateBidding(
 	return s.biddingRepo.CreateBidding(ctx, userID, companyID, bidding, biddingItems)
 }
 
-func (s *BiddingService) GetBidding(ctx context.Context, biddingID int64) (*types.BiddingModel, error) {
+func (s *BiddingService) GetBidding(ctx context.Context, biddingID int64) (*types.BiddingBiddingItems, error) {
 	return s.biddingRepo.GetBidding(ctx, biddingID)
 }
 

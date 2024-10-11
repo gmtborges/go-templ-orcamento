@@ -3,7 +3,7 @@ package handler
 import (
 	"github.com/labstack/echo/v4"
 
-	"github.com/gmtborges/orcamento-auto/views"
+	"github.com/gmtborges/orcamento-auto/views/pages"
 )
 
 type PolicyHandler struct{}
@@ -13,5 +13,5 @@ func NewPolicyHandler() *PolicyHandler {
 }
 
 func (h *PolicyHandler) Index(c echo.Context) error {
-	return views.PolicyIndex().Render(c.Request().Context(), c.Response())
+	return pages.PolicyIndex().Render(c.Request().Context(), c.Response())
 }

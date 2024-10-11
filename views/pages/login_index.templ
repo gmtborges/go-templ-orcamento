@@ -1,19 +1,15 @@
-package views
+package pages
 
-import "github.com/gmtborges/orcamento-auto/views/layouts"
+import (
+	"github.com/gmtborges/orcamento-auto/views/layouts"
+	"github.com/gmtborges/orcamento-auto/types"
+)
 
-type LoginIndexViewModel struct {
-	Email    string
-	Password string
-	Errors   []string
-	Warnings []string
+templ loginMetaTags() {
 }
 
-templ metaTags() {
-}
-
-templ LoginIndex(vm LoginIndexViewModel) {
-	@layouts.Base("Orçamento Auto - Entrar", metaTags()) {
+templ LoginIndex(vm types.LoginIndexViewModel) {
+	@layouts.Base("Orçamento Auto - Entrar", loginMetaTags()) {
 		<div class="flex mt-44 flex-col justify-center px-6 lg:px-8">
 			<div class="sm:mx-auto sm:w-full sm:max-w-sm">
 				<img class="mx-auto h-36 w-auto" :src="$store.darkMode ? '/static/logo-full-dark.svg' : '/static/logo-full.svg'" alt="Orçamento Auto logo"/>

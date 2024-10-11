@@ -1,0 +1,97 @@
+package partials
+
+import (
+	"fmt"
+	"regexp"
+
+	"github.com/gmtborges/orcamento-auto/types"
+)
+
+func formatAutoCategoryType(categoryType string) string {
+	if categoryType == "SERVICE" {
+		return "Serviço"
+	}
+	return "Peça"
+}
+
+func maskPhone(phone string) string {
+	re := regexp.MustCompile(`(\d{2})(\d{5})(\d{4})`)
+	maskedPhone := re.ReplaceAllString(phone, "($1) $2-$3")
+	return maskedPhone
+}
+
+templ OfferList(vm types.OfferIndexViewModel) {
+	<div id="offer-list" class="flex flex-col w-full overflow-x-auto md:overflow-hidden">
+		<div class="w-full max-w-5xl m-auto">
+			for _, b := range vm.Biddings {
+				<div class="mb-10 border p-2 rounded-lg border-gray-300 dark:border-gray-600">
+					<p class="text-2xl font-bold text-center">
+						{ b.VehicleBrand } { b.VehicleName } / { b.VehicleColor } / { fmt.Sprintf("%d", b.VehicleYear) }
+					</p>
+					for _, bi := range b.Items {
+						<div class="pt-2">
+							<div x-data class="odd:border-b pb-2 border-gray-300 dark:border-gray-600">
+								<div class="flex justify-between mb-2">
+									<p class="text-xl w-1/2">
+										<strong>{ formatAutoCategoryType(bi.AutoCategoryType) }:</strong> { bi.AutoCategoryDescription }
+									</p>
+									<p class="text-end min-h-10">{ bi.Notes }</p>
+								</div>
+								<div class="flex gap-6">
+									<button
+										class="cursor-pointer link-accent font-bold"
+										@click="openOffer = false; makeOffer = !makeOffer"
+									>
+										Fazer proposta
+									</button>
+									<button
+										class="cursor-pointer link-primary font-bold"
+										@click="$refs.openOffer.showModal()"
+									>
+										Ver propostas
+									</button>
+								</div>
+								<dialog x-ref="openOffer" class="modal modal-bottom sm:modal-middle">
+									<div class="modal-box">
+										if len(bi.Offers) > 0 {
+											for _, offer := range bi.Offers {
+												<p>Preço: { fmt.Sprintf("%v", offer.Price) }</p>
+											}
+										} else {
+											<p>Sem propostas até o momento.</p>
+										}
+									</div>
+									<form method="dialog" class="modal-backdrop">
+										<button>close</button>
+									</form>
+								</dialog>
+							</div>
+						</div>
+					}
+					<div class="flex flex-col items-end">
+						<p>
+							<strong>Contato para dúvidas: </strong>{ maskPhone(b.CompanyPhone) }
+						</p>
+						<p class="text-end w-2/3">{ b.Notes }</p>
+					</div>
+				</div>
+			}
+			<div class="flex justify-end items-center gap-4">
+				<p class="mt-2">Total: { fmt.Sprintf("%d", vm.Count) }</p>
+				<div class="join mt-2">
+					for i := 1; i <= vm.TotalPages; i++ {
+						<button
+							class={ "join-item", "btn", templ.KV("btn-active", vm.CurrentPage == i) }
+							hx-get={ string(templ.URL(fmt.Sprintf("/propostas?p=%d", i))) }
+							hx-target="#offer-list"
+							hx-swap="innerHTML"
+							hx-push-url="true"
+						>
+							{ fmt.Sprintf("%d", i) }
+						</button>
+					}
+				</div>
+			</div>
+		</div>
+	</div>
+}

@@ -16,7 +16,7 @@ type Company struct {
 	State     string
 	City      string
 	Address   string
-	Cellphone string
+	Telephone string
 	CreatedAt time.Time `db:"created_at"`
 	UpdatedAt time.Time `db:"updated_at"`
 }
